@@ -1,4 +1,4 @@
-package chord;
+package chord.model;
 
 /**
  * Hello world!

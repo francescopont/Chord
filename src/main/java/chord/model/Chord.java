@@ -1,4 +1,4 @@
-package chord;
+package chord.model;
 //DISCLAIMER
 //le note in italiano sono per spiegare il codice informalmente, le note in inglese sono documentazione definitiva
 //problemi che abbiamo ora: SINCRONIZZAZIONE

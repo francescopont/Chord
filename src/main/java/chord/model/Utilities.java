@@ -1,4 +1,4 @@
-package chord;
+package chord.model;
 
 // this class contains all the operations we need to run periodically on each node, and the code for the hash function
 import java.nio.charset.StandardCharsets;

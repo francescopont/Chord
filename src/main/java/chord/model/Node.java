@@ -1,8 +1,9 @@
-package chord;
+package chord.model;
 
 import java.util.*;
+import java.lang.*;
 
-class Node{
+public class Node{
     private NodeInfo nodeInfo;
     private String nodeidentifier;
     //attenzione: devo sincerarmi che queste liste mantengano l'ordine di inserimento
@@ -39,8 +40,6 @@ class Node{
         this.finger_table = new LinkedList<NodeInfo>();
         this.successor_list = new LinkedList<NodeInfo>();
         this.predecessor = null;
-
-
 
         //here I must contact myfriend
         //not implemented yet
@@ -95,6 +94,7 @@ class Node{
         //qua devo implementare la chiamata ricorsiva
         //e mi serve avere le API del socket layer
         return nodeInfo;
+
 
 
     }
