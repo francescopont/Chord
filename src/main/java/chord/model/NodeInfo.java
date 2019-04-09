@@ -1,7 +1,7 @@
-package chord;
+package chord.model;
 
 //è davvero molto utile: la usiamo ovunque, la consiglio
-class NodeInfo {
+public class NodeInfo {
 
     private String IPAddress;
     private int port;
