@@ -88,6 +88,7 @@ class Node{
             finger++;
         }
 
+
         //looking into the finger table
         //-2 because the counter starts from 0
         NodeInfo nodeInfo = this.finger_table.get(finger -2);

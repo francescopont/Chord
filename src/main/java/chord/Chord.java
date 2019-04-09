@@ -39,7 +39,10 @@ public class Chord{
                     throw new Exception("Port already in use!");
                 }
             }
+
+
             virtualnodes.add(new Node(new NodeInfo(IPAddress,port), new NodeInfo(knownIPAddress, knownPort)));
+
         }
 
 
