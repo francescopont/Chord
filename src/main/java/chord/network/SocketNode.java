@@ -10,16 +10,18 @@ import java.net.Socket;
 public class SocketNode implements Runnable {
     private chord.model.NodeInfo info;
     private Node node;
+    private boolean terminate;
 
     public SocketNode(NodeInfo info, Node node){
         this.info=info;
         this.node=node;
+        this.terminate = false;
     }
 
     @Override
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(info.getPort())) {
-            while (true) {
+            while (!terminate) {
                 Socket clientSocket = serverSocket.accept();
                 new Thread(new SocketHandler(node,clientSocket)).start();
             }
@@ -27,6 +29,12 @@ public class SocketNode implements Runnable {
             e.printStackTrace();
         }
     }
+
+    public void terminate(){
+        this.terminate = true;
+    }
+
+
 
 }
 

@@ -20,10 +20,8 @@ public class Node{
         //I need to computer the identifier associated to this node, given the key
         String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
         this.nodeidentifier = Utilities.hashfunction(key);
-
-
-        this.finger_table = new LinkedList<NodeInfo>();
-        this.successor_list = new LinkedList<NodeInfo>();
+        this.finger_table = new LinkedList<>();
+        this.successor_list = new LinkedList<>();
         this.predecessor = null;
 
     }

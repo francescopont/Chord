@@ -10,6 +10,8 @@ package chord.model;
 //nodeidentifier indica l'hash di key
 
 
+import chord.network.SocketNode;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -40,12 +42,14 @@ public class Chord{
                 }
             }
 
+            NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
+            NodeInfo knownnode = new NodeInfo(knownIPAddress,knownPort);
+            Node node = new Node(nodeInfo, knownnode);
 
-            virtualnodes.add(new Node(new NodeInfo(IPAddress,port), new NodeInfo(knownIPAddress, knownPort)));
+            virtualnodes.add(node);
+            new Thread(new SocketNode(nodeInfo,node)).start();
 
         }
-
-
 
     }
 
@@ -63,7 +67,11 @@ public class Chord{
                     throw new Exception("Port already in use!");
                 }
             }
-            virtualnodes.add(new Node(new NodeInfo(IPAddress,port)));
+
+            NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
+            Node node = new Node(nodeInfo);
+            virtualnodes.add(node);
+            new Thread(new SocketNode(nodeInfo,node)).start();
 
         }
     }
@@ -80,4 +88,7 @@ public class Chord{
         //dobbiamo accordarci su cosa debba ritornare?? una concat di ip e porta???
         return "not implemented yet";
     };
+
+
+
 }
