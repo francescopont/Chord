@@ -10,6 +10,8 @@ package chord.model;
 //nodeidentifier indica l'hash di key
 
 
+import chord.network.Message;
+import chord.network.Router;
 import chord.network.SocketNode;
 
 import java.util.LinkedList;
@@ -47,7 +49,7 @@ public class Chord{
             Node node = new Node(nodeInfo, knownnode);
 
             virtualnodes.add(node);
-            new Thread(new SocketNode(nodeInfo,node)).start();
+            Router.addnode(port);
 
         }
 
@@ -71,7 +73,7 @@ public class Chord{
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             Node node = new Node(nodeInfo);
             virtualnodes.add(node);
-            new Thread(new SocketNode(nodeInfo,node)).start();
+            Router.addnode(port);
 
         }
     }
@@ -88,6 +90,15 @@ public class Chord{
         //dobbiamo accordarci su cosa debba ritornare?? una concat di ip e porta???
         return "not implemented yet";
     };
+
+    public static void deliverMessage(int port, Message message){
+        for (Node virtualnode: virtualnodes){
+            if (virtualnode.getPort() == port){
+                MessageHandler handler = new MessageHandler(virtualnode,message);
+                new Thread(handler).start();
+            }
+        }
+    }
 
 
 

@@ -1,16 +1,15 @@
 package chord.network;
-
+//attenzione: rispetto a quanto scritto lunedì ho cambiato la semantica degli attributi
 public class Message {
     private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
-    private final boolean ack; //indica se è richiesto un ack o meno (succhia fra)
-    private final int id; //identificativo del messaggio per tenere traccia dell'ordine dei messaggi (incrementale non lo usano dal 1800)
+    private final boolean ack; //indica se è il messaggio è una risposta o no
+    private int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
 
     //passati da costruttore e non più modificabili
 
-    public Message(int type, boolean ack, int id){
+    public Message(int type, boolean ack){
         this.type=type;
         this.ack=ack;
-        this.id=id;
     }
 
     public int getType() {
@@ -23,6 +22,10 @@ public class Message {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
 

@@ -1,5 +1,6 @@
 package chord.network;
 
+import chord.model.Chord;
 import chord.model.Node;
 
 import java.io.IOException;
@@ -9,13 +10,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SocketHandler implements Runnable{
-    private Node node;
+    private int port;
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public SocketHandler(Node node, Socket socket){
-        this.node=node;
+    public SocketHandler(int port, Socket socket){
+        this.port = port;
         this.socket=socket;
     }
 
@@ -26,11 +27,13 @@ public class SocketHandler implements Runnable{
             in=new ObjectInputStream(socket.getInputStream());
             Message message= (Message) in.readObject();
             System.out.println("eccociiii");
-            new Thread(new MessageHandler(message)).start();
+            Chord.deliverMessage(this.port, message);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
+
 
 }
 

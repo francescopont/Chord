@@ -1,5 +1,7 @@
 package chord.model;
 
+import chord.network.Message;
+
 import java.util.*;
 import java.lang.*;
 
@@ -10,6 +12,9 @@ public class Node{
     private List<NodeInfo> finger_table;
     private List<NodeInfo> successor_list;
     private NodeInfo predecessor;
+
+    //riguardo le answers c'è un discorso da fare che però non mi è ancora del tutto chiaro
+    private Hashtable<Integer, Message> answers;
 
 
 
@@ -23,6 +28,7 @@ public class Node{
         this.finger_table = new LinkedList<>();
         this.successor_list = new LinkedList<>();
         this.predecessor = null;
+        this.answers = new Hashtable<>();
 
     }
 
@@ -38,6 +44,7 @@ public class Node{
         this.finger_table = new LinkedList<NodeInfo>();
         this.successor_list = new LinkedList<NodeInfo>();
         this.predecessor = null;
+        this.answers = new Hashtable<>();
 
         //here I must contact myfriend
         //not implemented yet

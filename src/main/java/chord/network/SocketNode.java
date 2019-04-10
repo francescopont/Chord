@@ -8,22 +8,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SocketNode implements Runnable {
-    private chord.model.NodeInfo info;
-    private Node node;
+    private int port;
     private boolean terminate;
 
-    public SocketNode(NodeInfo info, Node node){
-        this.info=info;
-        this.node=node;
+    public SocketNode(int port){
+        this.port = port;
         this.terminate = false;
     }
 
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(info.getPort())) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (!terminate) {
                 Socket clientSocket = serverSocket.accept();
-                new Thread(new SocketHandler(node,clientSocket)).start();
+                new Thread(new SocketHandler(port,clientSocket)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -34,7 +32,8 @@ public class SocketNode implements Runnable {
         this.terminate = true;
     }
 
-
-
+    public int getPort() {
+        return port;
+    }
 }
 

@@ -1,6 +1,8 @@
 package chord.model;
 
 // this class contains all the operations we need to run periodically on each node, and the code for the hash function
+
+// la COMPUTE FINGER è SBAGLIATA. E VA CORRETTA
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +14,7 @@ class Utilities extends TimerTask {
 
 
     public Utilities(List<Node> nodes){
+        //counter è usato dalla fix finger
         this.virtualnodes = nodes;
         counter++;
         if (counter > 16){
@@ -48,7 +51,7 @@ class Utilities extends TimerTask {
 
             // Convert hash bytes into StringBuffer
             for (int i = 0; i < 2; i++) {
-                String hex = Integer.toHexString(0xff & hash[i]);
+                String hex = Integer.toHexString(0xff &  hash[i]);
                 if (hex.length() == 1) hexHash.append('0');
                 hexHash.append(hex);
             }
