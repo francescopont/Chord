@@ -1,5 +1,6 @@
 package chord.model;
 //DISCLAIMER
+
 //le note in italiano sono per spiegare il codice informalmente, le note in inglese sono documentazione definitiva
 //problemi che abbiamo ora: SINCRONIZZAZIONE
 //dal momento che SHA-1 mappa su 160 bit, non possiamo usare nè gli int nè i long per rappresentare questi numeri,
@@ -8,6 +9,10 @@ package chord.model;
 //attenzione alla convenzione corretta:
 //key indica ip.concat(port)
 //nodeidentifier indica l'hash di key
+
+//TO DO
+//correggere hash table
+//cercar
 
 
 import chord.network.Message;

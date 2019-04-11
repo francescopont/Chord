@@ -6,6 +6,7 @@ public class Message {
     private int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
 
     //passati da costruttore e non più modificabili
+    // l'id viene preso da ticket e quindi è settato in seguito
 
     public Message(int type, boolean ack){
         this.type=type;
