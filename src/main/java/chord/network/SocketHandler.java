@@ -11,20 +11,20 @@ import java.net.Socket;
 
 public class SocketHandler implements Runnable{
     private int port;
-    private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public SocketHandler(int port, Socket socket){
+    public SocketHandler(int port, Socket socket) throws IOException{
         this.port = port;
-        this.socket=socket;
+        this.out = new ObjectOutputStream(socket.getOutputStream());
+        this.in = new ObjectInputStream(socket.getInputStream());
+
     }
 
 
     @Override
     public void run() {
         try {
-            in=new ObjectInputStream(socket.getInputStream());
             Message message= (Message) in.readObject();
             System.out.println("eccociiii");
             Chord.deliverMessage(this.port, message);
@@ -32,6 +32,15 @@ public class SocketHandler implements Runnable{
             e.printStackTrace();
         }
     }
+
+    public synchronized void sendMessage(Message message)throws IOException{
+        out.writeObject(message);
+        out.flush();
+    }
+
+
+
+
 
 
 
