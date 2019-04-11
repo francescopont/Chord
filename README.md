@@ -1,3 +1,3 @@
 # Chord
-Distributed systems' project
-Very cool people working on it
+Distributed systems' project. 
+Very cool people working on it!
