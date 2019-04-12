@@ -11,8 +11,7 @@ package chord.model;
 //nodeidentifier indica l'hash di key
 
 //TO DO
-//correggere hash table
-//cercar
+//robustness of code ( non available ports, etc...)
 
 
 import chord.network.Message;
@@ -44,7 +43,7 @@ public class Chord{
             }
             //questo codice è davvero necessario???
             for(Node node: virtualnodes){
-                if (node.getPort() == port){
+                if (node.getPort() == port) {
                     throw new Exception("Port already in use!");
                 }
             }

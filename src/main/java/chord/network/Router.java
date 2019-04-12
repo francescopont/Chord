@@ -6,6 +6,9 @@ import java.util.List;
 public class Router {
     private static List<SocketNode> nodes;
 
+    //don't let anyone instantiate this class
+    private Router(){};
+
     public static void addnode(int port){
         synchronized (nodes){
             if (nodes == null){
@@ -21,10 +24,15 @@ public class Router {
 
     }
 
-    //returns a ticket for that message
+    //returns the ticket for that message ( which is basically an incremental identifier)
     public static int sendMessage(int port, Message message){
         int ticket = Ticket.getTicket();
         message.setId(ticket);
+        for (SocketNode node: nodes){
+            if (node.getPort() == port){
+                node.sendMessage(message);
+            }
+        }
 
         //not implemented yet (how to send the message?)
         //the problem here is how to discover if I have already open a connection with the other node

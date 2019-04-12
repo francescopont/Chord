@@ -2,13 +2,13 @@ package chord.model;
 
 // this class contains all the operations we need to run periodically on each node, and the code for the hash function
 
-// la COMPUTE FINGER è SBAGLIATA. E VA CORRETTA
+// la COMPUTE FINGER dovrebbe essere stata corretta usando gli interi, ma non è stata testata
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.TimerTask;
-class Utilities extends TimerTask {
+public class Utilities extends TimerTask {
     private List<Node> virtualnodes;
     public static int counter=0;
 
@@ -49,7 +49,7 @@ class Utilities extends TimerTask {
             digest = MessageDigest.getInstance("SHA-1");
             hash = digest.digest(key.getBytes(StandardCharsets.UTF_8));
 
-            // Convert hash bytes into StringBuffer
+            // Convert hash bytes into StringBuffer ( via integer representation)
             for (int i = 0; i < 2; i++) {
                 String hex = Integer.toHexString(0xff &  hash[i]);
                 if (hex.length() == 1) hexHash.append('0');
@@ -65,19 +65,13 @@ class Utilities extends TimerTask {
     //conviene riconvertire la stringa in byte piuttosto che ricalcolare l'hash, che è un'operazione onerosa
     public static String computefinger(String nodeidentifier, int finger){
 
-        //reconverting the  string nodeidentifier in the  byte representation
-        byte[] hash = new byte[20];
+        //reconverting the  string nodeidentifier in the  integer representation
+        int[] hash = new int[20];
         int j=0;
         for (int i =0; i< nodeidentifier.length() -1; i= i+2){
             //every byte corresponds to two chars in the String representation
             String number = "" + nodeidentifier.charAt(i) + nodeidentifier.charAt(i+1);
-            try{
-
-                hash[j] = Byte.decode("0x"+number);
-            }catch(NumberFormatException e){
-                // in case of negative numbers
-                hash[j] = (byte) (-128 +Integer.parseInt(number,16) -128);
-            }
+            hash[j] = Integer.parseInt(number,16);
             j++;
         }
 
@@ -101,23 +95,24 @@ class Utilities extends TimerTask {
         //reconverting the hash in the String representation to return
         StringBuffer hexHash = new StringBuffer();
         for (int h = 0; h < hash.length; h++) {
-            String hex = Integer.toHexString(0xff & hash[h]);
+            String hex = Integer.toHexString(hash[h]);
             if (hex.length() == 1) hexHash.append('0');
             hexHash.append(hex);
         }
         return hexHash.toString();
     }
 
-    private static void recursion (byte hash[], int tosum, int i){
-        if (hash[i] + tosum <= 127){
-            hash[i] = (byte)(hash[i] + tosum);
+    private static void recursion (int hash[], int tosum, int i){
+        if (hash[i] + tosum <= 255){
+            hash[i] = hash[i] + tosum;
         }
         else{
             //in case we reach the maximum value in that byte
-            hash[i] = (byte) (hash[i] + tosum -128-128);
+            hash[i] =  (hash[i] + tosum -256);
             if(i >0){
                 recursion(hash,1, i-1);
             }
+            //se siamo al bit più grande è giusto che il riporto si perda
         }
     }
 

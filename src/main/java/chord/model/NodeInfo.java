@@ -7,7 +7,7 @@ public class NodeInfo {
     private int port;
 
     //only other classes from this library can create instances
-    protected NodeInfo(String IPAddress, int port){
+    public NodeInfo(String IPAddress, int port){
         this.IPAddress = IPAddress;
         this.port = port;
     }
