@@ -29,5 +29,4 @@ public class NodeInfo {
         return port;
     }
 
-
 }

@@ -101,8 +101,20 @@ public class Node{
         //e mi serve avere le API del socket layer
         return nodeInfo;
 
-
-
     }
+
+    //when you
+    public void initialize(){
+        for (int i = 0; i<16; i++) {
+            finger_table.add(this.nodeInfo);
+        }
+
+        for (int i=0; i<4; i++){
+            successor_list.add(this.nodeInfo);
+        }
+    }
+
+
+
 }
 

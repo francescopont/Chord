@@ -21,4 +21,12 @@ public class MessageHandler implements Runnable {
 
 
 //please put protocol of types here!!!
-// ........
+/*
+    ping 1
+    request of predecessor 2
+    find successor 3
+    notify 4
+
+    ack 0
+ */
+

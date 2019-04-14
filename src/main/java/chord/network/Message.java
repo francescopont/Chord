@@ -5,12 +5,12 @@ import chord.model.NodeInfo;
 
 import java.io.Serializable;
 
-//attenzione: rispetto a quanto scritto lunedì ho cambiato la semantica degli attributi
+
 public class Message implements Serializable{
 
     private final NodeInfo nodeInfo; //the destination address of this message
     private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
-    private final boolean ack; //indica se è il messaggio è una risposta o no
+    private final boolean ack; //indica se è il messaggio richiede una risposta
     private int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
 
     //passati da costruttore e non più modificabili

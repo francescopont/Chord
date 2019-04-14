@@ -55,6 +55,7 @@ public class Chord{
             virtualnodes.add(node);
             Router.addnode(port);
 
+
         }
 
     }
@@ -78,7 +79,7 @@ public class Chord{
             Node node = new Node(nodeInfo);
             virtualnodes.add(node);
             Router.addnode(port);
-
+            node.initialize();
         }
     }
 
