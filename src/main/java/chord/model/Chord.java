@@ -14,9 +14,8 @@ package chord.model;
 //robustness of code ( non available ports, etc...)
 
 
-import chord.network.Message;
+import chord.Messages.Message;
 import chord.network.Router;
-import chord.network.SocketNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -50,10 +49,11 @@ public class Chord{
 
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             NodeInfo knownnode = new NodeInfo(knownIPAddress,knownPort);
-            Node node = new Node(nodeInfo, knownnode);
+            Node node = new Node(nodeInfo);
 
             virtualnodes.add(node);
             Router.addnode(port);
+            node.initialize(knownnode);
 
 
         }

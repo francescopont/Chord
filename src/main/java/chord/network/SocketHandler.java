@@ -1,12 +1,11 @@
 package chord.network;
 
+import chord.Messages.Message;
 import chord.model.Chord;
-import chord.model.Node;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SocketHandler implements Runnable{

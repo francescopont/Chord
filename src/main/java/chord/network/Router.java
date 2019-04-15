@@ -1,5 +1,7 @@
 package chord.network;
 
+import chord.Messages.Message;
+
 import java.util.LinkedList;
 import java.util.List;
 

@@ -1,6 +1,8 @@
 package chord.model;
 
-import chord.network.Message;
+import chord.Messages.Message;
+import chord.network.Router;
+import chord.Messages.SuccessorAnswerMessage;
 
 import java.util.*;
 import java.lang.*;
@@ -12,13 +14,14 @@ public class Node{
     private List<NodeInfo> finger_table;
     private List<NodeInfo> successor_list;
     private NodeInfo predecessor;
+    private boolean initialized;
 
     //riguardo le answers c'è un discorso da fare che però non mi è ancora del tutto chiaro
     private Hashtable<Integer, Message> answers;
 
 
 
-    //this constructor is called when you CREATE a new Chord
+    //this constructor is called when you CREATE and when you JOIN a new Chord and when you JOIN an existent Chord
     public Node(NodeInfo me) {
         this.nodeInfo = me;
 
@@ -29,26 +32,10 @@ public class Node{
         this.successor_list = new LinkedList<>();
         this.predecessor = null;
         this.answers = new Hashtable<>();
+        this.initialized = false;
 
     }
 
-    //this constructor is called when you JOIN a Chord, given a known node
-    public Node(NodeInfo me, NodeInfo myfriend){
-        this.nodeInfo = me;
-
-        //I need to computer the identifier associated to this node, given the key
-        String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
-        this.nodeidentifier = Utilities.hashfunction(key);
-
-
-        this.finger_table = new LinkedList<NodeInfo>();
-        this.successor_list = new LinkedList<NodeInfo>();
-        this.predecessor = null;
-        this.answers = new Hashtable<>();
-
-        //here I must contact myfriend
-        //not implemented yet
-    }
 
 
     public int getPort(){
@@ -103,7 +90,7 @@ public class Node{
 
     }
 
-    //when you
+    //when you create a new chord, you have to initialize all the stuff
     public void initialize(){
         for (int i = 0; i<16; i++) {
             finger_table.add(this.nodeInfo);
@@ -112,7 +99,32 @@ public class Node{
         for (int i=0; i<4; i++){
             successor_list.add(this.nodeInfo);
         }
+
+        this.initialized = true;
     }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void initialize(NodeInfo nodeInfo){
+        Message message = new Message(3, true, nodeInfo);
+        int ticket;
+        ticket = Router.sendMessage(getPort(), message);
+        while (!this.answers.containsKey(ticket)){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        SuccessorAnswerMessage message1 = (SuccessorAnswerMessage) this.answers.get(ticket);
+         NodeInfo successor = message1.getSuccessor();
+         this.successor_list.add(successor);
+
+    }
+
+
 
 
 

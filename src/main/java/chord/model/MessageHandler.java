@@ -1,6 +1,6 @@
 package chord.model;
 
-import chord.network.Message;
+import chord.Messages.Message;
 
 public class MessageHandler implements Runnable {
     private Message message;
@@ -26,7 +26,9 @@ public class MessageHandler implements Runnable {
     request of predecessor 2
     find successor 3
     notify 4
+     initial request of successor 6
 
     ack 0
+    reply 6
  */
 

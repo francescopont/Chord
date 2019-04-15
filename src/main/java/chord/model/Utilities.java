@@ -28,9 +28,12 @@ public class Utilities extends TimerTask {
         synchronized (virtualnodes){
             for ( Node node: virtualnodes){
                 //this code might be exposed to frequent changes: it's useful to separate it from the Chord class
-                node.stabilize();
-                node.fix_finger(counter);
-                node.check_predecessor();
+                if (node.isInitialized()) {
+                        node.stabilize();
+                        node.fix_finger(counter);
+                        node.check_predecessor();
+                }
+
             }
         }
     }

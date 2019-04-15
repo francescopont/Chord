@@ -1,6 +1,6 @@
 package chord.network;
 
-import chord.model.Node;
+import chord.Messages.Message;
 import chord.model.NodeInfo;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class SocketNode implements Runnable {
     //to send a message
     public void sendMessage(Message message){
         boolean yetsend = false;
-        NodeInfo nodeInfo = message.getNodeInfo();
+        NodeInfo nodeInfo = message.getDestination();
 
         // we check if we already have an active connection open with the receiver
         if ( this.activeconnections.containsKey(nodeInfo)){
