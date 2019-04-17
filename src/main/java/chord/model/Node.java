@@ -1,6 +1,7 @@
 package chord.model;
 
 import chord.Messages.Message;
+import chord.Messages.SuccessorRequestMessage;
 import chord.network.Router;
 import chord.Messages.SuccessorAnswerMessage;
 
@@ -108,9 +109,11 @@ public class Node{
     }
 
     public void initialize(NodeInfo nodeInfo){
-        Message message = new Message(3, true, nodeInfo);
+        Message message = new SuccessorRequestMessage(nodeInfo, this.nodeidentifier);
         int ticket;
         ticket = Router.sendMessage(getPort(), message);
+
+        //aspetto finchè non ho ricevuto la risposta
         while (!this.answers.containsKey(ticket)){
             try {
                 wait();
@@ -118,9 +121,14 @@ public class Node{
                 e.printStackTrace();
             }
         }
+
+
         SuccessorAnswerMessage message1 = (SuccessorAnswerMessage) this.answers.get(ticket);
-         NodeInfo successor = message1.getSuccessor();
-         this.successor_list.add(successor);
+        NodeInfo successor = message1.getSuccessor();
+        this.successor_list.add(successor);
+        this.finger_table.add(0, successor);
+
+
 
     }
 
