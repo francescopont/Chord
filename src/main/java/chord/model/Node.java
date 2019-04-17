@@ -76,9 +76,26 @@ public class Node{
 
         //else
         //calculating the right finger
+
         int finger = 1;
-        while (Utilities.computefinger(this.nodeidentifier,finger).compareTo(hashedkey)<0){
-            finger++;
+        //caso  1: chiave che cerco minore del mio id
+        if(hashedkey.compareTo(this.nodeidentifier)<0){
+            //vado avanti fino ad arrivare alla teste
+            while(Utilities.computefinger(this.nodeidentifier,finger).compareTo(this.nodeidentifier)>0){
+                finger++;
+            }
+            //una volta arrivata alla testa vado avanti finchè non trovo il primo nodo che supera la chiave che sto cercando
+            while ((Utilities.computefinger(this.nodeidentifier,finger).compareTo(hashedkey)<0)){
+                finger++;
+            }
+
+        }
+        else{ //chiave che cerco maggiore del mio id
+            //vado avanti finchè non trovo il primo nodo che supera la chiave o finchè non finisco l'anello e quindi prendo il nodo più piccolo a cui sono arrivato
+            while ((Utilities.computefinger(this.nodeidentifier,finger).compareTo(hashedkey)<0)||(Utilities.computefinger(this.nodeidentifier,finger).compareTo(this.nodeidentifier)>0) ){
+                finger++;
+        }
+
         }
 
         //looking into the finger table
@@ -178,11 +195,6 @@ public class Node{
                 }
 
                 //now I populate the finger table
-
-
-
-
-
 
 
                 initialized = true;
