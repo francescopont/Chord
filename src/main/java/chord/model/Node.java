@@ -1,6 +1,7 @@
 package chord.model;
 
 import chord.Messages.Message;
+import chord.Messages.PingRequestMessage;
 import chord.Messages.SuccessorRequestMessage;
 import chord.network.Router;
 import chord.Messages.SuccessorAnswerMessage;
@@ -56,7 +57,24 @@ public class Node{
         return;
     }
     public void check_predecessor(){
-        //cercherà di pingare il predecessore
+        if(predecessor!=null) {
+            PingRequestMessage pingRequestMessage = new PingRequestMessage(this.predecessor);
+            int ticket;
+            ticket=Router.sendMessage(getPort(),pingRequestMessage);
+            try{
+                wait(1000);
+            }
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            if(this.answers.containsKey(ticket)){
+                this.answers.remove(ticket);
+            }
+            else{
+                this.predecessor=null;
+            }
+
+        }
         return;
     }
 
@@ -116,6 +134,7 @@ public class Node{
         //e mi serve avere le API del socket layer
         SuccessorAnswerMessage answerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
         NodeInfo successor= answerMessage.getSuccessor();
+        this.answers.remove(ticket);
         return successor;
 
     }
@@ -154,6 +173,7 @@ public class Node{
         NodeInfo successor = answerMessage.getSuccessor();
         this.successor_list.add(successor);
         this.finger_table.add(0, successor);
+        this.answers.remove(ticket);
 
         //now I populate the successor list and the finger table on a separate thread
         new Thread(new Runnable() {
@@ -180,6 +200,7 @@ public class Node{
                     }
                     SuccessorAnswerMessage answerMessage = (SuccessorAnswerMessage) answers.get(ticket);
                     NodeInfo successor = answerMessage.getSuccessor();
+                    answers.remove(ticket);
 
                     //questo è un primo modo di gestire un corner case
                     if (successor.equals(nodeidentifier)){
