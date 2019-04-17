@@ -27,6 +27,7 @@ public class Router {
     }
 
     //returns the ticket for that message ( which is basically an incremental identifier)
+    //porta= porta da cui mando
     public static int sendMessage(int port, Message message){
         int ticket = Ticket.getTicket();
         message.setId(ticket);

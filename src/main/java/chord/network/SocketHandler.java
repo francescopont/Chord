@@ -21,7 +21,6 @@ public class SocketHandler implements Runnable{
         this.out = new ObjectOutputStream(socket.getOutputStream());
         this.in = new ObjectInputStream(socket.getInputStream());
 
-
     }
 
     //PROBLEMA: COME FARLO TERMINARE SENZA SIDE EFFECTS ( CIOè AVVISANDO IL SOCKET NODE CHE è TERMINATO)

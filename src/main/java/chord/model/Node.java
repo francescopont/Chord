@@ -4,6 +4,7 @@ import chord.Messages.Message;
 import chord.Messages.SuccessorRequestMessage;
 import chord.network.Router;
 import chord.Messages.SuccessorAnswerMessage;
+import chord.network.Ticket;
 
 import java.util.*;
 import java.lang.*;
@@ -65,11 +66,11 @@ public class Node{
     public NodeInfo find_successor(String hashedkey){
 
         //first look into the successor list
-        for (NodeInfo nodeInfo: this.successor_list) {
-            String key = nodeInfo.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+        for (NodeInfo successor: this.successor_list) {
+            String key = successor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
             String nodeidentifier = Utilities.hashfunction(key);
             if (nodeidentifier.compareTo(hashedkey) > 0){
-                return nodeInfo;
+                return successor;
             }
         }
 
@@ -80,14 +81,25 @@ public class Node{
             finger++;
         }
 
-
         //looking into the finger table
         //-2 because the counter starts from 0
-        NodeInfo nodeInfo = this.finger_table.get(finger -2);
-
+        NodeInfo closestSuccessor = this.finger_table.get(finger -2);
+        SuccessorRequestMessage successorRequestMessage=new SuccessorRequestMessage(closestSuccessor,hashedkey);
+        int ticket;
+        ticket=Router.sendMessage(this.getPort(),successorRequestMessage);
+        while(!answers.containsKey(ticket)){
+            try{
+                wait();
+            }
+            catch(InterruptedException e){
+                 e.printStackTrace();
+            }
+        }
         //qua devo implementare la chiamata ricorsiva
         //e mi serve avere le API del socket layer
-        return nodeInfo;
+        SuccessorAnswerMessage answerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
+        NodeInfo successor= answerMessage.getSuccessor();
+        return successor;
 
     }
 
@@ -121,10 +133,8 @@ public class Node{
                 e.printStackTrace();
             }
         }
-
-
-        SuccessorAnswerMessage message1 = (SuccessorAnswerMessage) this.answers.get(ticket);
-        NodeInfo successor = message1.getSuccessor();
+        SuccessorAnswerMessage answerMessage = (SuccessorAnswerMessage) this.answers.get(ticket);
+        NodeInfo successor = answerMessage.getSuccessor();
         this.successor_list.add(successor);
         this.finger_table.add(0, successor);
 
