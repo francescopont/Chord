@@ -58,7 +58,7 @@ public class Node{
     }
     public void check_predecessor(){
         if(predecessor!=null) {
-            PingRequestMessage pingRequestMessage = new PingRequestMessage(this.predecessor);
+            PingRequestMessage pingRequestMessage = new PingRequestMessage(this.predecessor,this.nodeInfo);
             int ticket;
             ticket=Router.sendMessage(getPort(),pingRequestMessage);
             try{
@@ -119,7 +119,7 @@ public class Node{
         //looking into the finger table
         //-2 because the counter starts from 0
         NodeInfo closestSuccessor = this.finger_table.get(finger -2);
-        SuccessorRequestMessage successorRequestMessage=new SuccessorRequestMessage(closestSuccessor,hashedkey);
+        SuccessorRequestMessage successorRequestMessage=new SuccessorRequestMessage(closestSuccessor,hashedkey,this.nodeInfo);
         int ticket;
         ticket=Router.sendMessage(this.getPort(),successorRequestMessage);
         while(!answers.containsKey(ticket)){
@@ -157,7 +157,7 @@ public class Node{
     }
 
     public void initialize(final NodeInfo myfriend){
-        Message message = new SuccessorRequestMessage(myfriend, this.nodeidentifier);
+        Message message = new SuccessorRequestMessage(myfriend, this.nodeidentifier,this.nodeInfo);
         int ticket;
         ticket = Router.sendMessage(getPort(), message);
 
@@ -186,7 +186,7 @@ public class Node{
                     NodeInfo predecessor = successor_list.get(i-1);
                     String key = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
                     String hashedkey = Utilities.hashfunction(key);
-                    Message message = new SuccessorRequestMessage(successor_list.get(i-1), hashedkey);
+                    Message message = new SuccessorRequestMessage(successor_list.get(i-1), hashedkey,nodeInfo);
                     int ticket;
                     ticket = Router.sendMessage(getPort(), message);
 
@@ -222,6 +222,10 @@ public class Node{
             }
         }).start();
 
+    }
+
+    public void addAnswer(int ticket, Message message){
+        answers.put(ticket,message);
     }
 
 

@@ -1,6 +1,7 @@
 package chord.Messages;
 
 
+import chord.model.Node;
 import chord.model.NodeInfo;
 
 
@@ -13,7 +14,9 @@ public class  Message implements Serializable{
     private final NodeInfo destination; //the destination address of this message
     private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
     private final boolean ack; //indica se è il messaggio richiede una risposta
-    private int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
+    protected int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
+    private final NodeInfo sender;
+
     //passati da costruttore e non più modificabili
     // l'id viene preso da ticket e quindi è settato in seguito
 
@@ -21,10 +24,11 @@ public class  Message implements Serializable{
 
 
 
-    public Message(int type, boolean ack, NodeInfo destination){
+    public Message(int type, boolean ack, NodeInfo destination, NodeInfo sender){
         this.type=type;
         this.ack=ack;
         this.destination = destination;
+        this.sender=sender;
 
     }
 
@@ -48,5 +52,6 @@ public class  Message implements Serializable{
         return destination;
     }
 
+    public NodeInfo getSender(){return sender;}
 
 }

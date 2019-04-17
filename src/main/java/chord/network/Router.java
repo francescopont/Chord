@@ -43,6 +43,14 @@ public class Router {
         return ticket;
     }
 
+    public static void sendAnswer(int port, Message message){
+        for (SocketNode node: nodes){
+            if (node.getPort() == port){
+                node.sendMessage(message);
+            }
+        }
+    }
+
     public static void terminate(int port){
         for (SocketNode node: nodes){
             if (node.getPort() == port){
