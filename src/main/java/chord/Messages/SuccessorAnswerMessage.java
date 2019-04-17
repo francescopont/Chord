@@ -4,7 +4,6 @@ import chord.Messages.Message;
 import chord.model.NodeInfo;
 
 public class SuccessorAnswerMessage extends Message {
-
     private final NodeInfo successor;
 
     public SuccessorAnswerMessage(NodeInfo nodeInfo, NodeInfo successor ) {

@@ -139,7 +139,6 @@ public class Node{
         this.finger_table.add(0, successor);
 
 
-
     }
 
 

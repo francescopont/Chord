@@ -65,11 +65,11 @@ public class Utilities extends TimerTask {
     }
 
     //to compute the i-th finger in the current Chord, given the node identifier
-    //conviene riconvertire la stringa in byte piuttosto che ricalcolare l'hash, che è un'operazione onerosa
+    //uso sempre l'intero, non ritorno mai ai bytes, per gestire i numeri negativi
     public static String computefinger(String nodeidentifier, int finger){
 
         //reconverting the  string nodeidentifier in the  integer representation
-        int[] hash = new int[20];
+        int[] hash = new int[2];
         int j=0;
         for (int i =0; i< nodeidentifier.length() -1; i= i+2){
             //every byte corresponds to two chars in the String representation
