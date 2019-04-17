@@ -29,4 +29,12 @@ public class NodeInfo {
         return port;
     }
 
+    //it may be useful
+    //attenzione: non è l'override del metodo equals standard della classe object
+    public boolean equals(NodeInfo nodeInfo){
+        if (nodeInfo.IPAddress == this.IPAddress && nodeInfo.port == this.port){
+            return true;
+        }
+        return  false;
+    }
 }

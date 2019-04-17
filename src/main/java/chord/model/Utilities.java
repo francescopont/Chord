@@ -65,13 +65,13 @@ public class Utilities extends TimerTask {
     }
 
     //to compute the i-th finger in the current Chord, given the node identifier
-    //uso sempre l'intero, non ritorno mai ai bytes, per gestire i numeri negativi
+    //uso sempre l'intero, non ritorno mai ai bytes, per evitare la gestione dei numeri negativi in complemento a due
     public static String computefinger(String nodeidentifier, int finger){
 
         //reconverting the  string nodeidentifier in the  integer representation
         int[] hash = new int[2];
         int j=0;
-        for (int i =0; i< nodeidentifier.length() -1; i= i+2){
+        for (int i =0; i< 4; i= i+2){
             //every byte corresponds to two chars in the String representation
             String number = "" + nodeidentifier.charAt(i) + nodeidentifier.charAt(i+1);
             hash[j] = Integer.parseInt(number,16);
@@ -79,25 +79,21 @@ public class Utilities extends TimerTask {
         }
 
 
-        //calculating the byte representation of the new finger
-        finger = 17 - finger;
-        //now finger indicates the bit I need to change
-        int i=0;
-        //finding the right byte to change
-        while (finger > 8){
-            finger = finger - 8;
-            i++;
-        }
+        //counter starts from 0
+        finger = finger -1;
+
+
 
 
         //changing the byte
         //the function recursion basically executes the sum, handlind the eventual carry over
-        recursion(hash, (int) Math.pow(2,8-finger), i );
+        //se gli passo il riferimento allora non sta modificando una copia, ma davvero l'array hash
+        recursion(hash, finger%8, finger/8);
 
 
         //reconverting the hash in the String representation to return
         StringBuffer hexHash = new StringBuffer();
-        for (int h = 0; h < hash.length; h++) {
+        for (int h = 0; h < 2; h++) {
             String hex = Integer.toHexString(hash[h]);
             if (hex.length() == 1) hexHash.append('0');
             hexHash.append(hex);

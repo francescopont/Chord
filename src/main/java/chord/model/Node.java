@@ -14,7 +14,7 @@ public class Node{
     private String nodeidentifier;
     //attenzione: devo sincerarmi che queste liste mantengano l'ordine di inserimento
     private List<NodeInfo> finger_table;
-    private List<NodeInfo> successor_list;
+    private LinkedList<NodeInfo> successor_list;
     private NodeInfo predecessor;
     private boolean initialized;
 
@@ -23,7 +23,7 @@ public class Node{
 
 
 
-    //this constructor is called when you CREATE and when you JOIN a new Chord and when you JOIN an existent Chord
+    //this constructor is called when you CREATE and when you JOIN an existent Chord
     public Node(NodeInfo me) {
         this.nodeInfo = me;
 
@@ -120,8 +120,8 @@ public class Node{
         return initialized;
     }
 
-    public void initialize(NodeInfo nodeInfo){
-        Message message = new SuccessorRequestMessage(nodeInfo, this.nodeidentifier);
+    public void initialize(final NodeInfo myfriend){
+        Message message = new SuccessorRequestMessage(myfriend, this.nodeidentifier);
         int ticket;
         ticket = Router.sendMessage(getPort(), message);
 
@@ -138,6 +138,56 @@ public class Node{
         this.successor_list.add(successor);
         this.finger_table.add(0, successor);
 
+        //now I populate the successor list and the finger table on a separate thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //first, the successor list
+                //QUA CI SONO UN PO' DI CORNER CASES DA GESTIRE
+                for (int i = 1; i<4; i++){
+                    NodeInfo predecessor = successor_list.get(i-1);
+                    String key = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
+                    String hashedkey = Utilities.hashfunction(key);
+                    Message message = new SuccessorRequestMessage(successor_list.get(i-1), hashedkey);
+                    int ticket;
+                    ticket = Router.sendMessage(getPort(), message);
+
+                    //aspetto finchè non ho ricevuto la risposta
+                    while (!answers.containsKey(ticket)){
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    SuccessorAnswerMessage answerMessage = (SuccessorAnswerMessage) answers.get(ticket);
+                    NodeInfo successor = answerMessage.getSuccessor();
+
+                    //questo è un primo modo di gestire un corner case
+                    if (successor.equals(nodeidentifier)){
+                        while (i<4){
+                            successor_list.addLast(nodeInfo);
+                            i++;
+                        }
+                    } else{
+                        successor_list.addLast( successor);
+                    }
+
+
+                }
+
+                //now I populate the finger table
+
+
+
+
+
+
+
+                initialized = true;
+            }
+        }).start();
 
     }
 
