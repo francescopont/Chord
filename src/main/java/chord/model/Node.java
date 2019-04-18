@@ -1,10 +1,7 @@
 package chord.model;
 
-import chord.Messages.Message;
-import chord.Messages.PingRequestMessage;
-import chord.Messages.SuccessorRequestMessage;
+import chord.Messages.*;
 import chord.network.Router;
-import chord.Messages.SuccessorAnswerMessage;
 import chord.network.Ticket;
 
 import java.util.*;
@@ -47,7 +44,43 @@ public class Node{
 
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize(){
+        PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(this.successor_list.getFirst(), this.nodeInfo);
+        int ticket = Router.sendMessage(this.getPort(), predecessorRequestMessage);
+        while (!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            }catch (InterruptedException  e){
+                e.printStackTrace();
+            }
+        }
+        PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
+        NodeInfo predecessor = answerMessage.getPredecessor();
 
+        String key = successor_list.getFirst().getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+        String hashedkey_successor = Utilities.hashfunction(key);
+
+        String potential_key = predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+        String hashedkey_potential_predecessor = Utilities.hashfunction(key);
+
+
+        if (hashedkey_successor.compareTo(this.nodeidentifier) <0){
+            if(hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 || hashedkey_potential_predecessor.compareTo(hashedkey_successor)<0){
+                this.successor_list.set(0, predecessor);
+            }
+        }
+        else if (hashedkey_potential_predecessor.compareTo(hashedkey_successor)<0 && hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 ){
+            this.successor_list.set(0, predecessor);
+        }
+        NotifyRequestMessage notifyRequestMessage = new NotifyRequestMessage(this.successor_list.getFirst(), this.nodeInfo);
+        int ticket1 = Router.sendMessage(this.getPort(), predecessorRequestMessage);
+        while (!this.answers.containsKey(ticket1)){
+            try{
+                wait();
+            }catch (InterruptedException  e){
+                e.printStackTrace();
+            }
+        }
+        NotifyAnswerMessage
         return;
     }
     public void fix_finger(int counter){
@@ -94,7 +127,6 @@ public class Node{
 
         //else
         //calculating the right finger
-
         int finger = 1;
         //caso  1: chiave che cerco minore del mio id
         if(hashedkey.compareTo(this.nodeidentifier)<0){
