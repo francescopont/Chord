@@ -81,6 +81,8 @@ public class Node{
             }
         }
 
+        //una volta che mi arriva la risposta cosa ci faccio?? niente???
+
 
         return;
     }
@@ -249,7 +251,6 @@ public class Node{
                 }
 
                 //now I populate the finger table
-
 
                 initialized = true;
             }
