@@ -1,9 +1,6 @@
 package chord.model;
 
-import chord.Messages.Message;
-import chord.Messages.PingAnswerMessage;
-import chord.Messages.SuccessorAnswerMessage;
-import chord.Messages.SuccessorRequestMessage;
+import chord.Messages.*;
 import chord.network.Router;
 
 public class MessageHandler implements Runnable {
@@ -28,6 +25,12 @@ public class MessageHandler implements Runnable {
                 NodeInfo successor=node.find_successor(((SuccessorRequestMessage) message).getNodeidentifier());
                 SuccessorAnswerMessage successorAnswerMessage= new SuccessorAnswerMessage(message.getSender(),successor,message.getDestination(),message.getId());
                 Router.sendAnswer(node.getPort(),successorAnswerMessage);
+                break;
+            case 4:
+                //chi riceve la notify controlla se chi gliel'ha mandata possa essere il suo predecessore o meno giusto?
+                node.notify(message.getSender());
+                NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
+                Router.sendMessage(node.getPort(),notifyAnswerMessage);
                 break;
             case 6:
                 node.addAnswer(message.getId(),message);

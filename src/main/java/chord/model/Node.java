@@ -72,7 +72,7 @@ public class Node{
             this.successor_list.set(0, predecessor);
         }
         NotifyRequestMessage notifyRequestMessage = new NotifyRequestMessage(this.successor_list.getFirst(), this.nodeInfo);
-        int ticket1 = Router.sendMessage(this.getPort(), predecessorRequestMessage);
+        int ticket1 = Router.sendMessage(this.getPort(), notifyRequestMessage);
         while (!this.answers.containsKey(ticket1)){
             try{
                 wait();
@@ -80,7 +80,8 @@ public class Node{
                 e.printStackTrace();
             }
         }
-        NotifyAnswerMessage
+
+
         return;
     }
     public void fix_finger(int counter){
@@ -260,7 +261,27 @@ public class Node{
         answers.put(ticket,message);
     }
 
+    //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
+    public void notify(NodeInfo potential_predecessor){
+        String key = this.predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+        String hashedkey_predecessor = Utilities.hashfunction(key);
 
+        String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+        String hashedkey_potential_predecessor = Utilities.hashfunction(key);
+
+        if(this.predecessor==null){
+            this.predecessor=potential_predecessor;
+        }
+        else if (hashedkey_predecessor.compareTo(this.nodeidentifier) <0){
+            if(hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0 && hashedkey_potential_predecessor.compareTo(hashedkey_predecessor)>0){
+                this.predecessor=potential_predecessor;
+            }
+        }
+        else if (hashedkey_potential_predecessor.compareTo(hashedkey_predecessor)<0 && hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 ){
+            this.predecessor=potential_predecessor;
+        }
+
+    }
 
 
 
