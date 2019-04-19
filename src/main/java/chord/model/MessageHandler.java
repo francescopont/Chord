@@ -33,8 +33,9 @@ public class MessageHandler implements Runnable {
                 Router.sendMessage(node.getPort(),notifyAnswerMessage);
                 break;
             case 6:
-                node.addAnswer(message.getId(),message);
-                node.notifyAll();
+                NodeDispatcher dispatcher = node.getDispatcher();
+                dispatcher.addAnswer(message.getId(),message);
+                dispatcher.notifyAll();
                 break;
 
         }

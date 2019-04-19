@@ -15,6 +15,7 @@ public class  Message implements Serializable{
     private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
     private final boolean ack; //indica se è il messaggio richiede una risposta
     protected int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
+    private TimerExpiredException exception;
     private final NodeInfo sender;
 
     //passati da costruttore e non più modificabili
@@ -53,5 +54,19 @@ public class  Message implements Serializable{
     }
 
     public NodeInfo getSender(){return sender;}
+
+    public TimerExpiredException getException() {
+        return exception;
+    }
+
+    public void setException(TimerExpiredException exception) {
+        this.exception = exception;
+    }
+
+    public void check() throws TimerExpiredException {
+        if (this.exception != null){
+            throw  this.exception;
+        }
+    }
 
 }

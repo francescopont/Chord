@@ -9,13 +9,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.TimerTask;
 public class Utilities extends TimerTask {
-    private List<Node> virtualnodes;
+    private final Node virtualnode;
     public static int counter=0;
 
 
-    public Utilities(List<Node> nodes){
+    public Utilities(Node node){
         //counter è usato dalla fix finger
-        this.virtualnodes = nodes;
+        this.virtualnode = node;
         counter++;
         if (counter > 16){
             counter=0;
@@ -25,19 +25,15 @@ public class Utilities extends TimerTask {
     //calls periodic functions on the nodes
     @Override
     public void run() {
-        synchronized (virtualnodes){
-            for ( Node node: virtualnodes){
-                //this code might be exposed to frequent changes: it's useful to separate it from the Chord class
-                if (node.isInitialized()) {
-                        node.stabilize();
-                        node.fix_finger(counter);
-                        node.check_predecessor();
-                }
-
+        synchronized (virtualnode) {
+            //this code might be exposed to frequent changes: it's useful to separate it from the Chord class
+            if (virtualnode.isInitialized()) {
+                virtualnode.stabilize();
+                virtualnode.fix_finger(counter);
+                virtualnode.check_predecessor();
             }
         }
     }
-
 
     //code modified for testing
     //we use just the first two byte to test the correct behaviour of the function

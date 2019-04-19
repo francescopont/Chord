@@ -37,9 +37,6 @@ public class Chord{
         synchronized (virtualnodes){
             if (virtualnodes == null){
                 virtualnodes = new LinkedList<>();
-                //per l'esecuzione delle operazioni periodiche: i tempi sono a casaccio
-                Timer timer = new Timer (false);
-                timer.schedule(new Utilities(virtualnodes), 0, 20000000);
             }
             //questo codice è davvero necessario???
             for(Node node: virtualnodes){
@@ -65,9 +62,6 @@ public class Chord{
         synchronized (virtualnodes){
             if (virtualnodes == null){
                 virtualnodes = new LinkedList<>();
-                //per l'esecuzione delle operazioni periodiche: i tempi sono a casaccio
-                Timer timer = new Timer (false);
-                timer.schedule(new Utilities(virtualnodes), 0, 20000000);
             }
             //questo codice è davvero necessario???
             for(Node node: virtualnodes){
