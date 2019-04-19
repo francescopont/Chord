@@ -44,17 +44,7 @@ public class Node{
 
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize(){
-        PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(this.successor_list.getFirst(), this.nodeInfo);
-        int ticket = Router.sendMessage(this.getPort(), predecessorRequestMessage);
-        while (!this.answers.containsKey(ticket)){
-            try{
-                wait();
-            }catch (InterruptedException  e){
-                e.printStackTrace();
-            }
-        }
-        PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
-        NodeInfo predecessor = answerMessage.getPredecessor();
+        NodeInfo predecessor = this.sendPredecessorRequest(this.successor_list.getFirst());
 
         String key = successor_list.getFirst().getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
         String hashedkey_successor = Utilities.hashfunction(key);
@@ -71,18 +61,8 @@ public class Node{
         else if (hashedkey_potential_predecessor.compareTo(hashedkey_successor)<0 && hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 ){
             this.successor_list.set(0, predecessor);
         }
-        NotifyRequestMessage notifyRequestMessage = new NotifyRequestMessage(this.successor_list.getFirst(), this.nodeInfo);
-        int ticket1 = Router.sendMessage(this.getPort(), notifyRequestMessage);
-        while (!this.answers.containsKey(ticket1)){
-            try{
-                wait();
-            }catch (InterruptedException  e){
-                e.printStackTrace();
-            }
-        }
-
+        this.sendNotify(this.successor_list.getFirst(),this.nodeInfo);
         //una volta che mi arriva la risposta cosa ci faccio?? niente???
-
 
         return;
     }
@@ -92,6 +72,7 @@ public class Node{
         this.finger_table.set(counter, nodeInfo );
         return;
     }
+
     public void check_predecessor(){
         if(predecessor!=null) {
             PingRequestMessage pingRequestMessage = new PingRequestMessage(this.predecessor,this.nodeInfo);
@@ -154,22 +135,7 @@ public class Node{
         //looking into the finger table
         //-2 because the counter starts from 0
         NodeInfo closestSuccessor = this.finger_table.get(finger -2);
-        SuccessorRequestMessage successorRequestMessage=new SuccessorRequestMessage(closestSuccessor,hashedkey,this.nodeInfo);
-        int ticket;
-        ticket=Router.sendMessage(this.getPort(),successorRequestMessage);
-        while(!answers.containsKey(ticket)){
-            try{
-                wait();
-            }
-            catch(InterruptedException e){
-                 e.printStackTrace();
-            }
-        }
-        //qua devo implementare la chiamata ricorsiva
-        //e mi serve avere le API del socket layer
-        SuccessorAnswerMessage answerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
-        NodeInfo successor= answerMessage.getSuccessor();
-        this.answers.remove(ticket);
+        NodeInfo successor= this.sendSuccessorRequest(closestSuccessor,hashedkey);
         return successor;
 
     }
@@ -192,23 +158,10 @@ public class Node{
     }
 
     public void initialize(final NodeInfo myfriend){
-        Message message = new SuccessorRequestMessage(myfriend, this.nodeidentifier,this.nodeInfo);
-        int ticket;
-        ticket = Router.sendMessage(getPort(), message);
 
-        //aspetto finchè non ho ricevuto la risposta
-        while (!this.answers.containsKey(ticket)){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        SuccessorAnswerMessage answerMessage = (SuccessorAnswerMessage) this.answers.get(ticket);
-        NodeInfo successor = answerMessage.getSuccessor();
+        NodeInfo successor = this.sendSuccessorRequest(myfriend,this.nodeidentifier);
         this.successor_list.add(successor);
         this.finger_table.add(0, successor);
-        this.answers.remove(ticket);
 
         //now I populate the successor list and the finger table on a separate thread
         new Thread(new Runnable() {
@@ -221,21 +174,7 @@ public class Node{
                     NodeInfo predecessor = successor_list.get(i-1);
                     String key = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
                     String hashedkey = Utilities.hashfunction(key);
-                    Message message = new SuccessorRequestMessage(successor_list.get(i-1), hashedkey,nodeInfo);
-                    int ticket;
-                    ticket = Router.sendMessage(getPort(), message);
-
-                    //aspetto finchè non ho ricevuto la risposta
-                    while (!answers.containsKey(ticket)){
-                        try {
-                            wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    SuccessorAnswerMessage answerMessage = (SuccessorAnswerMessage) answers.get(ticket);
-                    NodeInfo successor = answerMessage.getSuccessor();
-                    answers.remove(ticket);
+                    NodeInfo successor = sendSuccessorRequest(successor_list.get(i-1),hashedkey);
 
                     //questo è un primo modo di gestire un corner case
                     if (successor.equals(nodeidentifier)){
@@ -246,8 +185,6 @@ public class Node{
                     } else{
                         successor_list.addLast( successor);
                     }
-
-
                 }
 
                 //now I populate the finger table
@@ -282,6 +219,51 @@ public class Node{
             this.predecessor=potential_predecessor;
         }
 
+
+    }
+
+    public void sendNotify(NodeInfo destination, NodeInfo sender){
+        NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
+        int ticket= Router.sendMessage(this.getPort(),notifyRequestMessage);
+        while (!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            }catch (InterruptedException  e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public NodeInfo sendPredecessorRequest(NodeInfo node){
+        PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(node, this.nodeInfo);
+        int ticket = Router.sendMessage(this.getPort(), predecessorRequestMessage);
+        while (!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            }catch (InterruptedException  e){
+                e.printStackTrace();
+            }
+        }
+
+        PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
+        return answerMessage.getPredecessor();
+
+    }
+
+    public NodeInfo sendSuccessorRequest(NodeInfo destination, String node){
+        SuccessorRequestMessage successorRequestMessage= new SuccessorRequestMessage(destination, node, this.nodeInfo);
+        int ticket= Router.sendMessage(this.getPort(), successorRequestMessage);
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+
+        SuccessorAnswerMessage successorAnswerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
+        this.answers.remove(ticket);
+        return successorAnswerMessage.getSuccessor();
     }
 
 
