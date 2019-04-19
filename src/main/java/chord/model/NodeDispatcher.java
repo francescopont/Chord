@@ -4,20 +4,20 @@ import chord.Messages.*;
 import chord.network.Router;
 
 //l'unica cosa a carico di node è eliminare il messaggio nl caso in cui contenga un errore ( conosce il ticket a partire dal messaggio di errore)
-
-import java.util.Hashtable;
-import java.util.Timer;
-import java.util.TimerTask;
+//problema: la sincronizzazione
+import java.util.*;
 
 public class NodeDispatcher {
     private Hashtable<Integer, Message> answers;
     private int port;
     private NodeInfo nodeInfo;
+    private int last_delivered;
 
     public NodeDispatcher(int port, NodeInfo nodeInfo){
         this.answers = new Hashtable<>();
         this.port = port;
         this.nodeInfo = nodeInfo;
+        this.last_delivered = 0;
     }
 
     public void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{
@@ -27,29 +27,35 @@ public class NodeDispatcher {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(!answers.containsKey(ticket)){
-                    NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,ticket);
-                    notifyAnswerMessage.setException(new TimerExpiredException(ticket));
-                    answers.put(ticket,notifyAnswerMessage);
-                    notifyAll();
+                synchronized (this){
+                    if(!answers.containsKey(ticket)){
+                        NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,ticket);
+                        notifyAnswerMessage.setException(new TimerExpiredException(ticket));
+                        answers.put(ticket,notifyAnswerMessage);
+                        notifyAll();
+                    }
+                    else{
+                        answers.remove(ticket);
+                    }
                 }
-                else{
-                    answers.remove(ticket);
-                }
+
             }
         }, 1000);
 
-
-        while (!this.answers.containsKey(ticket)){
-            try{
-                wait();
-            }catch (InterruptedException  e){
-                e.printStackTrace();
+        synchronized (this){
+            while (!this.answers.containsKey(ticket)){
+                try{
+                    wait();
+                }catch (InterruptedException  e){
+                    e.printStackTrace();
+                }
             }
+            NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
+            notifyAnswerMessage.check();
         }
 
-        NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
-        notifyAnswerMessage.check();
+
+
     }
 
     public NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{
@@ -144,8 +150,20 @@ public class NodeDispatcher {
         pingAnswerMessage.check();
     }
 
-    public void addAnswer(int ticket, Message message){
+    public synchronized void addAnswer(int ticket, Message message){
+        if(ticket <= this.last_delivered){
+            return;
+        }
+        while ( !(this.last_delivered == ticket -1)){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
         answers.put(ticket,message);
+        last_delivered = ticket;
+        notifyAll();
     }
 
     public void deleteanswer(int ticket){

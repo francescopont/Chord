@@ -1,5 +1,4 @@
 package chord.model;
-
 import chord.Messages.*;
 import java.util.*;
 import java.lang.*;
@@ -50,9 +49,9 @@ public class Node {
                 this.successor_list.set(0, potential_predecessor);
             }
         }catch (TimerExpiredException e){
-            this.dispatcher.deleteanswer(e.getTicket());
-            this.successor_list.removeFirst();
+            NodeInfo old_successor = this.successor_list.removeFirst();
             this.finger_table.remove(0);
+
 
         }
 
