@@ -3,10 +3,10 @@ package chord.model;
 // this class contains all the operations we need to run periodically on each node, and the code for the hash function
 
 // la COMPUTE FINGER dovrebbe essere stata corretta usando gli interi, ma non è stata testata
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.TimerTask;
 public class Utilities extends TimerTask {
     private final Node virtualnode;

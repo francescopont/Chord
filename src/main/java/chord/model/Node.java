@@ -1,7 +1,9 @@
 package chord.model;
-import chord.Messages.*;
-import java.util.*;
-import java.lang.*;
+
+import chord.Messages.TimerExpiredException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
 
 public class Node {
     private NodeInfo nodeInfo;
