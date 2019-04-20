@@ -23,7 +23,7 @@ public class Node {
         this.successor_list = new LinkedList<>();
         this.predecessor = null;
         this.initialized = false;
-        this.dispatcher = new NodeDispatcher(this.getPort(), this.nodeInfo);
+        this.dispatcher = new NodeDispatcher(this.getPort());
 
     }
 
@@ -55,7 +55,11 @@ public class Node {
 
         }
 
-        this.dispatcher.sendNotify(this.successor_list.getFirst(),this.nodeInfo);
+        try {
+            this.dispatcher.sendNotify(this.successor_list.getFirst(),this.nodeInfo);
+        } catch (TimerExpiredException e) {
+            //put code here
+        }
         //una volta che mi arriva la risposta cosa ci faccio?? niente???
     }
 
@@ -69,7 +73,11 @@ public class Node {
     //da sistemare
     public void check_predecessor(){
         if(predecessor!=null) {
-            dispatcher.sendPing(this.predecessor,this.nodeInfo);
+            try {
+                dispatcher.sendPing(this.predecessor,this.nodeInfo);
+            } catch (TimerExpiredException e) {
+                //put code here
+            }
         }
         return;
     }
@@ -77,7 +85,7 @@ public class Node {
     //[in a recursive manner]
     //ask this node to find the successor of id
     //param = an hashed identifier of the item I want to retrieve
-    public NodeInfo find_successor(String hashedkey){
+    public NodeInfo find_successor(String hashedkey)  {
         
         //first look into the successor list
         for (NodeInfo successor: this.successor_list) {
@@ -112,7 +120,12 @@ public class Node {
         //looking into the finger table
         //-2 because the counter starts from 0
         NodeInfo closestSuccessor = this.finger_table.get(finger -2);
-        NodeInfo successor= this.dispatcher.sendSuccessorRequest(closestSuccessor,hashedkey);
+        NodeInfo successor= null;
+        try {
+            successor = this.dispatcher.sendSuccessorRequest(closestSuccessor,hashedkey,this.nodeInfo);
+        } catch (TimerExpiredException e) {
+            //put code here
+        }
         return successor;
     }
 
@@ -137,7 +150,12 @@ public class Node {
     }
     public void initialize(final NodeInfo myfriend){
 
-        NodeInfo successor = this.dispatcher.sendSuccessorRequest(myfriend,this.nodeidentifier);
+        NodeInfo successor = null;
+        try {
+            successor = this.dispatcher.sendSuccessorRequest(myfriend,this.nodeidentifier,this.nodeInfo);
+        } catch (TimerExpiredException e) {
+            //put code here
+        }
         this.successor_list.add(successor);
         this.finger_table.add(0, successor);
 
@@ -171,7 +189,7 @@ public class Node {
         }).start();
         Timer timer = new Timer();
         timer.schedule(new Utilities(this),
-                1000);
+                1000, 1000);
     }
 
     public NodeDispatcher getDispatcher() {

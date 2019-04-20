@@ -35,7 +35,6 @@ public class MessageHandler implements Runnable {
             case 6:
                 NodeDispatcher dispatcher = node.getDispatcher();
                 dispatcher.addAnswer(message.getId(),message);
-                dispatcher.notifyAll();
                 break;
 
         }
