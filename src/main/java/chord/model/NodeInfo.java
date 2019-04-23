@@ -1,7 +1,9 @@
 package chord.model;
 
+import java.io.Serializable;
+
 //è davvero molto utile: la usiamo ovunque, la consiglio
-public class NodeInfo {
+public class NodeInfo implements Serializable{
 
     private String IPAddress;
     private int port;

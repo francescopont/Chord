@@ -10,6 +10,7 @@ public class MessageHandler implements Runnable {
     public MessageHandler (Node node, Message message){
         this.node = node;
         this.message=message;
+        System.out.println("ho ricevuto un messaggio " + message.getType());
     }
 
     @Override

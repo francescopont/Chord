@@ -15,6 +15,8 @@ package chord.model;
 
 
 import chord.Messages.Message;
+import chord.PortAlreadyChosenException;
+import chord.PortAlreadyInUseException;
 import chord.network.Router;
 
 import java.util.LinkedList;
@@ -23,7 +25,7 @@ import java.util.Timer;
 
 public class Chord{
     //the list of virtual nodes this application is handling
-    private static List<Node> virtualnodes;
+    private static List<Node> virtualnodes = new LinkedList<>();
 
 
     //don't let anyone instantiate this class
@@ -33,24 +35,26 @@ public class Chord{
     //mi sembra la soluzione che più assomiglia ad una libreria "vera" e  che maschera tutta l'implementazione interna
     //inoltre ciascuno nodo fisico può in questo modo creare e gestire tanti nodi virtuali quanti vuole, e
     //il fatto di poter gestire più nodi virtuali migliora le performance, according to the paper
-    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort)throws Exception{
+    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws PortAlreadyChosenException, PortAlreadyInUseException {
         synchronized (virtualnodes){
-            if (virtualnodes == null){
-                virtualnodes = new LinkedList<>();
-            }
             //questo codice è davvero necessario???
             for(Node node: virtualnodes){
                 if (node.getPort() == port) {
-                    throw new Exception("Port already in use!");
+                    throw new PortAlreadyChosenException();
                 }
             }
 
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             NodeInfo knownnode = new NodeInfo(knownIPAddress,knownPort);
             Node node = new Node(nodeInfo);
-
             virtualnodes.add(node);
-            Router.addnode(port);
+            try{
+                Router.addnode(port);
+            }catch(PortAlreadyInUseException e){
+                node.modifyPort(e.getPort());
+                throw e;
+            }
+
             node.initialize(knownnode);
 
 
@@ -58,22 +62,22 @@ public class Chord{
 
     }
 
-    public static void create(String IPAddress, int port) throws Exception{
+    public static void create(String IPAddress, int port)throws PortAlreadyChosenException,PortAlreadyInUseException{
         synchronized (virtualnodes){
-            if (virtualnodes == null){
-                virtualnodes = new LinkedList<>();
-            }
-            //questo codice è davvero necessario???
             for(Node node: virtualnodes){
                 if (node.getPort() == port){
-                    throw new Exception("Port already in use!");
+                    throw new PortAlreadyChosenException();
                 }
             }
-
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             Node node = new Node(nodeInfo);
             virtualnodes.add(node);
-            Router.addnode(port);
+            try{
+                Router.addnode(port);
+            }catch(PortAlreadyInUseException e){
+                node.modifyPort(e.getPort());
+                throw e;
+            }
             node.initialize();
         }
     }

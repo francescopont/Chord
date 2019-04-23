@@ -4,13 +4,15 @@ package chord.model;
 
 // la COMPUTE FINGER dovrebbe essere stata corretta usando gli interi, ma non è stata testata
 
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.TimerTask;
 public class Utilities extends TimerTask {
     private final Node virtualnode;
-    public static int counter=0;
+    private int counter=0;
 
 
     public Utilities(Node node){
@@ -25,6 +27,7 @@ public class Utilities extends TimerTask {
     //calls periodic functions on the nodes
     @Override
     public void run() {
+        System.out.println("sto facendo partire un utilities "+ virtualnode.getPort());
         synchronized (virtualnode) {
             //this code might be exposed to frequent changes: it's useful to separate it from the Chord class
             if (virtualnode.isInitialized()) {
@@ -72,11 +75,12 @@ public class Utilities extends TimerTask {
             String number = "" + nodeidentifier.charAt(i) + nodeidentifier.charAt(i+1);
             hash[j] = Integer.parseInt(number,16);
             j++;
+
         }
 
 
         //counter starts from 0
-        finger = finger -1;
+        finger = 16-finger;
 
 
 
@@ -84,8 +88,7 @@ public class Utilities extends TimerTask {
         //changing the byte
         //the function recursion basically executes the sum, handlind the eventual carry over
         //se gli passo il riferimento allora non sta modificando una copia, ma davvero l'array hash
-        recursion(hash, finger%8, finger/8);
-
+        recursion(hash, (int) Math.pow(2,(15-finger)%8), finger/8);
 
         //reconverting the hash in the String representation to return
         StringBuffer hexHash = new StringBuffer();

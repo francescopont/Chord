@@ -1,45 +1,56 @@
 package chord.network;
 
 import chord.Messages.Message;
+import chord.PortAlreadyInUseException;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Router {
-    private static List<SocketNode> nodes;
+    private static List<SocketNode> nodes = new LinkedList<>();
 
     //don't let anyone instantiate this class
     private Router(){};
 
-    public static void addnode(int port){
+    //se la porta è già in uso lancia un'eccezione con la porta effettiva libera che è riuscito ad usare
+    public static void addnode(int port) throws PortAlreadyInUseException {
         synchronized (nodes){
-            if (nodes == null){
-                nodes = new LinkedList<>();
+            SocketNode node;
+            try{
+                node = new SocketNode(port);
+                nodes.add(node);
+                new Thread(node).start();
+            }catch (IOException e){
+                try {
+                    node = new SocketNode(0);
+                    int actual_port = node.getPort();
+                    nodes.add(node);
+                    new Thread(node).start();
+                    throw new PortAlreadyInUseException(actual_port);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
             }
 
         }
-        SocketNode node = new SocketNode(port);
-        nodes.add(node);
-        new Thread(node).start();
 
-        //problema: sincronizzazione ( cosa succede se ci metto in mezzo altre istruzioni che per esempio iterano sui nodi?)
 
     }
 
     //returns the ticket for that message ( which is basically an incremental identifier)
     //porta= porta da cui mando
+    //forse qua è meglio controllare che la porta da cui sto mandando corrisponda alla porta del sender contenuto nel messaggio
     public static int sendMessage(int port, Message message){
         int ticket = Ticket.getTicket();
         message.setId(ticket);
         for (SocketNode node: nodes){
             if (node.getPort() == port){
+
                 node.sendMessage(message);
             }
         }
-
-        //not implemented yet (how to send the message?)
-        //the problem here is how to discover if I have already open a connection with the other node
-        //in that case it's better to use that connection, instead of opening a new one
         return ticket;
     }
 

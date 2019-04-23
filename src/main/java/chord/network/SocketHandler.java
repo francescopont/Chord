@@ -1,7 +1,8 @@
 package chord.network;
 
 import chord.Messages.Message;
-import chord.model.Chord;
+import chord.SocketTester.SocketTester;
+
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,28 +30,30 @@ public class SocketHandler implements Runnable{
 
     @Override
     public void run() {
-        try {
 
-            while(!terminate){
+        while(!terminate){
+            try {
+
                 //read the message from the buffer
                 Message message= (Message) in.readObject();
-
-                //print out a message for fun
-                System.out.println("eccociiii");
 
                 //deliver the message to the above layer
                 //note: since we do not have actors like in Erlang, when we get something from another layer
                 //it's recommended to handle it on a separate thread
-                Chord.deliverMessage(this.port, message);
+                SocketTester.deliverMessage(this.port, message);
                 //note: the socket layer does not care about the content of the message
+            }catch (IOException | ClassNotFoundException e) {
+                //do something
+                //e.printStackTrace();
             }
+        }
 
+        try{
             socket.close();
-
-
-        } catch (IOException | ClassNotFoundException e) {
+        }catch (IOException e){
             e.printStackTrace();
         }
+
     }
 
     public synchronized void sendMessage(Message message)throws IOException{

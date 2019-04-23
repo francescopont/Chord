@@ -11,6 +11,8 @@ import java.util.Hashtable;
 public class SocketNode implements Runnable {
     //the port is an unique identifier for the node
     private int port;
+    //the socket where I listen for new connections
+    ServerSocket serverSocket;
     //to delete the node
     private boolean terminate;
     // to keep memory on the connection open
@@ -21,15 +23,17 @@ public class SocketNode implements Runnable {
 
 
     //constructor
-    public SocketNode(int port){
-        this.port = port;
+    public SocketNode(int port)throws IOException{
         this.terminate = false;
         this.activeconnections = new Hashtable<>();
+        this.serverSocket = new ServerSocket(port);
+        this.port = serverSocket.getLocalPort();
+        System.out.println("port:" + this.port);
     }
 
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try {
             while (!terminate) {
                 // I got a new connection!!!
                 Socket clientSocket = serverSocket.accept();
@@ -45,7 +49,7 @@ public class SocketNode implements Runnable {
                 this.activeconnections.put(nodeInfo,handler);
 
                 //handle the new connection!!
-                new Thread(new SocketHandler(port,clientSocket)).start();
+                new Thread(handler).start();
 
             }
         } catch (IOException e) {
@@ -85,6 +89,7 @@ public class SocketNode implements Runnable {
         }
 
         if (!yetsend){
+
             try (Socket socket = new Socket(nodeInfo.getIPAddress(),nodeInfo.getPort())){
 
                 //REPEAT THE CODE AS ABOVE
@@ -95,13 +100,11 @@ public class SocketNode implements Runnable {
                 this.activeconnections.put(nodeInfo,handler);
 
                 //handle the new connection!!
-                new Thread(new SocketHandler(port,socket)).start();
-
+                new Thread(handler).start();
                 //finally send the message
                 handler.sendMessage(message);
             }catch (IOException e){
 
-                e.printStackTrace();
                 //andrebbe rilanciato??? gestito diversamente??
             }
         }

@@ -33,6 +33,14 @@ public class Node {
         return this.nodeInfo.getPort();
     }
 
+    public void modifyPort(int port){
+        this.nodeInfo.setPort(port);
+        NodeInfo me = this.nodeInfo;
+        String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
+        this.nodeidentifier = Utilities.hashfunction(key);
+    }
+
+
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize(){
         try{
@@ -50,6 +58,7 @@ public class Node {
             else if (hashedkey_potential_predecessor.compareTo(hashedkey_successor)<0 && hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 ){
                 this.successor_list.set(0, potential_predecessor);
             }
+
         }catch (TimerExpiredException e){
             NodeInfo old_successor = this.successor_list.removeFirst();
             this.finger_table.remove(0);
@@ -62,6 +71,7 @@ public class Node {
         } catch (TimerExpiredException e) {
             //put code here
         }
+
         //una volta che mi arriva la risposta cosa ci faccio?? niente???
     }
 
@@ -78,6 +88,7 @@ public class Node {
             try {
                 dispatcher.sendPing(this.predecessor,this.nodeInfo);
             } catch (TimerExpiredException e) {
+                predecessor = null;
                 //put code here
             }
         }
@@ -145,13 +156,14 @@ public class Node {
         Timer timer = new Timer();
         timer.schedule(new Utilities(this),
         1000);
+        System.out.println("Sto facendo partire un timer");
     }
 
     public boolean isInitialized() {
         return initialized;
     }
-    public void initialize(final NodeInfo myfriend){
 
+    public void initialize(final NodeInfo myfriend){
         NodeInfo successor = null;
         try {
             successor = this.dispatcher.sendSuccessorRequest(myfriend,this.nodeidentifier,this.nodeInfo);
@@ -172,7 +184,12 @@ public class Node {
                     NodeInfo predecessor = successor_list.get(i-1);
                     String key = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
                     String hashedkey = Utilities.hashfunction(key);
-                    NodeInfo successor = dispatcher.sendSuccessorRequest(successor_list.get(i-1),hashedkey);
+                    NodeInfo successor = null;
+                    try {
+                        successor = dispatcher.sendSuccessorRequest(predecessor,hashedkey, nodeInfo);
+                    } catch (TimerExpiredException e) {
+                        //put code here
+                    }
 
                     //questo è un primo modo di gestire un corner case
                     if (successor.equals(nodeidentifier)){
@@ -186,12 +203,17 @@ public class Node {
                 }
 
                 //now I populate the finger table
+                //???
+                //manca un pezzo qua
                 initialized = true;
             }
         }).start();
+
+
         Timer timer = new Timer();
         timer.schedule(new Utilities(this),
                 1000, 1000);
+        System.out.println("Sto facendo partire un timer");
     }
 
     public NodeDispatcher getDispatcher() {
@@ -200,6 +222,7 @@ public class Node {
 
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
     public void notify(NodeInfo potential_predecessor){
+
         if(this.predecessor==null){
             this.predecessor=potential_predecessor;
         }
