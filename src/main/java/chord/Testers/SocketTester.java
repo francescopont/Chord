@@ -1,22 +1,23 @@
-package chord.SocketTester;
+package chord.Testers;
 
 import chord.Messages.Message;
-import chord.Exceptions.PortAlreadyInUseException;
+import chord.Exceptions.PortException;
 import chord.model.NodeInfo;
 import chord.network.Router;
 
 public class SocketTester {
     public static void main(String[] args) {
+
         int actual_port_1 = 10000;
         int actual_port_2 = 10001;
         try {
             Router.addnode(10000);
-        } catch (PortAlreadyInUseException e) {
+        } catch (PortException e) {
             actual_port_1 = e.getPort();
         }
         try{
             Router.addnode(10000);
-        }catch( PortAlreadyInUseException e){
+        }catch( PortException e){
             actual_port_2 = e.getPort();
         }
 

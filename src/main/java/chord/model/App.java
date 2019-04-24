@@ -1,6 +1,6 @@
 package chord.model;
 
-import chord.Exceptions.PortAlreadyInUseException;
+import chord.Exceptions.PortException;
 
 /**
  * Hello world!
@@ -16,7 +16,7 @@ public class App
         try {
             Chord.create("127.0.0.1", 1000);
 
-        } catch (PortAlreadyInUseException e) {
+        } catch (PortException e) {
             actual_port = e.getPort();
         }
         try{

@@ -7,6 +7,7 @@ public class PredecessorRequestMessage extends Message {
 
 
     public PredecessorRequestMessage(NodeInfo destination,  NodeInfo sender) {
+
         super(2, true, destination, sender);
     }
 

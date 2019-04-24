@@ -9,56 +9,57 @@ import chord.network.Router;
 import java.util.*;
 
 public class NodeDispatcher {
-    private Hashtable<Integer, Message> answers;
+    private HashMap<Integer, Message> answers;
     private int port;
-    private int last_delivered;
+    private List<Integer> waiting_tickets;
 
     public NodeDispatcher(int port){
-        this.answers = new Hashtable<>();
+        this.answers = new HashMap<>();
         this.port = port;
-        this.last_delivered = 0;
+        this.waiting_tickets = new LinkedList<>();
     }
 
-    public void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
+    public synchronized void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
         NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
         final int ticket= Router.sendMessage(this.port,notifyRequestMessage);
+        this.waiting_tickets.add(ticket);
         Timer timer = new Timer(false);
         timer.schedule(new TimerTask() {
             @Override
-            public void run() {
+            public void run(){
                 synchronized (this){
-                    if(last_delivered < ticket){
+                    if(waiting_tickets.contains(ticket)){
                         NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,ticket);
                         notifyAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, notifyAnswerMessage);
                     }
                 }
             }
-        }, 1000);
+        }, 10000);
 
-        synchronized (this){
-            while (!this.answers.containsKey(ticket)){
-                try{
-                    wait();
-                }catch (InterruptedException  e){
-                    e.printStackTrace();
-                }
+        while (!this.answers.containsKey(ticket)) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
-            answers.remove(ticket);
-            notifyAnswerMessage.check();
         }
+        NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
+        waiting_tickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        notifyAnswerMessage.check();
     }
 
-    public NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{
+    public synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{
         PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(destination, sender);
         final int ticket = Router.sendMessage(this.port, predecessorRequestMessage);
+        this.waiting_tickets.add(ticket);
         Timer timer = new Timer(false);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 synchronized (this){
-                    if(last_delivered < ticket){
+                    if(waiting_tickets.contains(ticket)){
                         PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(sender,null, destination,ticket);
                         predecessorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,predecessorAnswerMessage);
@@ -66,32 +67,33 @@ public class NodeDispatcher {
                 }
 
             }
-        }, 1000);
+        }, 10000);
 
-        synchronized (this){
-            while (!this.answers.containsKey(ticket)){
-                try{
-                    wait();
-                }catch (InterruptedException  e){
-                    e.printStackTrace();
-                }
+        while (!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            }catch (InterruptedException  e){
+                e.printStackTrace();
             }
-            PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
-            answers.remove(ticket);
-            answerMessage.check();
-            return answerMessage.getPredecessor();
         }
+        PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
+        waiting_tickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        answerMessage.check();
+        return answerMessage.getPredecessor();
     }
 
-    public NodeInfo sendSuccessorRequest(final NodeInfo destination, String node, final NodeInfo sender)throws TimerExpiredException{
+
+    public synchronized NodeInfo sendSuccessorRequest(final NodeInfo destination, String node, final NodeInfo sender)throws TimerExpiredException{
         SuccessorRequestMessage successorRequestMessage= new SuccessorRequestMessage(destination, node, sender);
         final int ticket= Router.sendMessage(this.port, successorRequestMessage);
+        this.waiting_tickets.add(ticket);
         Timer timer = new Timer(false);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 synchronized (this){
-                    if(last_delivered < ticket){
+                    if(waiting_tickets.contains(ticket)){
                         SuccessorAnswerMessage successorAnswerMessage = new SuccessorAnswerMessage(sender,null, destination,ticket);
                         successorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,successorAnswerMessage);
@@ -99,34 +101,31 @@ public class NodeDispatcher {
                 }
 
             }
-        }, 1000);
-
-        synchronized (this){
-            while(!this.answers.containsKey(ticket)){
-                try{
-                    wait();
-                } catch (InterruptedException e){
-                    e.printStackTrace();
-                }
+        }, 10000);
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
             }
-
-            SuccessorAnswerMessage successorAnswerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
-            answers.remove(ticket);
-            successorAnswerMessage.check();
-            return successorAnswerMessage.getSuccessor();
         }
-
+        SuccessorAnswerMessage successorAnswerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
+        waiting_tickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        successorAnswerMessage.check();
+        return successorAnswerMessage.getSuccessor();
     }
 
-    public void sendPing(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException{
+    public synchronized void sendPing(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException{
         PingRequestMessage pingRequestMessage = new PingRequestMessage(destination,sender);
         final int ticket=Router.sendMessage(this.port,pingRequestMessage);
+        this.waiting_tickets.add(ticket);
         Timer timer = new Timer(false);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 synchronized (this){
-                    if(last_delivered < ticket){
+                    if(waiting_tickets.contains(ticket)){
                         PingAnswerMessage successorAnswerMessage = new PingAnswerMessage(sender,destination, ticket);
                         successorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, successorAnswerMessage);
@@ -134,43 +133,26 @@ public class NodeDispatcher {
                 }
 
             }
-        }, 1000);
-        synchronized (this){
-            while(!this.answers.containsKey(ticket)){
-                try{
-                    wait();
-                } catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-            }
-
-            PingAnswerMessage pingAnswerMessage = (PingAnswerMessage) answers.get(ticket);
-            answers.remove(ticket);
-            pingAnswerMessage.check();
-        }
-
-    }
-
-    public synchronized void addAnswer(int ticket, Message message){
-        //devo consegnare i messaggi in ordine di invio?
-        if(ticket <= this.last_delivered){
-            return;
-        }
-        while ( this.last_delivered != ticket -1){
+        }, 10000);
+        while(!this.answers.containsKey(ticket)){
             try{
                 wait();
-            }catch (InterruptedException e){
+            } catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
-        answers.put(ticket,message);
-        last_delivered = ticket;
-        if (last_delivered == Integer.MAX_VALUE){
-            last_delivered =0;
-        }
-        notifyAll();
+        PingAnswerMessage pingAnswerMessage = (PingAnswerMessage) answers.get(ticket);
+        waiting_tickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        pingAnswerMessage.check();
+        System.out.println("ping terminato correttamente da: "+ this.port);
     }
 
+    public synchronized void addAnswer(int ticket, Message message){
+        if( waiting_tickets.contains(ticket) && !answers.containsKey(ticket)){
+            answers.put(ticket,message);
+            notifyAll();
+        }
 
-
+    }
 }

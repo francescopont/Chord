@@ -35,6 +35,10 @@ public class Node {
         return this.nodeInfo.getPort();
     }
 
+    public NodeInfo getPredecessor() {
+        return predecessor;
+    }
+
     public void modifyPort(int port){
         this.nodeInfo.setPort(port);
         NodeInfo me = this.nodeInfo;
@@ -208,8 +212,7 @@ public class Node {
         }).start();
 
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this),1000, 1000);
-        System.out.println("Sto facendo partire un timer");
+        timer.schedule(new Utilities(this),10000, 10000);
     }
 
     public NodeDispatcher getDispatcher() {

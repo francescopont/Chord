@@ -1,7 +1,7 @@
 package chord.network;
 
 import chord.Messages.Message;
-import chord.Exceptions.PortAlreadyInUseException;
+import chord.Exceptions.PortException;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -14,7 +14,7 @@ public class Router {
     private Router(){};
 
     //se la porta è già in uso lancia un'eccezione con la porta effettiva libera che è riuscito ad usare
-    public static void addnode(int port) throws PortAlreadyInUseException {
+    public static void addnode(int port) throws PortException {
         synchronized (nodes){
             SocketNode node;
             try{
@@ -27,12 +27,11 @@ public class Router {
                     int actual_port = node.getPort();
                     nodes.add(node);
                     new Thread(node).start();
-                    throw new PortAlreadyInUseException(actual_port);
+                    throw new PortException(actual_port);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             }
-
         }
 
 
@@ -57,7 +56,6 @@ public class Router {
         for (SocketNode node: nodes){
             if (node.getPort() == port){
                 node.sendMessage(message);
-
             }
         }
     }

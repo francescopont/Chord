@@ -12,7 +12,7 @@ public class SocketNode implements Runnable {
     //the port is an unique identifier for the node
     private int port;
     //the socket where I listen for new connections
-    ServerSocket serverSocket;
+    private ServerSocket serverSocket;
     //to delete the node
     private boolean terminate;
     // to keep memory on the connection open

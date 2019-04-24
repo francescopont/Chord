@@ -1,7 +1,8 @@
 package chord.network;
 
 import chord.Messages.Message;
-import chord.SocketTester.SocketTester;
+import chord.Testers.SocketTester;
+import chord.model.Chord;
 
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class SocketHandler implements Runnable{
                 //deliver the message to the above layer
                 //note: since we do not have actors like in Erlang, when we get something from another layer
                 //it's recommended to handle it on a separate thread
-                SocketTester.deliverMessage(this.port, message);
+                Chord.deliverMessage(this.port, message);
                 //note: the socket layer does not care about the content of the message
             }catch (IOException | ClassNotFoundException e) {
                 //do something

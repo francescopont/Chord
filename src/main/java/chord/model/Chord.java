@@ -15,7 +15,7 @@ package chord.model;
 
 
 import chord.Messages.Message;
-import chord.Exceptions.PortAlreadyInUseException;
+import chord.Exceptions.PortException;
 import chord.network.Router;
 
 import java.util.LinkedList;
@@ -33,7 +33,7 @@ public class Chord{
     //mi sembra la soluzione che più assomiglia ad una libreria "vera" e  che maschera tutta l'implementazione interna
     //inoltre ciascuno nodo fisico può in questo modo creare e gestire tanti nodi virtuali quanti vuole, e
     //il fatto di poter gestire più nodi virtuali migliora le performance, according to the paper
-    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws  PortAlreadyInUseException {
+    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws PortException {
         synchronized (virtualnodes){
             //questo codice è davvero necessario???
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
@@ -42,7 +42,7 @@ public class Chord{
             virtualnodes.add(node);
             try{
                 Router.addnode(port);
-            }catch(PortAlreadyInUseException e){
+            }catch(PortException e){
                 node.modifyPort(e.getPort());
                 throw e;
             }
@@ -52,14 +52,14 @@ public class Chord{
 
     }
 
-    public static void create(String IPAddress, int port)throws PortAlreadyInUseException{
+    public static void create(String IPAddress, int port)throws PortException {
         synchronized (virtualnodes){
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             Node node = new Node(nodeInfo);
             virtualnodes.add(node);
             try{
                 Router.addnode(port);
-            }catch(PortAlreadyInUseException e){
+            }catch(PortException e){
                 node.modifyPort(e.getPort());
                 throw e;
             }
@@ -81,12 +81,15 @@ public class Chord{
     };
 
     public static void deliverMessage(int port, Message message){
+        System.out.println("messaggio ricevuto");
         for (Node virtualnode: virtualnodes){
             if (virtualnode.getPort() == port){
                 MessageHandler handler = new MessageHandler(virtualnode,message);
+                System.out.println("destination: " + port + " message id[recevied]: " +message.getId());
                 new Thread(handler).start();
             }
         }
+
     }
 
     public void deleteNode(int port){
@@ -96,6 +99,11 @@ public class Chord{
                 virtualnode.terminate();
             }
         }
+    }
+
+    //useful for testing
+    public static void addNodeTesting(Node node){
+        virtualnodes.add(node);
     }
 
 
