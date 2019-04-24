@@ -47,11 +47,7 @@ public class NodeDispatcher {
             NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
             answers.remove(ticket);
             notifyAnswerMessage.check();
-
         }
-
-
-
     }
 
     public NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{

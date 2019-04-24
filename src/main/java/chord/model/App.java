@@ -1,6 +1,5 @@
 package chord.model;
 
-import chord.Exceptions.PortAlreadyChosenException;
 import chord.Exceptions.PortAlreadyInUseException;
 
 /**
@@ -19,8 +18,6 @@ public class App
 
         } catch (PortAlreadyInUseException e) {
             actual_port = e.getPort();
-        }catch (PortAlreadyChosenException e){
-            e.printStackTrace();
         }
         try{
             Chord.join("127.0.0.1",10001, "127.0.0.1", actual_port );

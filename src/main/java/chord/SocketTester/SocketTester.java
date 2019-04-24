@@ -15,7 +15,7 @@ public class SocketTester {
             actual_port_1 = e.getPort();
         }
         try{
-            Router.addnode(10001);
+            Router.addnode(10000);
         }catch( PortAlreadyInUseException e){
             actual_port_2 = e.getPort();
         }

@@ -15,7 +15,6 @@ package chord.model;
 
 
 import chord.Messages.Message;
-import chord.Exceptions.PortAlreadyChosenException;
 import chord.Exceptions.PortAlreadyInUseException;
 import chord.network.Router;
 
@@ -24,7 +23,7 @@ import java.util.List;
 
 public class Chord{
     //the list of virtual nodes this application is handling
-    private static List<Node> virtualnodes = new LinkedList<>();
+    private final static List<Node> virtualnodes = new LinkedList<>();
 
 
     //don't let anyone instantiate this class
@@ -34,15 +33,9 @@ public class Chord{
     //mi sembra la soluzione che più assomiglia ad una libreria "vera" e  che maschera tutta l'implementazione interna
     //inoltre ciascuno nodo fisico può in questo modo creare e gestire tanti nodi virtuali quanti vuole, e
     //il fatto di poter gestire più nodi virtuali migliora le performance, according to the paper
-    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws PortAlreadyChosenException, PortAlreadyInUseException {
+    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws  PortAlreadyInUseException {
         synchronized (virtualnodes){
             //questo codice è davvero necessario???
-            for(Node node: virtualnodes){
-                if (node.getPort() == port) {
-                    throw new PortAlreadyChosenException();
-                }
-            }
-
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             NodeInfo knownnode = new NodeInfo(knownIPAddress,knownPort);
             Node node = new Node(nodeInfo);
@@ -55,19 +48,12 @@ public class Chord{
             }
 
             node.initialize(knownnode);
-
-
         }
 
     }
 
-    public static void create(String IPAddress, int port)throws PortAlreadyChosenException,PortAlreadyInUseException{
+    public static void create(String IPAddress, int port)throws PortAlreadyInUseException{
         synchronized (virtualnodes){
-            for(Node node: virtualnodes){
-                if (node.getPort() == port){
-                    throw new PortAlreadyChosenException();
-                }
-            }
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             Node node = new Node(nodeInfo);
             virtualnodes.add(node);
