@@ -1,4 +1,4 @@
-package chord.Messages;
+package chord.Exceptions;
 
 public class TimerExpiredException extends Exception {
 

@@ -1,6 +1,6 @@
 package chord.model;
 
-import chord.Messages.TimerExpiredException;
+import chord.Exceptions.TimerExpiredException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -13,6 +13,7 @@ public class Node {
     private LinkedList<NodeInfo> successor_list;
     private NodeInfo predecessor;
     private boolean initialized;
+    private boolean terminated;
     private final NodeDispatcher dispatcher;
 
     //this constructor is called when you CREATE and when you JOIN an existent Chord
@@ -25,6 +26,7 @@ public class Node {
         this.successor_list = new LinkedList<>();
         this.predecessor = null;
         this.initialized = false;
+        this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
 
     }
@@ -48,7 +50,7 @@ public class Node {
             String key = successor_list.getFirst().getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
             String hashedkey_successor = Utilities.hashfunction(key);
             String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-            String hashedkey_potential_predecessor = Utilities.hashfunction(key);
+            String hashedkey_potential_predecessor = Utilities.hashfunction(potential_key);
 
             if (hashedkey_successor.compareTo(this.nodeidentifier) <0){
                 if(hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 || hashedkey_potential_predecessor.compareTo(hashedkey_successor)<0){
@@ -62,8 +64,6 @@ public class Node {
         }catch (TimerExpiredException e){
             NodeInfo old_successor = this.successor_list.removeFirst();
             this.finger_table.remove(0);
-
-
         }
 
         try {
@@ -94,6 +94,7 @@ public class Node {
         }
         return;
     }
+
 
     //[in a recursive manner]
     //ask this node to find the successor of id
@@ -143,7 +144,7 @@ public class Node {
     }
 
     //when you create a new chord, you have to initialize all the stuff
-    public void initialize(){
+    public synchronized void initialize(){
         for (int i = 0; i<16; i++) {
             finger_table.add(this.nodeInfo);
         }
@@ -151,19 +152,16 @@ public class Node {
         for (int i=0; i<4; i++){
             successor_list.add(this.nodeInfo);
         }
-
         this.initialized = true;
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this),
-        1000);
-        System.out.println("Sto facendo partire un timer");
+        timer.schedule(new Utilities(this),1000);
     }
 
     public boolean isInitialized() {
         return initialized;
     }
 
-    public void initialize(final NodeInfo myfriend){
+    public synchronized void initialize(final NodeInfo myfriend){
         NodeInfo successor = null;
         try {
             successor = this.dispatcher.sendSuccessorRequest(myfriend,this.nodeidentifier,this.nodeInfo);
@@ -209,10 +207,8 @@ public class Node {
             }
         }).start();
 
-
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this),
-                1000, 1000);
+        timer.schedule(new Utilities(this),1000, 1000);
         System.out.println("Sto facendo partire un timer");
     }
 
@@ -222,29 +218,29 @@ public class Node {
 
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
     public void notify(NodeInfo potential_predecessor){
-
         if(this.predecessor==null){
             this.predecessor=potential_predecessor;
         }
-        else{
+        else {
             String key = this.predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
             String hashedkey_predecessor = Utilities.hashfunction(key);
-
             String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-            String hashedkey_potential_predecessor = Utilities.hashfunction(key);
-
-
-            if (hashedkey_predecessor.compareTo(this.nodeidentifier) <0){
-                if(hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0 && hashedkey_potential_predecessor.compareTo(hashedkey_predecessor)>0){
-                    this.predecessor=potential_predecessor;
+            String hashedkey_potential_predecessor = Utilities.hashfunction(potential_key);
+            if (hashedkey_predecessor.compareTo(this.nodeidentifier) < 0) {
+                if (hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0 && hashedkey_potential_predecessor.compareTo(hashedkey_predecessor) > 0) {
+                    this.predecessor = potential_predecessor;
                 }
-            }
-            else if (hashedkey_potential_predecessor.compareTo(hashedkey_predecessor) >0 || hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0 ){
-                this.predecessor=potential_predecessor;
+            } else if (hashedkey_potential_predecessor.compareTo(hashedkey_predecessor) > 0 || hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0) {
+                this.predecessor = potential_predecessor;
             }
         }
-
     }
 
+    public void terminate() {
+        this.terminated = true;
+    }
+    public boolean isTerminated(){
+        return terminated;
+    }
 }
 

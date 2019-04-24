@@ -27,10 +27,9 @@ public class Utilities extends TimerTask {
     //calls periodic functions on the nodes
     @Override
     public void run() {
-        System.out.println("sto facendo partire un utilities "+ virtualnode.getPort());
         synchronized (virtualnode) {
             //this code might be exposed to frequent changes: it's useful to separate it from the Chord class
-            if (virtualnode.isInitialized()) {
+            if (virtualnode.isInitialized() && !virtualnode.isTerminated()) {
                 virtualnode.stabilize();
                 virtualnode.fix_finger(counter);
                 virtualnode.check_predecessor();

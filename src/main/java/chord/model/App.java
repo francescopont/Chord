@@ -1,7 +1,7 @@
 package chord.model;
 
-import chord.PortAlreadyChosenException;
-import chord.PortAlreadyInUseException;
+import chord.Exceptions.PortAlreadyChosenException;
+import chord.Exceptions.PortAlreadyInUseException;
 
 /**
  * Hello world!

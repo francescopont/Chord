@@ -15,13 +15,12 @@ package chord.model;
 
 
 import chord.Messages.Message;
-import chord.PortAlreadyChosenException;
-import chord.PortAlreadyInUseException;
+import chord.Exceptions.PortAlreadyChosenException;
+import chord.Exceptions.PortAlreadyInUseException;
 import chord.network.Router;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
 
 public class Chord{
     //the list of virtual nodes this application is handling
@@ -100,6 +99,15 @@ public class Chord{
             if (virtualnode.getPort() == port){
                 MessageHandler handler = new MessageHandler(virtualnode,message);
                 new Thread(handler).start();
+            }
+        }
+    }
+
+    public void deleteNode(int port){
+        Router.terminate(port);
+        for (Node virtualnode: virtualnodes){
+            if (virtualnode.getPort() == port){
+                virtualnode.terminate();
             }
         }
     }

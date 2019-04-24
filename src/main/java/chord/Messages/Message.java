@@ -1,7 +1,7 @@
 package chord.Messages;
 
 
-import chord.model.Node;
+import chord.Exceptions.TimerExpiredException;
 import chord.model.NodeInfo;
 
 

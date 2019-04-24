@@ -10,7 +10,6 @@ public class MessageHandler implements Runnable {
     public MessageHandler (Node node, Message message){
         this.node = node;
         this.message=message;
-        System.out.println("ho ricevuto un messaggio " + message.getType());
     }
 
     @Override
@@ -31,7 +30,7 @@ public class MessageHandler implements Runnable {
                 //chi riceve la notify controlla se chi gliel'ha mandata possa essere il suo predecessore o meno giusto?
                 node.notify(message.getSender());
                 NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
-                Router.sendMessage(node.getPort(),notifyAnswerMessage);
+                Router.sendAnswer(node.getPort(),notifyAnswerMessage);
                 break;
             case 6:
                 NodeDispatcher dispatcher = node.getDispatcher();

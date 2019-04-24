@@ -13,14 +13,14 @@ import static org.junit.Assert.*;
 
 public class UtilitiesTest {
     private Utilities utilities;
-    //private Node mocknode;
+    private Node mocknode;
 
     @Before
     public void before() throws Exception {
-        //mocknode = mock(Node.class);
+        mocknode = mock(Node.class);
 
         //tested class
-        //utilities = new Utilities(mocknode);
+        utilities = new Utilities(mocknode);
     }
 
     @Test

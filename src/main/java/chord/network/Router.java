@@ -1,7 +1,7 @@
 package chord.network;
 
 import chord.Messages.Message;
-import chord.PortAlreadyInUseException;
+import chord.Exceptions.PortAlreadyInUseException;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -31,7 +31,6 @@ public class Router {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-
             }
 
         }
@@ -42,15 +41,15 @@ public class Router {
     //returns the ticket for that message ( which is basically an incremental identifier)
     //porta= porta da cui mando
     //forse qua è meglio controllare che la porta da cui sto mandando corrisponda alla porta del sender contenuto nel messaggio
-    public static int sendMessage(int port, Message message){
+    public static int sendMessage(int port, Message message) {
         int ticket = Ticket.getTicket();
         message.setId(ticket);
         for (SocketNode node: nodes){
             if (node.getPort() == port){
-
                 node.sendMessage(message);
             }
         }
+
         return ticket;
     }
 
@@ -58,6 +57,7 @@ public class Router {
         for (SocketNode node: nodes){
             if (node.getPort() == port){
                 node.sendMessage(message);
+
             }
         }
     }

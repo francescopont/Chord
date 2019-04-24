@@ -1,5 +1,6 @@
 package chord.model;
 
+import chord.Exceptions.TimerExpiredException;
 import chord.Messages.*;
 import chord.network.Router;
 
@@ -18,7 +19,7 @@ public class NodeDispatcher {
         this.last_delivered = 0;
     }
 
-    public void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{
+    public void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
         NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
         final int ticket= Router.sendMessage(this.port,notifyRequestMessage);
         Timer timer = new Timer(false);
@@ -31,9 +32,7 @@ public class NodeDispatcher {
                         notifyAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, notifyAnswerMessage);
                     }
-
                 }
-
             }
         }, 1000);
 
@@ -66,11 +65,7 @@ public class NodeDispatcher {
                     if(last_delivered < ticket){
                         PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(sender,null, destination,ticket);
                         predecessorAnswerMessage.setException(new TimerExpiredException());
-                        answers.put(ticket,predecessorAnswerMessage);
-                        notifyAll();
-                    }
-                    else{
-                        answers.remove(ticket);
+                        addAnswer(ticket,predecessorAnswerMessage);
                     }
                 }
 
@@ -90,8 +85,6 @@ public class NodeDispatcher {
             answerMessage.check();
             return answerMessage.getPredecessor();
         }
-
-
     }
 
     public NodeInfo sendSuccessorRequest(final NodeInfo destination, String node, final NodeInfo sender)throws TimerExpiredException{
@@ -105,11 +98,7 @@ public class NodeDispatcher {
                     if(last_delivered < ticket){
                         SuccessorAnswerMessage successorAnswerMessage = new SuccessorAnswerMessage(sender,null, destination,ticket);
                         successorAnswerMessage.setException(new TimerExpiredException());
-                        answers.put(ticket,successorAnswerMessage);
-                        notifyAll();
-                    }
-                    else{
-                        answers.remove(ticket);
+                        addAnswer(ticket,successorAnswerMessage);
                     }
                 }
 
@@ -144,11 +133,7 @@ public class NodeDispatcher {
                     if(last_delivered < ticket){
                         PingAnswerMessage successorAnswerMessage = new PingAnswerMessage(sender,destination, ticket);
                         successorAnswerMessage.setException(new TimerExpiredException());
-                        answers.put(ticket,successorAnswerMessage);
-                        notifyAll();
-                    }
-                    else{
-                        answers.remove(ticket);
+                        addAnswer(ticket, successorAnswerMessage);
                     }
                 }
 
@@ -171,6 +156,7 @@ public class NodeDispatcher {
     }
 
     public synchronized void addAnswer(int ticket, Message message){
+        //devo consegnare i messaggi in ordine di invio?
         if(ticket <= this.last_delivered){
             return;
         }
