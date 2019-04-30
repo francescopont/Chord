@@ -89,7 +89,6 @@ public class Chord{
                 new Thread(handler).start();
             }
         }
-
     }
 
     public void deleteNode(int port){
@@ -105,7 +104,6 @@ public class Chord{
     public static void addNodeTesting(Node node){
         virtualnodes.add(node);
     }
-
 
 
 }

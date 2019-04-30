@@ -18,7 +18,7 @@ public class MessageHandler implements Runnable {
         switch (message.getType()){
             case 1:
                 PingAnswerMessage pingAnswerMessage= new PingAnswerMessage(message.getSender(),message.getDestination(),message.getId());
-                //Router.sendAnswer(node.getPort(),pingAnswerMessage);
+                Router.sendAnswer(node.getPort(),pingAnswerMessage);
                 break;
             case 2:
                 /*NodeInfo predecessor = node.getPredecessor();
