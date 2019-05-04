@@ -5,7 +5,7 @@ import chord.model.Chord;
 
 public class NodeTester {
 
-    public static void main(){
+    public static void main(String args[]){
         int actualPort=1000;
         try {
             Chord.create("127.0.0.1",actualPort);
