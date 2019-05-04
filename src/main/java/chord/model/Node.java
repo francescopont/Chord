@@ -217,6 +217,7 @@ public class Node {
         }
         this.successor_list.add(successor);
         this.finger_table.add(0, successor);
+        this.predecessor=null;
 
         //now I populate the successor list and the finger table on a separate thread
         new Thread(new Runnable() {
@@ -247,9 +248,18 @@ public class Node {
                     }
                 }
 
-                //now I populate the finger table
-                //???
-                //manca un pezzo qua
+                for(int i=2; i<16; i++) {
+                    String hashedkey = Utilities.computefinger(nodeidentifier, i);
+                    NodeInfo finger = null;
+                    try {
+                        finger = dispatcher.sendSuccessorRequest(successor_list.getFirst(), hashedkey, nodeInfo);
+                    } catch (TimerExpiredException e) {
+                        e.printStackTrace();
+                    }
+                    finger_table.add(i-1, finger);
+                    //ci pensa poi la stabilize a sistemarla?? o ci penso io subito??
+                }
+
                 initialized = true;
             }
         }).start();
