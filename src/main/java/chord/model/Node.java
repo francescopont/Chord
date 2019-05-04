@@ -103,10 +103,8 @@ public class Node {
     //ask this node to find the successor of id
     //param = an hashed identifier of the item I want to retrieve
     public NodeInfo find_successor(String hashedkey) {
-        System.out.println("sono arrivato");
         //am I responsible for that data?
         if (predecessor != null){
-            System.out.println("entrato");
             String predeccessorkey = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
             String hashedpredecessorkey = Utilities.hashfunction(predeccessorkey);
             if(hashedpredecessorkey.compareTo(this.nodeidentifier)==0){
@@ -207,7 +205,7 @@ public class Node {
         this.predecessor = this.nodeInfo;
         this.initialized = true;
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this), 100000,1000);
+        timer.schedule(new Utilities(this), 100000000,1000000);
     }
 
     public boolean isInitialized() {
@@ -267,6 +265,7 @@ public class Node {
                 }
 
                 initialized = true;
+                printStatus();
             }
         }).start();
 
