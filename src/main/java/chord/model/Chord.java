@@ -104,5 +104,11 @@ public class Chord{
         virtualnodes.add(node);
     }
 
+    public static void printNode(){
+        for(Node node: virtualnodes){
+            node.printStatus();
+        }
+    }
+
 
 }
