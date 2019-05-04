@@ -51,9 +51,9 @@ public class Node {
     public void stabilize() {
         try {
             NodeInfo potential_predecessor = this.dispatcher.sendPredecessorRequest(this.successor_list.getFirst(), this.nodeInfo);
-            String key = successor_list.getFirst().getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+            String key = successor_list.getFirst().getIPAddress().concat(Integer.toString(successor_list.getFirst().getPort()));
             String hashedkey_successor = Utilities.hashfunction(key);
-            String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+            String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(potential_predecessor.getPort()));
             String hashedkey_potential_predecessor = Utilities.hashfunction(potential_key);
 
             if (hashedkey_successor.compareTo(this.nodeidentifier) < 0) {
@@ -199,6 +199,7 @@ public class Node {
         for (int i = 0; i < 4; i++) {
             successor_list.add(this.nodeInfo);
         }
+        this.predecessor = this.nodeInfo;
         this.initialized = true;
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), 1000,1000);
