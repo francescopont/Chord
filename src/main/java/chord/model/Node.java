@@ -1,8 +1,8 @@
 package chord.model;
 
 import chord.Exceptions.TimerExpiredException;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -30,7 +30,6 @@ public class Node {
         this.initialized = false;
         this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
-
     }
 
     public int getPort() {
@@ -47,7 +46,6 @@ public class Node {
         String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
         this.nodeidentifier = Utilities.hashfunction(key);
     }
-
 
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize() {
@@ -105,16 +103,61 @@ public class Node {
     //ask this node to find the successor of id
     //param = an hashed identifier of the item I want to retrieve
     public NodeInfo find_successor(String hashedkey) {
-
-        //first look into the successor list
-        for (NodeInfo successor : this.successor_list) {
-            String key = successor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-            String nodeidentifier = Utilities.hashfunction(key);
-            if (nodeidentifier.compareTo(hashedkey) > 0) {
-                return successor;
+        //am I responsible for that data?
+        if (predecessor != null){
+            String predeccessorkey = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
+            String hashedpredecessorkey = Utilities.hashfunction(predeccessorkey);
+            if (hashedpredecessorkey.compareTo(this.nodeidentifier) > 0){
+                if (hashedpredecessorkey.compareTo(hashedkey)< 0){
+                    return this.nodeInfo;
+                }
+                if (hashedkey.compareTo(this.nodeidentifier)<0){
+                    return this.nodeInfo;
+                }
+            }
+            else if (hashedkey.compareTo(hashedpredecessorkey)>0 && hashedkey.compareTo(this.nodeidentifier)<0){
+                return this.nodeInfo;
             }
         }
-        //else
+
+        //first look in the successor list
+        Iterator<NodeInfo> iterator = this.successor_list.iterator();
+        if (hashedkey.compareTo(this.nodeidentifier) < 0) {
+            boolean Chordstart = false;
+            boolean findsuccessor = false;
+            NodeInfo successor = null;
+            while ((!Chordstart || !findsuccessor) && iterator.hasNext()) {
+                findsuccessor = false;
+                successor = iterator.next();
+                String key = successor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+                String nodeidentifier = Utilities.hashfunction(key);
+                if (nodeidentifier.compareTo(this.nodeidentifier) < 0) {
+                    Chordstart = true;
+                }
+                if (nodeidentifier.compareTo(hashedkey) > 0) {
+                    findsuccessor = true;
+
+                }
+            }
+            if (findsuccessor) {
+                return successor;
+            }
+        }else{
+            boolean findsuccessor = false;
+            NodeInfo successor = null;
+            while (!findsuccessor && iterator.hasNext()) {
+                findsuccessor = false;
+                successor = iterator.next();
+                String key = successor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
+                String nodeidentifier = Utilities.hashfunction(key);
+                if (nodeidentifier.compareTo(hashedkey) > 0 || nodeidentifier.compareTo(this.nodeidentifier) <0) {
+                    return successor;
+
+                }
+            }
+        }
+
+        //else look in the finger table
         //calculating the right finger
         int finger = 1;
         //caso  1: chiave che cerco minore del mio id
@@ -158,9 +201,8 @@ public class Node {
         }
         this.initialized = true;
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this), 1000);
+        timer.schedule(new Utilities(this), 1000,1000);
     }
-
 
     public boolean isInitialized() {
         return initialized;
@@ -261,10 +303,6 @@ public class Node {
             System.out.println(nodeInfo.getIPAddress() + "-" + nodeInfo.getPort() + "\n");
         }
         System.out.println("\n\n");
-
-
-
-
     }
 }
 

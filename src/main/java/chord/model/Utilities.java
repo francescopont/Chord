@@ -2,9 +2,8 @@ package chord.model;
 
 // this class contains all the operations we need to run periodically on each node, and the code for the hash function
 
-// la COMPUTE FINGER dovrebbe essere stata corretta usando gli interi, ma non è stata testata
 
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
