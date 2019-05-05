@@ -15,7 +15,6 @@ public class App
         int actual_port = 1000;
         try {
             Chord.create("127.0.0.1", 1000);
-
         } catch (PortException e) {
             actual_port = e.getPort();
         }
