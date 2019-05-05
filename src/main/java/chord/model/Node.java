@@ -31,6 +31,7 @@ public class Node {
         this.initialized = false;
         this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
+        this.fix_finger_counter = 1;
 
     }
 
@@ -81,10 +82,13 @@ public class Node {
     }
 
     public void fix_finger() {
-        String hashedkey = Utilities.computefinger(this.nodeidentifier, counter);
+        String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
-        this.finger_table.set(counter, nodeInfo);
-        return;
+        this.finger_table.set(fix_finger_counter, nodeInfo);
+        fix_finger_counter++;
+        if (fix_finger_counter == 17){
+            fix_finger_counter = 1;
+        }
     }
 
     //da sistemare
