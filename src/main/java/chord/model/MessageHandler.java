@@ -21,14 +21,11 @@ public class MessageHandler implements Runnable {
                 Router.sendAnswer(node.getPort(),pingAnswerMessage);
                 break;
             case 2:
-                /*NodeInfo predecessor = node.getPredecessor();
-                PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(message.getSender(), predecessor,message.getDestination(),message.getId())
+                NodeInfo predecessor = node.getPredecessor();
+                PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(message.getSender(), predecessor,message.getDestination(),message.getId());
                 Router.sendAnswer(node.getPort(), predecessorAnswerMessage);
                 break;
-                */
-                PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(message.getSender(), null,message.getDestination(),message.getId());
-                Router.sendAnswer(node.getPort(), predecessorAnswerMessage);
-                break;
+
             case 3:
                 NodeInfo successor=node.find_successor(((SuccessorRequestMessage) message).getNodeidentifier());
                 SuccessorAnswerMessage successorAnswerMessage= new SuccessorAnswerMessage(message.getSender(),successor,message.getDestination(),message.getId());
@@ -37,7 +34,7 @@ public class MessageHandler implements Runnable {
 
             case 4:
                 //chi riceve la notify controlla se chi gliel'ha mandata possa essere il suo predecessore o meno giusto?
-                //node.notify(message.getSender());
+                node.notify(message.getSender());
                 NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
                 Router.sendAnswer(node.getPort(),notifyAnswerMessage);
                 break;

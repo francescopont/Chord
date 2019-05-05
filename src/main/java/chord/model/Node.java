@@ -17,6 +17,7 @@ public class Node {
     private boolean initialized;
     private boolean terminated;
     private final NodeDispatcher dispatcher;
+    private int fix_finger_counter;
 
     //this constructor is called when you CREATE and when you JOIN an existent Chord
     public Node(NodeInfo me) {
@@ -30,6 +31,7 @@ public class Node {
         this.initialized = false;
         this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
+
     }
 
     public int getPort() {
@@ -78,7 +80,7 @@ public class Node {
         //una volta che mi arriva la risposta cosa ci faccio?? niente???
     }
 
-    public void fix_finger(int counter) {
+    public void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
         this.finger_table.set(counter, nodeInfo);
@@ -169,20 +171,24 @@ public class Node {
         if (hashedkey.compareTo(this.nodeidentifier) < 0) {
             //vado avanti fino ad arrivare alla teste
             while (Utilities.computefinger(this.nodeidentifier, finger).compareTo(this.nodeidentifier) > 0) {
+                System.out.println("finger " + finger);
                 finger++;
             }
             //una volta arrivata alla testa vado avanti finchè non trovo il primo nodo che supera la chiave che sto cercando
             while ((Utilities.computefinger(this.nodeidentifier, finger).compareTo(hashedkey) < 0)) {
+                System.out.println("finger " + finger);
                 finger++;
             }
         } else { //chiave che cerco maggiore del mio id
             //vado avanti finchè non trovo il primo nodo che supera la chiave o finchè non finisco l'anello e quindi prendo il nodo più piccolo a cui sono arrivato
-            while ((Utilities.computefinger(this.nodeidentifier, finger).compareTo(hashedkey) < 0) || (Utilities.computefinger(this.nodeidentifier, finger).compareTo(this.nodeidentifier) > 0)) {
+            while ((Utilities.computefinger(this.nodeidentifier, finger).compareTo(hashedkey) < 0) && (Utilities.computefinger(this.nodeidentifier, finger).compareTo(this.nodeidentifier) > 0) ) {
+                System.out.println("finger " + finger);
                 finger++;
             }
 
         }
 
+        System.out.println("final finger " + finger);
         //looking into the finger table
         //-2 because the counter starts from 0
         NodeInfo closestSuccessor = this.finger_table.get(finger - 2);

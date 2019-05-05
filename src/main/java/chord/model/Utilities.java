@@ -11,16 +11,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.TimerTask;
 public class Utilities extends TimerTask {
     private final Node virtualnode;
-    private int counter=0;
 
 
     public Utilities(Node node){
         //counter è usato dalla fix finger
         this.virtualnode = node;
-        counter++;
-        if (counter > 16){
-            counter=0;
-        }
     }
 
     //calls periodic functions on the nodes
@@ -30,7 +25,7 @@ public class Utilities extends TimerTask {
             //this code might be exposed to frequent changes: it's useful to separate it from the Chord class
             if (virtualnode.isInitialized() && !virtualnode.isTerminated()) {
                 virtualnode.stabilize();
-                virtualnode.fix_finger(counter);
+                virtualnode.fix_finger();
                 virtualnode.check_predecessor();
             }
         }

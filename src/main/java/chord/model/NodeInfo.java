@@ -7,11 +7,14 @@ public class NodeInfo implements Serializable{
 
     private String IPAddress;
     private int port;
+    private String hash;
 
     //only other classes from this library can create instances
     public NodeInfo(String IPAddress, int port){
         this.IPAddress = IPAddress;
         this.port = port;
+        String key = IPAddress.concat(Integer.toString(port));
+        this.hash = Utilities.hashfunction(key);
     }
 
     //getters and setters
@@ -29,6 +32,10 @@ public class NodeInfo implements Serializable{
 
     public int getPort() {
         return port;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     //it may be useful
