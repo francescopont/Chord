@@ -3,11 +3,11 @@ package chord.model;
 import java.util.Comparator;
 import java.util.Map;
 
-public class FingerTableComparator implements Comparator<NodeInfo> {
+public class NodeComparator implements Comparator<NodeInfo> {
     //the hash where we start from the ring
     private String nodeidentifier;
 
-    public FingerTableComparator(String nodeidentifier) {
+    public NodeComparator(String nodeidentifier) {
         this.nodeidentifier = nodeidentifier;
     }
 
