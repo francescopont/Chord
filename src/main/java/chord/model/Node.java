@@ -119,7 +119,7 @@ public class Node {
         }
         //provo la successor list
         try {
-            successor= successor_list.successor(nodeInfo);
+            successor= successor_list.getSuccessor(key);
         } catch (SuccessorListException e) {
             try {
                 //provo la fingertable

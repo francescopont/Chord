@@ -3,26 +3,24 @@ package chord.model;
 import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.SuccessorListException;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class SuccessorList {
 
-    private List<NodeInfo> successor_list;
+    private TreeMap<String, NodeInfo> successor_list;
     private Comparator comparator;
     private boolean initialized;
 
     public SuccessorList(String nodeIdentifier){
-        this.successor_list =new LinkedList<>();
-        this.comparator= new NodeComparator(nodeIdentifier);
+        Comparator comparator = new NodeComparator(nodeIdentifier);
+        this.comparator = comparator;
+        this.successor_list = new TreeMap<String, NodeInfo>(comparator);
         initialized = false;
     }
 
-    public void addEntry(NodeInfo node){
+    public void addEntry(String key, NodeInfo node){
         if (!initialized){
-            successor_list.add(node);
+            successor_list.put(key, node);
             if (successor_list.size() == 4){
                 initialized = true;
             }
@@ -30,15 +28,14 @@ public class SuccessorList {
     }
 
 
-    public NodeInfo successor(NodeInfo node) throws SuccessorListException,NotInitializedException{
+    public NodeInfo getSuccessor(String node) throws SuccessorListException,NotInitializedException{
         if(!initialized){
             throw new NotInitializedException();
         }
         synchronized (successor_list){
-            Collections.sort(successor_list,comparator);
-            for(NodeInfo nodeInfo: successor_list){
-                if (comparator.compare(nodeInfo,node)>=0){
-                    return nodeInfo;
+            for(String key: successor_list.keySet()){
+                if (comparator.compare(key,node)>=0){
+                    return successor_list.get(key);
                 }
             }
             throw new SuccessorListException();
