@@ -39,6 +39,5 @@ public class FingerTableComparator implements Comparator<NodeInfo> {
         }
         //this instruction is never reached
         return 0;
-
     }
 }
