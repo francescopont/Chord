@@ -1,18 +1,17 @@
 package chord.model;
 
+import chord.Exceptions.NotInitializedException;
+import chord.Exceptions.SuccessorListException;
 import chord.Exceptions.TimerExpiredException;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
+import java.util.*;
 
 public class Node {
     private NodeInfo nodeInfo;
     private String nodeidentifier;
     //attenzione: devo sincerarmi che queste liste mantengano l'ordine di inserimento
-    private List<NodeInfo> finger_table;
-    private LinkedList<NodeInfo> successor_list;
+    private FingerTable finger_table;
+    private SuccessorList successor_list;
     private NodeInfo predecessor;
     private boolean initialized;
     private boolean terminated;
@@ -25,8 +24,8 @@ public class Node {
         //I need to computer the identifier associated to this node, given the key
         String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
         this.nodeidentifier = Utilities.hashfunction(key);
-        this.finger_table = new LinkedList<>();
-        this.successor_list = new LinkedList<>();
+        this.finger_table = new FingerTable(me.getHash());
+        this.successor_list = new SuccessorList(me.getHash());
         this.predecessor = null;
         this.initialized = false;
         this.terminated = false;
@@ -108,99 +107,35 @@ public class Node {
     //[in a recursive manner]
     //ask this node to find the successor of id
     //param = an hashed identifier of the item I want to retrieve
-    public NodeInfo find_successor(String hashedkey) {
-        //am I responsible for that data?
-        if (predecessor != null){
-            String predeccessorkey = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
-            String hashedpredecessorkey = Utilities.hashfunction(predeccessorkey);
-            if(hashedpredecessorkey.compareTo(this.nodeidentifier)==0){
-                return this.nodeInfo;
-            }
-            if (hashedpredecessorkey.compareTo(this.nodeidentifier) > 0){
-                if (hashedpredecessorkey.compareTo(hashedkey)< 0){
-                    return this.nodeInfo;
-                }
-                if (hashedkey.compareTo(this.nodeidentifier)<0){
-                    return this.nodeInfo;
-                }
-            }
-            else if (hashedkey.compareTo(hashedpredecessorkey)>0 && hashedkey.compareTo(this.nodeidentifier)<0){
+    public NodeInfo find_successor( String key){
+        NodeInfo successor=null;
+        //am I responsible for that key? If yes return myself
+        if(predecessor!=null){
+            String predecessorKey= predecessor.getHash();
+            Comparator comparator=new NodeComparator(this.nodeidentifier);
+            if((comparator.compare(this.nodeidentifier,key)>=0)&& (comparator.compare(predecessorKey,key)<0)){
                 return this.nodeInfo;
             }
         }
-
-        //first look in the successor list
-        Iterator<NodeInfo> iterator = this.successor_list.iterator();
-        if (hashedkey.compareTo(this.nodeidentifier) < 0) {
-            boolean Chordstart = false;
-            boolean findsuccessor = false;
-            NodeInfo successor = null;
-            while ((!Chordstart || !findsuccessor) && iterator.hasNext()) {
-                findsuccessor = false;
-                successor = iterator.next();
-                String key = successor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-                String nodeidentifier = Utilities.hashfunction(key);
-                if (nodeidentifier.compareTo(this.nodeidentifier) < 0) {
-                    Chordstart = true;
-                }
-                if (nodeidentifier.compareTo(hashedkey) > 0) {
-                    findsuccessor = true;
-
-                }
-            }
-            if (findsuccessor) {
-                return successor;
-            }
-        }else{
-            boolean findsuccessor = false;
-            NodeInfo successor = null;
-            while (!findsuccessor && iterator.hasNext()) {
-                findsuccessor = false;
-                successor = iterator.next();
-                String key = successor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-                String nodeidentifier = Utilities.hashfunction(key);
-                if (nodeidentifier.compareTo(hashedkey) > 0 || nodeidentifier.compareTo(this.nodeidentifier) <0) {
-                    return successor;
-
-                }
-            }
-        }
-
-        //else look in the finger table
-        //calculating the right finger
-        int finger = 1;
-        //caso  1: chiave che cerco minore del mio id
-        if (hashedkey.compareTo(this.nodeidentifier) < 0) {
-            //vado avanti fino ad arrivare alla teste
-            while (Utilities.computefinger(this.nodeidentifier, finger).compareTo(this.nodeidentifier) > 0) {
-                System.out.println("finger " + finger);
-                finger++;
-            }
-            //una volta arrivata alla testa vado avanti finchè non trovo il primo nodo che supera la chiave che sto cercando
-            while ((Utilities.computefinger(this.nodeidentifier, finger).compareTo(hashedkey) < 0)) {
-                System.out.println("finger " + finger);
-                finger++;
-            }
-        } else { //chiave che cerco maggiore del mio id
-            //vado avanti finchè non trovo il primo nodo che supera la chiave o finchè non finisco l'anello e quindi prendo il nodo più piccolo a cui sono arrivato
-            while ((Utilities.computefinger(this.nodeidentifier, finger).compareTo(hashedkey) < 0) && (Utilities.computefinger(this.nodeidentifier, finger).compareTo(this.nodeidentifier) > 0) ) {
-                System.out.println("finger " + finger);
-                finger++;
-            }
-
-        }
-
-        System.out.println("final finger " + finger);
-        //looking into the finger table
-        //-2 because the counter starts from 0
-        NodeInfo closestSuccessor = this.finger_table.get(finger - 2);
-        NodeInfo successor = null;
+        //provo la successor list
         try {
-            successor = this.dispatcher.sendSuccessorRequest(closestSuccessor, hashedkey, this.nodeInfo);
-        } catch (TimerExpiredException e) {
-            //put code here
+            successor= successor_list.successor(nodeInfo);
+        } catch (SuccessorListException e) {
+            try {
+                //provo la fingertable
+                successor= finger_table.closestSuccessor(nodeInfo);
+                successor= this.dispatcher.sendSuccessorRequest(successor,key,this.nodeInfo);
+            } catch (NotInitializedException ex) {
+                ex.printStackTrace();
+            } catch (TimerExpiredException ex) {
+                ex.printStackTrace();
+            }
+        } catch (NotInitializedException e) {
+            e.printStackTrace();
         }
+
         return successor;
+
     }
 
     //when you create a new chord, you have to initialize all the stuff
