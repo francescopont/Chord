@@ -9,29 +9,21 @@ public class SuccessorList {
 
     private TreeMap<String, NodeInfo> successor_list;
     private Comparator comparator;
-    private boolean initialized;
 
     public SuccessorList(String nodeIdentifier){
         Comparator comparator = new NodeComparator(nodeIdentifier);
         this.comparator = comparator;
         this.successor_list = new TreeMap<String, NodeInfo>(comparator);
-        initialized = false;
     }
 
     public void addEntry(String key, NodeInfo node){
-        if (!initialized){
+        if (successor_list.size() < 4){
             successor_list.put(key, node);
-            if (successor_list.size() == 4){
-                initialized = true;
-            }
         }
     }
 
 
-    public NodeInfo getSuccessor(String node) throws SuccessorListException,NotInitializedException{
-        if(!initialized){
-            throw new NotInitializedException();
-        }
+    public NodeInfo getSuccessor(String node) throws SuccessorListException{
         synchronized (successor_list){
             for(String key: successor_list.keySet()){
                 if (comparator.compare(key,node)>=0){
