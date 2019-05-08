@@ -22,6 +22,10 @@ public class FingerTable{
 
     }
 
+    public void removeFirst(){
+        finger_table.pollFirstEntry();
+    }
+
 
     public NodeInfo closestSuccessor(String node) {
         synchronized (finger_table){

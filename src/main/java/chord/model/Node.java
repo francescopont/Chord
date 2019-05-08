@@ -51,26 +51,20 @@ public class Node {
 
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize() {
+        Comparator comparator= new NodeComparator(nodeidentifier);
         try {
-            NodeInfo potential_predecessor = this.dispatcher.sendPredecessorRequest(this.successor_list.getFirst(), this.nodeInfo);
-            String key = successor_list.getFirst().getIPAddress().concat(Integer.toString(successor_list.getFirst().getPort()));
-            String hashedkey_successor = Utilities.hashfunction(key);
-            String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(potential_predecessor.getPort()));
-            String hashedkey_potential_predecessor = Utilities.hashfunction(potential_key);
+            NodeInfo potential_successor = this.dispatcher.sendPredecessorRequest(this.successor_list.getFirst(), this.nodeInfo);
+            String successor_key = successor_list.getFirst().getHash();
+            String potential_successor_key = potential_successor.getHash();
 
-            if (hashedkey_successor.compareTo(this.nodeidentifier) < 0) {
-                if (hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0 || hashedkey_potential_predecessor.compareTo(hashedkey_successor) < 0) {
-                    this.successor_list.set(0, potential_predecessor);
-                }
-            } else if (hashedkey_potential_predecessor.compareTo(hashedkey_successor) < 0 && hashedkey_potential_predecessor.compareTo(this.nodeidentifier) > 0) {
-                this.successor_list.set(0, potential_predecessor);
+            if((comparator.compare(potential_successor_key,nodeidentifier)>=0)&& (comparator.compare(potential_successor_key,successor_key)<=0){
+                this.successor_list.setFirt(potential_successor_key,potential_successor);
             }
 
         } catch (TimerExpiredException e) {
             NodeInfo old_successor = this.successor_list.removeFirst();
-            this.finger_table.remove(0);
+            this.finger_table.removeFirst();
         }
-
         try {
             this.dispatcher.sendNotify(this.successor_list.getFirst(), this.nodeInfo);
         } catch (TimerExpiredException e) {
@@ -83,7 +77,8 @@ public class Node {
     public void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
-        this.finger_table.set(fix_finger_counter, nodeInfo);
+        //qua come cazzo facciamo??
+        this.finger_table.addEntry(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == 17){
             fix_finger_counter = 1;
@@ -123,15 +118,11 @@ public class Node {
         } catch (SuccessorListException e) {
             try {
                 //provo la fingertable
-                successor= finger_table.closestSuccessor(nodeInfo);
+                successor= finger_table.closestSuccessor(key);
                 successor= this.dispatcher.sendSuccessorRequest(successor,key,this.nodeInfo);
-            } catch (NotInitializedException ex) {
-                ex.printStackTrace();
             } catch (TimerExpiredException ex) {
                 ex.printStackTrace();
             }
-        } catch (NotInitializedException e) {
-            e.printStackTrace();
         }
 
         return successor;
@@ -140,12 +131,11 @@ public class Node {
 
     //when you create a new chord, you have to initialize all the stuff
     public synchronized void initialize() {
-        for (int i = 0; i < 16; i++) {
-            finger_table.add(this.nodeInfo);
+        for (int i = 0; i < 16; i++) { //mi servono sempre i contatori? si per forza
+            finger_table.addEntry(this.nodeidentifier, this.nodeInfo);
         }
-
         for (int i = 0; i < 4; i++) {
-            successor_list.add(this.nodeInfo);
+            successor_list.addEntry(this.nodeidentifier,this.nodeInfo);
         }
         this.predecessor = this.nodeInfo;
         this.initialized = true;
@@ -164,8 +154,8 @@ public class Node {
         } catch (TimerExpiredException e) {
             //put code here
         }
-        this.successor_list.add(successor);
-        this.finger_table.add(0, successor);
+        this.successor_list.addEntry(successor.getHash(),successor);
+        this.finger_table.addEntry(successor.getHash(), successor); // come faccio ad essere sicura che sia in posizione 0??
         this.predecessor=null;
 
         //now I populate the successor list and the finger table on a separate thread
@@ -175,13 +165,13 @@ public class Node {
 
                 //first, the successor list
                 //QUA CI SONO UN PO' DI CORNER CASES DA GESTIRE
+                //capire come fare a fare get e set delle POSIZIONI (un po' sbatti)
                 for (int i = 1; i < 4; i++) {
-                    NodeInfo predecessor = successor_list.get(i - 1);
-                    String key = predecessor.getIPAddress().concat(Integer.toString(predecessor.getPort()));
-                    String hashedkey = Utilities.hashfunction(key);
+                    NodeInfo predecessor = successor_list.getSuccessor(i - 1);
+                    String key = predecessor.getHash();
                     NodeInfo successor = null;
                     try {
-                        successor = dispatcher.sendSuccessorRequest(predecessor, hashedkey, nodeInfo);
+                        successor = dispatcher.sendSuccessorRequest(predecessor, key, nodeInfo);
                     } catch (TimerExpiredException e) {
                         //put code here
                     }
@@ -189,11 +179,11 @@ public class Node {
                     //questo è un primo modo di gestire un corner case
                     if (successor.equals(nodeidentifier)) {
                         while (i < 4) {
-                            successor_list.addLast(nodeInfo);
+                            successor_list.addEntry(nodeidentifier, nodeInfo);
                             i++;
                         }
                     } else {
-                        successor_list.addLast(successor);
+                        successor_list.addEntry(successor.getHash(),successor);
                     }
                 }
 
@@ -205,7 +195,8 @@ public class Node {
                     } catch (TimerExpiredException e) {
                         e.printStackTrace();
                     }
-                    finger_table.add(i-1, finger);
+                    //finger_table.add(i-1, finger);
+                    finger_table.addEntry(hashedkey,finger); //può funzionare perchè l'ordine sarà giusto o poi sistemato?
                     //ci pensa poi la stabilize a sistemarla?? o ci penso io subito??
                 }
 
@@ -227,16 +218,14 @@ public class Node {
         if (this.predecessor == null) {
             this.predecessor = potential_predecessor;
         } else {
-            String key = this.predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-            String hashedkey_predecessor = Utilities.hashfunction(key);
-            String potential_key = potential_predecessor.getIPAddress().concat(Integer.toString(nodeInfo.getPort()));
-            String hashedkey_potential_predecessor = Utilities.hashfunction(potential_key);
-            if (hashedkey_predecessor.compareTo(this.nodeidentifier) < 0) {
-                if (hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0 && hashedkey_potential_predecessor.compareTo(hashedkey_predecessor) > 0) {
-                    this.predecessor = potential_predecessor;
-                }
-            } else if (hashedkey_potential_predecessor.compareTo(hashedkey_predecessor) > 0 || hashedkey_potential_predecessor.compareTo(this.nodeidentifier) < 0) {
-                this.predecessor = potential_predecessor;
+            //ordino i nodi in base al nodo
+            Comparator comparator= new NodeComparator(this.nodeidentifier);
+            //ho le due chiavi
+            String predecessor_key = this.predecessor.getHash();
+            String potential_key = potential_predecessor.getHash();
+            //se la chiave del potenziale successore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
+            if((comparator.compare(predecessor_key,potential_key)<=0) && (comparator.compare(potential_key,nodeidentifier)>=0){
+                this.predecessor=potential_predecessor;
             }
         }
     }
