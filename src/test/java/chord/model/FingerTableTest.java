@@ -13,6 +13,7 @@ public class FingerTableTest {
         fingerTable = new FingerTable("0000");
 
 
+
     }
 
     @Test

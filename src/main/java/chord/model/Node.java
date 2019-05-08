@@ -37,7 +37,6 @@ public class Node {
     public int getPort() {
         return this.nodeInfo.getPort();
     }
-
     public NodeInfo getPredecessor() {
         return predecessor;
     }
