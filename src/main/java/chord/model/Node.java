@@ -1,6 +1,5 @@
 package chord.model;
 
-import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.SuccessorListException;
 import chord.Exceptions.TimerExpiredException;
 
@@ -50,7 +49,7 @@ public class Node {
 
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize() {
-        Comparator comparator= new NodeComparator(nodeidentifier);
+        Comparator comparator= new FingerTableComparator(nodeidentifier);
         try {
             NodeInfo potential_successor = this.dispatcher.sendPredecessorRequest(this.successor_list.getFirst(), this.nodeInfo);
             String successor_key = successor_list.getFirst().getHash();
@@ -106,7 +105,7 @@ public class Node {
         //am I responsible for that key? If yes return myself
         if(predecessor!=null){
             String predecessorKey= predecessor.getHash();
-            Comparator comparator=new NodeComparator(this.nodeidentifier);
+            Comparator comparator=new FingerTableComparator(this.nodeidentifier);
             if((comparator.compare(this.nodeidentifier,key)>=0)&& (comparator.compare(predecessorKey,key)<0)){
                 return this.nodeInfo;
             }
@@ -218,7 +217,7 @@ public class Node {
             this.predecessor = potential_predecessor;
         } else {
             //ordino i nodi in base al nodo
-            Comparator comparator= new NodeComparator(this.nodeidentifier);
+            Comparator comparator= new FingerTableComparator(this.nodeidentifier);
             //ho le due chiavi
             String predecessor_key = this.predecessor.getHash();
             String potential_key = potential_predecessor.getHash();

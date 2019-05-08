@@ -10,7 +10,7 @@ public class SuccessorList {
     private Comparator comparator;
 
     public SuccessorList(String nodeIdentifier){
-        Comparator comparator = new NodeComparator(nodeIdentifier);
+        Comparator comparator = new FingerTableComparator(nodeIdentifier);
         this.comparator = comparator;
         this.successor_list = new TreeMap<String, NodeInfo>(comparator);
     }
@@ -27,7 +27,7 @@ public class SuccessorList {
     }
 
     public void setFirt(String key, NodeInfo nodeInfo){
-        //come faccio??
+
     }
 
     public NodeInfo removeFirst(){
@@ -45,12 +45,12 @@ public class SuccessorList {
 
     public NodeInfo getSuccessor(String node) throws SuccessorListException{
         synchronized (successor_list){
-            for(String key: successor_list.keySet()){
-                if (comparator.compare(key,node)>=0){
-                    return successor_list.get(key);
-                }
+            NodeInfo successor = this.successor_list.ceilingEntry(node).getValue();
+            if(successor == null){
+                throw new SuccessorListException();
             }
-            throw new SuccessorListException();
+            return successor;
+
         }
 
     }
