@@ -21,9 +21,20 @@ public class FingerTable{
         }
     }
 
-    public void modifyEntry(String oldkey, NodeInfo oldnodeInfo,String newkey, NodeInfo newnodeInfo){
-        finger_table.remove(oldkey,oldnodeInfo);
-        finger_table.put(newkey,newnodeInfo);
+    //contiamo da 0 a 15
+    public void modifyEntry(int position, NodeInfo newnodeInfo){
+        Iterator iterator = finger_table.entrySet().iterator();
+        int i = position;
+        while (iterator.hasNext()){
+            i--;
+            if (i==0){
+                finger_table.remove(iterator.next());
+                finger_table.put(newnodeInfo.getHash(),newnodeInfo);
+            }
+            iterator.next();
+
+        }
+
     }
 
     public NodeInfo removeFirst(){
@@ -39,6 +50,7 @@ public class FingerTable{
 
         //da finire
     }
+
 
 
 

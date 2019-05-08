@@ -76,7 +76,6 @@ public class Node {
     public void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
-        //qua come cazzo facciamo??
         this.finger_table.addEntry(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == 17){
