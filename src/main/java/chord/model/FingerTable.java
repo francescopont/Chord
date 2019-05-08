@@ -19,7 +19,14 @@ public class FingerTable{
         if (finger_table.size() < 16){
             finger_table.put(key, node);
         }
+    }
 
+    public void modifyEntry(String oldkey, NodeInfo oldnodeInfo,String newkey, NodeInfo newnodeInfo){
+        finger_table.remove(oldkey,oldnodeInfo);
+        finger_table.put(newkey,newnodeInfo);
+        //abbastanza sbatti perchè posso fare replace ma dei valori non dell'intera entry
+        //posso fare così perchè tanto poi il comparatore ordinerà lui stesso? e pure la stabilize ?
+        //dubito sinceramente
     }
 
     public void removeFirst(){
