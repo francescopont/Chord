@@ -16,6 +16,7 @@ public class Node {
     private boolean terminated;
     private final NodeDispatcher dispatcher;
     private int fix_finger_counter;
+    private NodeComparator comparator;
 
     //this constructor is called when you CREATE and when you JOIN an existent Chord
     public Node(NodeInfo me) {
@@ -30,6 +31,7 @@ public class Node {
         this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
         this.fix_finger_counter = 1;
+        this.comparator=new NodeComparator(me.getHash());
 
     }
 
@@ -49,14 +51,13 @@ public class Node {
 
     //not implemented yet[periodic operations to handle changes in the chord]
     public void stabilize() {
-        Comparator comparator= new FingerTableComparator(nodeidentifier);
         try {
             NodeInfo potential_successor = this.dispatcher.sendPredecessorRequest(this.successor_list.getFirst(), this.nodeInfo);
             String successor_key = successor_list.getFirst().getHash();
             String potential_successor_key = potential_successor.getHash();
 
             if((comparator.compare(potential_successor_key,nodeidentifier)>=0)&& (comparator.compare(potential_successor_key,successor_key)<=0){
-                this.successor_list.setFirt(potential_successor_key,potential_successor);
+                this.successor_list.setFirst(potential_successor_key,potential_successor);
             }
 
         } catch (TimerExpiredException e) {
@@ -105,7 +106,6 @@ public class Node {
         //am I responsible for that key? If yes return myself
         if(predecessor!=null){
             String predecessorKey= predecessor.getHash();
-            Comparator comparator=new FingerTableComparator(this.nodeidentifier);
             if((comparator.compare(this.nodeidentifier,key)>=0)&& (comparator.compare(predecessorKey,key)<0)){
                 return this.nodeInfo;
             }
@@ -216,8 +216,6 @@ public class Node {
         if (this.predecessor == null) {
             this.predecessor = potential_predecessor;
         } else {
-            //ordino i nodi in base al nodo
-            Comparator comparator= new FingerTableComparator(this.nodeidentifier);
             //ho le due chiavi
             String predecessor_key = this.predecessor.getHash();
             String potential_key = potential_predecessor.getHash();

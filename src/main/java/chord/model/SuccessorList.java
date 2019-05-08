@@ -26,8 +26,9 @@ public class SuccessorList {
         return successor_list.get(key);
     }
 
-    public void setFirt(String key, NodeInfo nodeInfo){
-
+    public void setFirst(String key, NodeInfo nodeInfo){
+        this.successor_list.pollFirstEntry();
+        this.successor_list.put(key,nodeInfo);
     }
 
     public NodeInfo removeFirst(){
@@ -37,9 +38,6 @@ public class SuccessorList {
     public void modifyEntry(String oldkey, NodeInfo oldnodeInfo,String newkey, NodeInfo newnodeInfo){
         successor_list.remove(oldkey,oldnodeInfo);
         successor_list.put(newkey,newnodeInfo);
-        //abbastanza sbatti perchè posso fare replace ma dei valori non dell'intera entry
-        //posso fare così perchè tanto poi il comparatore ordinerà lui stesso? e pure la stabilize ?
-        //dubito sinceramente
     }
 
 
