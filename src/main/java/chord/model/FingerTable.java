@@ -38,7 +38,7 @@ public class FingerTable{
     }
 
     public NodeInfo removeFirst(){
-        finger_table.pollFirstEntry();
+        return finger_table.pollFirstEntry().getValue();
     }
 
 

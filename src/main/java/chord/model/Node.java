@@ -56,7 +56,7 @@ public class Node {
             String successor_key = successor_list.getFirst().getHash();
             String potential_successor_key = potential_successor.getHash();
 
-            if((comparator.compare(potential_successor_key,nodeidentifier)>=0)&& (comparator.compare(potential_successor_key,successor_key)<=0){
+            if((comparator.compare(potential_successor_key,nodeidentifier)>=0)&& (comparator.compare(potential_successor_key,successor_key)<=0)){
                 this.successor_list.setFirst(potential_successor_key,potential_successor);
             }
 
@@ -76,7 +76,7 @@ public class Node {
     public void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
-        this.finger_table.addEntry(fix_finger_counter, nodeInfo);
+        this.finger_table.modifyEntry(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == 17){
             fix_finger_counter = 1;
@@ -219,7 +219,7 @@ public class Node {
             String predecessor_key = this.predecessor.getHash();
             String potential_key = potential_predecessor.getHash();
             //se la chiave del potenziale successore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
-            if((comparator.compare(predecessor_key,potential_key)<=0) && (comparator.compare(potential_key,nodeidentifier)>=0){
+            if((comparator.compare(predecessor_key,potential_key)<=0) && (comparator.compare(potential_key,nodeidentifier)>=0)){
                 this.predecessor=potential_predecessor;
             }
         }
