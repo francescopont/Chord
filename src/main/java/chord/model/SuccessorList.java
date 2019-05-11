@@ -46,7 +46,7 @@ public class SuccessorList {
 
     //to get a specific nodeinfo (indexes go from 0 to 4)
     public NodeInfo getElement(int position){
-        Iterator iterator = successorList.keySet().iterator();
+        Iterator<String> iterator = successorList.keySet().iterator();
         int i = position;
         boolean found = false;
         while (iterator.hasNext() && !found){
@@ -55,16 +55,24 @@ public class SuccessorList {
             }
             if(!found){
                 i--;
-                iterator.next();
+                System.out.println(iterator.next());
             }
         }
         return successorList.get(iterator.next());
     }
 
+    public NodeInfo getLastElement(){
+        return this.successorList.lastEntry().getValue();
+    }
+
+    public NodeInfo getFirstElement(){
+        return this.successorList.firstEntry().getValue();
+    }
+
     //useful for testing
     //to print the state of the successorList
     public void printTable(){
-        int i=1;
+        int i=0;
         System.out.println("SUCCESSOR LIST");
         for (String finger: this.successorList.keySet()){
             System.out.println("finger " + i + ": " + finger);

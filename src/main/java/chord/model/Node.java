@@ -57,7 +57,7 @@ public class Node {
     //periodic operations to handle changes in the chord
     public void stabilize() {
         try {
-            NodeInfo successor = this.successorList.getElement(0);
+            NodeInfo successor = this.successorList.getFirstElement()
             NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
             String successorKey = successor.getHash();
             String potentialSuccessorKey = potentialSuccessor.getHash();
@@ -67,12 +67,11 @@ public class Node {
             }
 
         } catch (TimerExpiredException e) {
-            //NodeInfo old_successor = this.successorList.removeFirst();
-            //this.fingerTable.removeFirst();
+            //put code here
         }
 
         try {
-            NodeInfo successor = this.successorList.getElement(0);
+            NodeInfo successor = this.successorList.getFirstElement();
             this.dispatcher.sendNotify(successor, this.nodeInfo);
         } catch (TimerExpiredException e) {
             //put code here
@@ -149,6 +148,8 @@ public class Node {
         this.initialized = true;
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), 100000000,1000000);
+        System.out.println("questo nodo è inizializzato: "+ this.nodeidentifier);
+        this.printStatus();
     }
 
 
@@ -160,51 +161,47 @@ public class Node {
             this.fingerTable.addFinger(successor.getHash(), successor);
             this.predecessor=null;
         } catch (TimerExpiredException e) {
+
             //put code here
         }
 
         //now I populate the successor list and the finger table on a separate thread
         new Thread(() -> {
-                //first, the successor list
-                for (int i = 1; i < 4; i++) {
-                    NodeInfo predecessor = successorList.getElement(i);
-                    String key = predecessor.getHash();
-                    NodeInfo successor = null;
-                    try {
-                        successor = dispatcher.sendSuccessorRequest(predecessor, key, nodeInfo);
-                    } catch (TimerExpiredException e) {
-                        //put code here
-                    }
-
-
-                    if (successor.getHash().equals(nodeidentifier)) {
-                        while (i < 4) {
-                            successorList.addEntry(nodeidentifier, nodeInfo);
-                            i++;
-                        }
-                    } else {
-                        successorList.addEntry(successor.getHash(),successor);
-                    }
+            //first, the successor list
+            for (int i = 1; i < 4; i++) {
+                successorList.printTable();
+                NodeInfo predecessor = successorList.getLastElement();
+                String key = predecessor.getHash();
+                NodeInfo successor = null;
+                try {
+                    successor = dispatcher.sendSuccessorRequest(predecessor, key, nodeInfo);
+                } catch (TimerExpiredException e) {
+                    //put code here
                 }
 
-                for(int i=1; i<16; i++) {
-                    String hashedkey = Utilities.computefinger(nodeidentifier, i);
-                    NodeInfo finger = null;
-                    NodeInfo successor = successorList.getElement(0);
-                    try {
-                        finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
-                        fingerTable.addFinger(hashedkey,finger);
-                    } catch (TimerExpiredException e) {
-                        e.printStackTrace();
+                if (successor.getHash().equals(nodeidentifier)) {
+                    while (i < 4) {
+                        successorList.addEntry(nodeidentifier, nodeInfo);
+                        i++;
                     }
-
+                } else {
+                    successorList.addEntry(successor.getHash(),successor);
                 }
-
-                initialized = true;
-                printStatus();
             }
-        ).start();
-
+            for(int i=1; i<16; i++) {
+                String hashedkey = Utilities.computefinger(nodeidentifier, i);
+                NodeInfo finger = null;
+                NodeInfo successor = successorList.getFirstElement();
+                try {
+                    finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
+                    fingerTable.addFinger(hashedkey,finger);
+                } catch (TimerExpiredException e) {
+                    e.printStackTrace();
+                }
+            }
+            initialized = true;
+            printStatus();
+        }).start();
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), 10000, 10000);
     }

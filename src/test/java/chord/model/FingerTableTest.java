@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
+import static org.junit.Assert.*;
 
 public class FingerTableTest {
     FingerTable fingerTable;
@@ -41,6 +42,8 @@ public class FingerTableTest {
         // we use the fake constructor
         fingerTable2 = new FingerTable("0000", nodeInfoMap2 );
         fingerTable2.printTable();
+
+
     }
 
 
@@ -65,15 +68,23 @@ public class FingerTableTest {
     }
 
     @Test
-    public void modifyEntryTest(){
+    public void modifyFingerTest(){
         NodeInfo nodeInfo = new NodeInfo("eeee");
-        fingerTable.modifyFinger(0,nodeInfo);
+        fingerTable.modifyFinger(15,nodeInfo);
 
         //asserts
         assert(fingerTable.checkMapping());
         assert (fingerTable.containsFinger(nodeInfo.getHash()));
-        assert (!(fingerTable.containsFinger(Utilities.computefinger("0000",0))));
+        assert (!(fingerTable.containsFinger(Utilities.computefinger("0000",15))));
         fingerTable.printTable();
+    }
+
+    @Test
+    public void getFingerTest(){
+        NodeInfo nodeInfo = new NodeInfo("eeee");
+        fingerTable2.addFinger(nodeInfo.getHash(),nodeInfo);
+        NodeInfo nodeInfo2 = fingerTable2.getFinger(14);
+        assert(nodeInfo.equals(nodeInfo2) );
     }
 
 }

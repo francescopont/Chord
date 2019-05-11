@@ -60,7 +60,7 @@ public class FingerTable{
 
     //to get a specific nodeinfo
     public NodeInfo getFinger(int position){
-        Iterator iterator = fingerTable.keySet().iterator();
+        Iterator<String> iterator = fingerTable.keySet().iterator();
         int i = position;
         boolean found = false;
         while (iterator.hasNext() && !found){
@@ -69,16 +69,18 @@ public class FingerTable{
             }
             if(!found){
                 i--;
-                iterator.next();
+                System.out.println(iterator.next());
             }
 
         }
         return fingerTable.get(iterator.next());
     }
 
+
+
     //to print the state of the fingertable
     public void printTable(){
-        int i=1;
+        int i=0;
         System.out.println("FINGER TABLE");
         for (String finger: this.fingerTable.keySet()){
             System.out.println("finger " + i + ": " + finger);
