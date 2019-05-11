@@ -19,7 +19,7 @@ public class NodeTester {
             e.printStackTrace();
         }
 
-        Chord.printNode();
+        Chord.printChord();
     }
 
 }

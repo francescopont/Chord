@@ -5,23 +5,22 @@ import chord.Exceptions.SuccessorListException;
 import java.util.*;
 
 public class SuccessorList {
-
-    private final TreeMap<String, NodeInfo> successor_list;
+    private final TreeMap<String, NodeInfo> successorList;
 
     public SuccessorList(String nodeIdentifier){
         Comparator comparator = new FingerTableComparator(nodeIdentifier);
-        this.successor_list = new TreeMap<String, NodeInfo>(comparator);
+        this.successorList = new TreeMap<String, NodeInfo>(comparator);
     }
 
     public synchronized void addEntry(String key, NodeInfo node){
-        if (successor_list.size() < 4){
-            successor_list.put(key, node);
+        if (successorList.size() < 4){
+            successorList.put(key, node);
         }
     }
 
     //contiamo da 0 a 15
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
-        Iterator<String> iterator = successor_list.keySet().iterator();
+        Iterator<String> iterator = successorList.keySet().iterator();
         int i = position;
         boolean found = false;
         while (iterator.hasNext() && !found){
@@ -33,12 +32,12 @@ public class SuccessorList {
                 iterator.next();
             }
         }
-        successor_list.remove(iterator.next());
-        successor_list.put(newnodeInfo.getHash(),newnodeInfo);
+        successorList.remove(iterator.next());
+        successorList.put(newnodeInfo.getHash(),newnodeInfo);
     }
 
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
-        NodeInfo successor = this.successor_list.ceilingEntry(node).getValue();
+        NodeInfo successor = this.successorList.ceilingEntry(node).getValue();
         if(successor == null){
             throw new SuccessorListException();
         }
@@ -47,7 +46,7 @@ public class SuccessorList {
 
     //to get a specific nodeinfo (indexes go from 0 to 4)
     public NodeInfo getElement(int position){
-        Iterator iterator = successor_list.keySet().iterator();
+        Iterator iterator = successorList.keySet().iterator();
         int i = position;
         boolean found = false;
         while (iterator.hasNext() && !found){
@@ -59,7 +58,18 @@ public class SuccessorList {
                 iterator.next();
             }
         }
-        return successor_list.get(iterator.next());
+        return successorList.get(iterator.next());
+    }
+
+    //useful for testing
+    //to print the state of the successorList
+    public void printTable(){
+        int i=1;
+        System.out.println("SUCCESSOR LIST");
+        for (String finger: this.successorList.keySet()){
+            System.out.println("finger " + i + ": " + finger);
+            i++;
+        }
     }
 
 

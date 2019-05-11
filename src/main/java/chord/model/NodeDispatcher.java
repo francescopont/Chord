@@ -19,6 +19,7 @@ public class NodeDispatcher {
         this.waiting_tickets = new LinkedList<>();
     }
 
+    //a set of methods used to send a message and handle the answer
     public synchronized void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
         NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
         final int ticket= Router.sendMessage(this.port,notifyRequestMessage);
@@ -145,9 +146,9 @@ public class NodeDispatcher {
         waiting_tickets.remove((Integer) ticket);
         answers.remove(ticket);
         pingAnswerMessage.check();
-        System.out.println("ping terminato correttamente da: "+ this.port);
     }
 
+    //this method is used when an answer is received
     public synchronized void addAnswer(int ticket, Message message){
         if( waiting_tickets.contains(ticket) && !answers.containsKey(ticket)){
             answers.put(ticket,message);
