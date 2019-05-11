@@ -28,6 +28,8 @@ public class NodeInfo implements Serializable{
 
     public void setPort(int port) {
         this.port = port;
+        String key = IPAddress.concat(Integer.toString(port));
+        this.hash = Utilities.hashfunction(key);
     }
 
     public int getPort() {
@@ -38,12 +40,21 @@ public class NodeInfo implements Serializable{
         return hash;
     }
 
-    //it may be useful
-    //attenzione: non è l'override del metodo equals standard della classe object
-    public boolean equals(NodeInfo nodeInfo){
-        if (nodeInfo.IPAddress == this.IPAddress && nodeInfo.port == this.port){
-            return true;
-        }
-        return  false;
+
+
+    //useful for testing
+    @Override
+    public boolean equals(Object o){
+        NodeInfo nodeInfo = (NodeInfo) o;
+        return hash.compareTo(nodeInfo.hash) == 0;
     }
+
+    //fake constructor used only for testing
+    public NodeInfo (String hash){
+        this.hash = hash;
+        this.IPAddress = "-.-.-.-";
+        this.port = -1;
+    }
+
+
 }

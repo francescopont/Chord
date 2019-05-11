@@ -13,14 +13,12 @@ import static org.junit.Assert.*;
 
 public class UtilitiesTest {
     private Utilities utilities;
-    private Node mocknode;
 
     @Before
     public void before() throws Exception {
-        mocknode = mock(Node.class);
-
+        Node node = new Node(new NodeInfo("0000"));
         //tested class
-        utilities = new Utilities(mocknode);
+        utilities = new Utilities(node);
     }
 
     @Test
@@ -39,9 +37,16 @@ public class UtilitiesTest {
 
     @Test
     public void computefinger() {
-        String hash = "aaaa";
+        String hash = "0000";
 
-        String finger_0 = Utilities.computefinger(hash,1);
-        assertEquals("aaab", finger_0);
+        String finger_0 = Utilities.computefinger(hash,0);
+        String finger_1 = Utilities.computefinger(hash,1);
+        String finger_2 = Utilities.computefinger(hash,2);
+        String finger_3 = Utilities.computefinger(hash,3);
+        String finger_4 = Utilities.computefinger(hash,4);
+        String finger_5 = Utilities.computefinger(hash,5);
+        String finger_6 = Utilities.computefinger(hash,6);
+
+        assertEquals("0001", finger_0);
     }
 }

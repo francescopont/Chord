@@ -14,7 +14,6 @@ public class Utilities extends TimerTask {
 
 
     public Utilities(Node node){
-        //counter è usato dalla fix finger
         this.virtualnode = node;
     }
 
@@ -45,7 +44,7 @@ public class Utilities extends TimerTask {
             hash = digest.digest(key.getBytes(StandardCharsets.UTF_8));
 
             // Convert hash bytes into StringBuffer ( via integer representation)
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < numberOfBit()/8; i++) {
                 String hex = Integer.toHexString(0xff &  hash[i]);
                 if (hex.length() == 1) hexHash.append('0');
                 hexHash.append(hex);
@@ -56,14 +55,15 @@ public class Utilities extends TimerTask {
         return hexHash.toString();
     }
 
+    //SI CONTA DA 0 A 15
     //to compute the i-th finger in the current Chord, given the node identifier
     //uso sempre l'intero, non ritorno mai ai bytes, per evitare la gestione dei numeri negativi in complemento a due
     public static String computefinger(String nodeidentifier, int finger){
 
         //reconverting the  string nodeidentifier in the  integer representation
-        int[] hash = new int[2];
+        int[] hash = new int[numberOfBit()/8];
         int j=0;
-        for (int i =0; i< 4; i= i+2){
+        for (int i =0; i< (numberOfBit()/8) *2; i= i+2){
             //every byte corresponds to two chars in the String representation
             String number = "" + nodeidentifier.charAt(i) + nodeidentifier.charAt(i+1);
             hash[j] = Integer.parseInt(number,16);
@@ -71,21 +71,16 @@ public class Utilities extends TimerTask {
 
         }
 
-
         //counter starts from 0
-        finger = 16-finger;
-
-
-
+        finger = numberOfBit()-finger;
 
         //changing the byte
         //the function recursion basically executes the sum, handlind the eventual carry over
-        //se gli passo il riferimento allora non sta modificando una copia, ma davvero l'array hash
-        recursion(hash, (int) Math.pow(2,(15-finger)%8), finger/8);
+        recursion(hash, (int) Math.pow(2,(numberOfBit()-finger)%8), (finger-1)/8);
 
         //reconverting the hash in the String representation to return
         StringBuffer hexHash = new StringBuffer();
-        for (int h = 0; h < 2; h++) {
+        for (int h = 0; h < numberOfBit()/8; h++) {
             String hex = Integer.toHexString(hash[h]);
             if (hex.length() == 1) hexHash.append('0');
             hexHash.append(hex);
@@ -105,6 +100,11 @@ public class Utilities extends TimerTask {
             }
             //se siamo al bit più grande è giusto che il riporto si perda
         }
+    }
+
+    public static int numberOfBit(){
+        //numero di bit che voglio usare, su un massimo di 160 dell'algoritmo sha 1
+        return 16;
     }
 
     //REAL CODE

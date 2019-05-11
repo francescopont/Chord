@@ -1,7 +1,7 @@
 package chord.model;
 
 import java.util.Comparator;
-import java.util.Map;
+
 
 public class FingerTableComparator implements Comparator<String> {
     //the hash where we start from the ring
@@ -12,9 +12,6 @@ public class FingerTableComparator implements Comparator<String> {
         this.nodeidentifier = nodeidentifier;
     }
 
-
-
-    //problema: quando gli passo il nodeidentifier che succede?
     // ho fatto queste scelte di minori e uguali pensando alla successor list
     @Override
     public int compare(String hash1, String hash2){

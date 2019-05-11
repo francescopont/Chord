@@ -30,7 +30,7 @@ public class Node {
         this.initialized = false;
         this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
-        this.fix_finger_counter = 1;
+        this.fix_finger_counter = 0;
         this.comparator=new NodeComparator(me.getHash());
 
     }
@@ -49,23 +49,26 @@ public class Node {
         this.nodeidentifier = Utilities.hashfunction(key);
     }
 
-    //not implemented yet[periodic operations to handle changes in the chord]
+    //periodic operations to handle changes in the chord
     public void stabilize() {
         try {
-            NodeInfo potential_successor = this.dispatcher.sendPredecessorRequest(this.successor_list.getFirst(), this.nodeInfo);
-            String successor_key = successor_list.getFirst().getHash();
+            NodeInfo successor = this.successor_list.getElement(0);
+            NodeInfo potential_successor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
+            String successor_key = successor.getHash();
             String potential_successor_key = potential_successor.getHash();
 
             if((comparator.compare(potential_successor_key,nodeidentifier)>=0)&& (comparator.compare(potential_successor_key,successor_key)<=0)){
-                this.successor_list.setFirst(potential_successor_key,potential_successor);
+                this.successor_list.modifyEntry(0,potential_successor);
             }
 
         } catch (TimerExpiredException e) {
-            NodeInfo old_successor = this.successor_list.removeFirst();
-            this.finger_table.removeFirst();
+            //NodeInfo old_successor = this.successor_list.removeFirst();
+            //this.finger_table.removeFirst();
         }
+
         try {
-            this.dispatcher.sendNotify(this.successor_list.getFirst(), this.nodeInfo);
+            NodeInfo successor = this.successor_list.getElement(0);
+            this.dispatcher.sendNotify(successor, this.nodeInfo);
         } catch (TimerExpiredException e) {
             //put code here
         }
@@ -76,14 +79,13 @@ public class Node {
     public void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
-        this.finger_table.modifyEntry(fix_finger_counter, nodeInfo);
+        this.finger_table.modifyFinger(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
-        if (fix_finger_counter == 17){
-            fix_finger_counter = 1;
+        if (fix_finger_counter == Utilities.numberOfBit()){
+            fix_finger_counter = 0;
         }
     }
 
-    //da sistemare
     public void check_predecessor() {
         if (predecessor != null) {
             try {
@@ -109,17 +111,20 @@ public class Node {
                 return this.nodeInfo;
             }
         }
-        //provo la successor list
+        //Is anyone from the successor list responsable for that key?
         try {
-            successor= successor_list.getSuccessor(key);
+            successor= successor_list.closestSuccessor(key);
+            return successor;
         } catch (SuccessorListException e) {
-            try {
-                //provo la fingertable
-                successor= finger_table.closestSuccessor(key);
-                successor= this.dispatcher.sendSuccessorRequest(successor,key,this.nodeInfo);
-            } catch (TimerExpiredException ex) {
-                ex.printStackTrace();
-            }
+            //the key is beyond the last entry of the successor list
+        }
+
+        //look in the finger table
+        try {
+            successor= finger_table.closestPredecessor(key);
+            successor= this.dispatcher.sendSuccessorRequest(successor,key,this.nodeInfo);
+        } catch (TimerExpiredException ex) {
+            ex.printStackTrace();
         }
 
         return successor;
@@ -129,7 +134,7 @@ public class Node {
     //when you create a new chord, you have to initialize all the stuff
     public synchronized void initialize() {
         for (int i = 0; i < 16; i++) { //mi servono sempre i contatori? si per forza
-            finger_table.addEntry(this.nodeidentifier, this.nodeInfo);
+            finger_table.addFinger(this.nodeidentifier, this.nodeInfo);
         }
         for (int i = 0; i < 4; i++) {
             successor_list.addEntry(this.nodeidentifier,this.nodeInfo);
@@ -152,7 +157,7 @@ public class Node {
             //put code here
         }
         this.successor_list.addEntry(successor.getHash(),successor);
-        this.finger_table.addEntry(successor.getHash(), successor); // come faccio ad essere sicura che sia in posizione 0??
+        this.finger_table.addFinger(successor.getHash(), successor); // come faccio ad essere sicura che sia in posizione 0??
         this.predecessor=null;
 
         //now I populate the successor list and the finger table on a separate thread
@@ -164,7 +169,7 @@ public class Node {
                 //QUA CI SONO UN PO' DI CORNER CASES DA GESTIRE
                 //capire come fare a fare get e set delle POSIZIONI (un po' sbatti)
                 for (int i = 1; i < 4; i++) {
-                    NodeInfo predecessor = successor_list.getSuccessor(i - 1);
+                    //NodeInfo predecessor = successor_list.closestSuccessor(i - 1);
                     String key = predecessor.getHash();
                     NodeInfo successor = null;
                     try {
@@ -193,7 +198,7 @@ public class Node {
                         e.printStackTrace();
                     }
                     //finger_table.add(i-1, finger);
-                    finger_table.addEntry(hashedkey,finger); //può funzionare perchè l'ordine sarà giusto o poi sistemato?
+                    finger_table.addFinger(hashedkey,finger); //può funzionare perchè l'ordine sarà giusto o poi sistemato?
                     //ci pensa poi la stabilize a sistemarla?? o ci penso io subito??
                 }
 
@@ -239,13 +244,9 @@ public class Node {
         System.out.println("It's me:  " + this.nodeidentifier + "!\n" +
                 "Predecessor: " + this.predecessor + "\n"
                 + "Successor list: " + "\n");
-        for (NodeInfo nodeInfo: this.successor_list){
-            System.out.println(nodeInfo.getIPAddress() + "-" + nodeInfo.getPort() + "\n");
-        }
+        //manca il print sulla successor list
         System.out.println("finger table: " + "\n");
-        for (NodeInfo nodeInfo: this.finger_table){
-            System.out.println(nodeInfo.getIPAddress() + "-" + nodeInfo.getPort() + "\n");
-        }
+        finger_table.printTable();
         System.out.println("\n\n");
     }
 }
