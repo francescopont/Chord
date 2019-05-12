@@ -2,47 +2,53 @@ package chord.model;
 import java.util.*;
 
 public class FingerTable{
-    private final TreeMap<String, NodeInfo> fingerTable;
+    private final TreeMap<Finger, NodeInfo> fingerTable;
 
     //constructor
     public FingerTable(String nodeIdentifier){
-        Comparator comparator = new FingerTableComparator(nodeIdentifier);
-        this.fingerTable =new TreeMap<String, NodeInfo>(comparator);
+        this.fingerTable =new TreeMap<Finger, NodeInfo>(new FingerTableComparator(nodeIdentifier));
     }
 
     //to add an entry when the finger table is not full
-    public synchronized void addFinger(String key, NodeInfo node){
+    public synchronized void addFinger(NodeInfo node){
         if (fingerTable.size() < Utilities.numberOfBit()){
-            fingerTable.put(key, node);
+            String key = node.getHash();
+            Finger finger = new Finger(key);
+            int position = fingerTable.ceilingKey(finger).getNumberofFinger();
+            position++;
+            fingerTable.put(finger, node);
+
+            //check the correctness of the other fingers
+            for (Finger finger1 : fingerTable.tailMap(finger, false).keySet()) {
+                position++;
+                finger1.setNumberofFinger(position);
+            }
+
         }
     }
 
     //contiamo da 0 A 15
-    public synchronized void modifyFinger(int position, NodeInfo newnodeInfo){
-        Iterator<String> iterator = fingerTable.keySet().iterator();
-        int i = position;
-        boolean found = false;
-        while (iterator.hasNext() && !found){
-            if (i==0){
-                found = true;
-            }
-            if(!found){
-                i--;
-                iterator.next();
+    public synchronized void modifyFinger(int position,  NodeInfo newnodeInfo){
+        Iterator<Finger> iterator = fingerTable.keySet().iterator();
+        while (iterator.hasNext()){
+            Finger finger = iterator.next();
+            if (finger.getNumberofFinger() == position){
+                finger.setHash(newnodeInfo.getHash());
+                fingerTable.put(finger,newnodeInfo);
             }
         }
-        fingerTable.remove(iterator.next());
-        fingerTable.put(newnodeInfo.getHash(), newnodeInfo);
+
     }
 
     //to get the closest precedessor of a given nodeidentifier
     public synchronized NodeInfo closestPredecessor(String node) {
-        return this.fingerTable.floorEntry(node).getValue();
+        Finger finger = new Finger(node);
+        return this.fingerTable.floorEntry(finger).getValue();
     }
 
 
     //useful for testing
-    public FingerTable(String nodeIdentifier, Map<String, NodeInfo> fingers){
+    public FingerTable(String nodeIdentifier, Map<Finger, NodeInfo> fingers){
         Comparator comparator = new FingerTableComparator(nodeIdentifier);
         this.fingerTable =new TreeMap<>(comparator);
         this.fingerTable.putAll(fingers);
@@ -50,8 +56,8 @@ public class FingerTable{
 
     //to check if every key maps to the right nodeinfo ( a bit trivial)
     public boolean checkMapping(){
-        for (Map.Entry<String,NodeInfo> entry : this.fingerTable.entrySet()){
-            if (!(entry.getKey().equals(entry.getValue().getHash()))){
+        for (Map.Entry<Finger,NodeInfo> entry : this.fingerTable.entrySet()){
+            if (!(entry.getKey().getHash().equals(entry.getValue().getHash()))){
                 return false;
             }
         }
@@ -59,54 +65,57 @@ public class FingerTable{
     }
 
     //to get a specific nodeinfo
+    //positions go from 0 to 15
     public NodeInfo getFinger(int position){
-        Iterator<String> iterator = fingerTable.keySet().iterator();
-        int i = position;
-        boolean found = false;
-        while (iterator.hasNext() && !found){
-            if (i==0){
-                found = true;
+        for (Map.Entry<Finger, NodeInfo> entry : fingerTable.entrySet()) {
+            if (entry.getKey().getNumberofFinger() == position) {
+                return entry.getValue();
             }
-            if(!found){
-                i--;
-                System.out.println(iterator.next());
-            }
-
         }
-        return fingerTable.get(iterator.next());
+
+        //if the method is called properly, this instruction is never reached
+        return fingerTable.lastEntry().getValue();
     }
 
 
 
     //to print the state of the fingertable
     public void printTable(){
-        int i=0;
         System.out.println("FINGER TABLE");
-        for (String finger: this.fingerTable.keySet()){
-            System.out.println("finger " + i + ": " + finger);
-            i++;
+        for (Finger finger: this.fingerTable.keySet()){
+            System.out.println("finger " + finger.getNumberofFinger() + ": " + finger.getHash());
+
         }
     }
 
     // to remove a finger ( it should never be used without calling addfinger immediately after
     public synchronized NodeInfo removeFinger(int position){
-        Iterator<String> iterator = fingerTable.keySet().iterator();
-        int i = position;
-        boolean found = false;
-        while (iterator.hasNext() && !found){
-            if (i==0){
-                found = true;
-            }
-            if(!found){
-                i--;
-                iterator.next();
+        Iterator<Finger> iterator = fingerTable.keySet().iterator();
+        NodeInfo nodeInfo = null;
+        while (iterator.hasNext()){
+            Finger finger = iterator.next();
+            if (finger.getNumberofFinger() == position){
+                 nodeInfo = fingerTable.remove(finger);
+
+                //check the correctness of the other fingers
+                Iterator<Finger> tailIterator = fingerTable.tailMap(finger,false).keySet().iterator();
+                while (tailIterator.hasNext()){
+                    iterator.next().setNumberofFinger(position);
+                    position++;
+
+                }
             }
         }
-        return fingerTable.remove(iterator.next());
+        return nodeInfo;
     }
 
     public boolean containsFinger(String key){
-        return this.fingerTable.containsKey(key);
+        for (Finger finger : fingerTable.keySet()) {
+            if (finger.getHash() == key) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

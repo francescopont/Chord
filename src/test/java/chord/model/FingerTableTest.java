@@ -16,12 +16,13 @@ public class FingerTableTest {
 
     @Before
     public void setUp() throws Exception {
-        Map<String, NodeInfo> nodeInfoMap = new HashMap<>();
+        Map<Finger, NodeInfo> nodeInfoMap = new HashMap<>();
         String hash = "0000";
         for (int i = 0; i< 16; i++){
             //we use here the fake constructor
             NodeInfo nodeInfo = new NodeInfo(Utilities.computefinger(hash,i));
-            nodeInfoMap.put(nodeInfo.getHash(),nodeInfo);
+            Finger finger = new Finger(nodeInfo.getHash(),i);
+            nodeInfoMap.put(finger,nodeInfo);
         }
 
         //tested class
@@ -30,12 +31,13 @@ public class FingerTableTest {
         fingerTable.printTable();
 
         //fingertable for addFinger
-        Map<String, NodeInfo> nodeInfoMap2 = new HashMap<>();
+        Map<Finger, NodeInfo> nodeInfoMap2 = new HashMap<>();
         String hash2 = "0000";
         for (int i = 0; i< 15; i++){
             //we use here the fake constructor
             NodeInfo nodeInfo = new NodeInfo(Utilities.computefinger(hash,i));
-            nodeInfoMap2.put(nodeInfo.getHash(),nodeInfo);
+            Finger finger = new Finger(nodeInfo.getHash(),i);
+            nodeInfoMap2.put(finger,nodeInfo);
         }
 
         //tested class
@@ -51,7 +53,8 @@ public class FingerTableTest {
     @Test
     public void addEntryTest(){
         NodeInfo nodeInfo = new NodeInfo("eeee");
-        fingerTable2.addFinger(nodeInfo.getHash(),nodeInfo);
+        Finger finger = new Finger(nodeInfo.getHash());
+        fingerTable2.addFinger(nodeInfo);
 
         //asserts
         assert(fingerTable2.checkMapping());
@@ -82,7 +85,7 @@ public class FingerTableTest {
     @Test
     public void getFingerTest(){
         NodeInfo nodeInfo = new NodeInfo("eeee");
-        fingerTable2.addFinger(nodeInfo.getHash(),nodeInfo);
+        fingerTable2.addFinger(nodeInfo);
         NodeInfo nodeInfo2 = fingerTable2.getFinger(14);
         assert(nodeInfo.equals(nodeInfo2) );
     }

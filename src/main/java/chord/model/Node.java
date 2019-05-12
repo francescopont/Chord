@@ -57,7 +57,7 @@ public class Node {
     //periodic operations to handle changes in the chord
     public void stabilize() {
         try {
-            NodeInfo successor = this.successorList.getFirstElement()
+            NodeInfo successor = this.successorList.getFirstElement();
             NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
             String successorKey = successor.getHash();
             String potentialSuccessorKey = potentialSuccessor.getHash();
@@ -139,7 +139,7 @@ public class Node {
     //this method is called when you create a new Chord
     public synchronized void initialize() {
         for (int i = 0; i < 16; i++) { //mi servono sempre i contatori? si per forza
-            fingerTable.addFinger(this.nodeidentifier, this.nodeInfo);
+            fingerTable.addFinger( this.nodeInfo);
         }
         for (int i = 0; i < 4; i++) {
             successorList.addEntry(this.nodeidentifier,this.nodeInfo);
@@ -158,7 +158,7 @@ public class Node {
         try {
             NodeInfo successor = this.dispatcher.sendSuccessorRequest(myfriend, this.nodeidentifier, this.nodeInfo);
             this.successorList.addEntry(successor.getHash(),successor);
-            this.fingerTable.addFinger(successor.getHash(), successor);
+            this.fingerTable.addFinger( successor);
             this.predecessor=null;
         } catch (TimerExpiredException e) {
 
@@ -194,7 +194,7 @@ public class Node {
                 NodeInfo successor = successorList.getFirstElement();
                 try {
                     finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
-                    fingerTable.addFinger(hashedkey,finger);
+                    fingerTable.addFinger(finger);
                 } catch (TimerExpiredException e) {
                     e.printStackTrace();
                 }
