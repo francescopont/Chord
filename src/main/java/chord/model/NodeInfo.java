@@ -28,6 +28,7 @@ public class NodeInfo implements Serializable{
 
     public void setPort(int port) {
         this.port = port;
+        // I need to update the hash function
         String key = IPAddress.concat(Integer.toString(port));
         this.hash = Utilities.hashfunction(key);
     }
@@ -35,7 +36,6 @@ public class NodeInfo implements Serializable{
     public int getPort() {
         return port;
     }
-
     public String getHash() {
         return hash;
     }
