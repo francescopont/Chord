@@ -2,24 +2,24 @@ package chord.model;
 
 public class Finger {
     private  String hash;
-    //numberofFinger goes from 0 to 15
-    private  int numberofFinger;
+    //position goes from 0 to 15
+    private  int position;
 
     public Finger(String hash){
-        this.numberofFinger = -1;
+        this.position = -1;
         this.hash = hash;
     }
 
-    public int getNumberofFinger(){
-        return this.numberofFinger;
+    public int getPosition(){
+        return this.position;
     }
 
     public String getHash(){
         return this.hash;
     }
 
-    public void setNumberofFinger(int numberofFinger) {
-        this.numberofFinger = numberofFinger;
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public void setHash(String hash) {
@@ -28,13 +28,13 @@ public class Finger {
 
     //useful for testing
     public Finger(String hash, int position){
-        this.numberofFinger = position;
+        this.position = position;
         this.hash = hash;
     }
 
     @Override
     public boolean equals(Object o){
         Finger finger = (Finger) o;
-        return this.hash.equals(finger.hash)  && numberofFinger == finger.numberofFinger;
+        return this.hash.equals(finger.hash)  && position == finger.position;
     }
 }

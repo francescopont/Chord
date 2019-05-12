@@ -54,7 +54,7 @@ public class MessageHandler implements Runnable {
     request of predecessor 2
     find successor 3
     notify 4
-     initial request of successor 6
+
 
 
     reply 6

@@ -28,7 +28,6 @@ public class SocketNode implements Runnable {
         this.activeconnections = new Hashtable<>();
         this.serverSocket = new ServerSocket(port);
         this.port = serverSocket.getLocalPort();
-        System.out.println("port:" + this.port);
     }
 
     @Override

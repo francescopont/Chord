@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 
 public class  Message implements Serializable{
-
     private final NodeInfo destination; //the destination address of this message
     private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
     private final boolean ack; //indica se è il messaggio richiede una risposta
@@ -18,13 +17,7 @@ public class  Message implements Serializable{
     private TimerExpiredException exception;
     private final NodeInfo sender;
 
-    //passati da costruttore e non più modificabili
-    // l'id viene preso da ticket e quindi è settato in seguito
-
-
-
-
-
+    //constructor
     public Message(int type, boolean ack, NodeInfo destination, NodeInfo sender){
         this.type=type;
         this.ack=ack;
@@ -63,6 +56,7 @@ public class  Message implements Serializable{
         this.exception = exception;
     }
 
+    //to check if the current message has an exception
     public void check() throws TimerExpiredException {
         if (this.exception != null){
             throw  this.exception;

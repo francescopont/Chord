@@ -5,39 +5,50 @@ import chord.Exceptions.SuccessorListException;
 import java.util.*;
 
 public class SuccessorList {
-    private final TreeMap<String, NodeInfo> successorList;
+    private final TreeMap<Finger, NodeInfo> successorList;
 
     public SuccessorList(String nodeIdentifier){
-        Comparator comparator = new FingerTableComparator(nodeIdentifier);
-        this.successorList = new TreeMap<String, NodeInfo>(comparator);
+        this.successorList = new TreeMap<Finger, NodeInfo>(new FingerTableComparator(nodeIdentifier));
     }
 
-    public synchronized void addEntry(String key, NodeInfo node){
+    public synchronized void addEntry( NodeInfo node){
         if (successorList.size() < 4){
-            successorList.put(key, node);
+            String key = node.getHash();
+            Finger finger = new Finger(key);
+            successorList.put(finger, node);
+            int position;
+            if (successorList.lowerKey(finger) != null){
+                position = successorList.lowerKey(finger).getPosition();
+                position++;
+            }else{
+                position =0;
+            }
+            finger.setPosition(position);
+
+            //check the correctness of the other fingers
+            for (Finger finger1 : successorList.tailMap(finger, false).keySet()) {
+                position++;
+                finger1.setPosition(position);
+            }
         }
     }
 
     //contiamo da 0 a 15
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
-        Iterator<String> iterator = successorList.keySet().iterator();
-        int i = position;
-        boolean found = false;
-        while (iterator.hasNext() && !found){
-            if (i==0){
-                found = true;
-            }
-            if(!found){
-                i--;
-                iterator.next();
+        Iterator<Finger> iterator = successorList.keySet().iterator();
+        while (iterator.hasNext()){
+            Finger finger = iterator.next();
+            if (finger.getPosition() == position){
+                finger.setHash(newnodeInfo.getHash());
+                successorList.put(finger,newnodeInfo);
             }
         }
-        successorList.remove(iterator.next());
-        successorList.put(newnodeInfo.getHash(),newnodeInfo);
+
     }
 
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
-        NodeInfo successor = this.successorList.ceilingEntry(node).getValue();
+        Finger finger = new Finger(node);
+        NodeInfo successor = this.successorList.ceilingEntry(finger).getValue();
         if(successor == null){
             throw new SuccessorListException();
         }
@@ -46,19 +57,14 @@ public class SuccessorList {
 
     //to get a specific nodeinfo (indexes go from 0 to 4)
     public NodeInfo getElement(int position){
-        Iterator<String> iterator = successorList.keySet().iterator();
-        int i = position;
-        boolean found = false;
-        while (iterator.hasNext() && !found){
-            if (i==0){
-                found = true;
-            }
-            if(!found){
-                i--;
-                System.out.println(iterator.next());
+        for (Map.Entry<Finger, NodeInfo> entry : successorList.entrySet()) {
+            if (entry.getKey().getPosition() == position) {
+                return entry.getValue();
             }
         }
-        return successorList.get(iterator.next());
+
+        //if the method is called properly, this instruction is never reached
+        return successorList.lastEntry().getValue();
     }
 
     public NodeInfo getLastElement(){
@@ -74,8 +80,8 @@ public class SuccessorList {
     public void printTable(){
         int i=0;
         System.out.println("SUCCESSOR LIST");
-        for (String finger: this.successorList.keySet()){
-            System.out.println("finger " + i + ": " + finger);
+        for (Finger finger: this.successorList.keySet()){
+            System.out.println("finger " + finger.getPosition() + ": " + finger.getHash());
             i++;
         }
     }

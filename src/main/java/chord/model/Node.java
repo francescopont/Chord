@@ -8,7 +8,6 @@ import java.util.*;
 public class Node {
     private NodeInfo nodeInfo;
     private String nodeidentifier;
-    //attenzione: devo sincerarmi che queste liste mantengano l'ordine di inserimento
     private FingerTable fingerTable;
     private SuccessorList successorList;
     private NodeInfo predecessor;
@@ -142,7 +141,7 @@ public class Node {
             fingerTable.addFinger( this.nodeInfo);
         }
         for (int i = 0; i < 4; i++) {
-            successorList.addEntry(this.nodeidentifier,this.nodeInfo);
+            successorList.addEntry(this.nodeInfo);
         }
         this.predecessor = this.nodeInfo;
         this.initialized = true;
@@ -157,7 +156,7 @@ public class Node {
     public synchronized void initialize(final NodeInfo myfriend) {
         try {
             NodeInfo successor = this.dispatcher.sendSuccessorRequest(myfriend, this.nodeidentifier, this.nodeInfo);
-            this.successorList.addEntry(successor.getHash(),successor);
+            this.successorList.addEntry(successor);
             this.fingerTable.addFinger( successor);
             this.predecessor=null;
         } catch (TimerExpiredException e) {
@@ -181,11 +180,11 @@ public class Node {
 
                 if (successor.getHash().equals(nodeidentifier)) {
                     while (i < 4) {
-                        successorList.addEntry(nodeidentifier, nodeInfo);
+                        successorList.addEntry( nodeInfo);
                         i++;
                     }
                 } else {
-                    successorList.addEntry(successor.getHash(),successor);
+                    successorList.addEntry(successor);
                 }
             }
             for(int i=1; i<16; i++) {

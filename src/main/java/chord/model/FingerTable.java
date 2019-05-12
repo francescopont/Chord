@@ -14,14 +14,21 @@ public class FingerTable{
         if (fingerTable.size() < Utilities.numberOfBit()){
             String key = node.getHash();
             Finger finger = new Finger(key);
-            int position = fingerTable.ceilingKey(finger).getNumberofFinger();
-            position++;
             fingerTable.put(finger, node);
+            int position;
+            if (fingerTable.lowerKey(finger) != null){
+                position = fingerTable.lowerKey(finger).getPosition();
+                position++;
+            }else{
+                position =0;
+            }
+
+            finger.setPosition(position);
 
             //check the correctness of the other fingers
             for (Finger finger1 : fingerTable.tailMap(finger, false).keySet()) {
                 position++;
-                finger1.setNumberofFinger(position);
+                finger1.setPosition(position);
             }
 
         }
@@ -32,7 +39,7 @@ public class FingerTable{
         Iterator<Finger> iterator = fingerTable.keySet().iterator();
         while (iterator.hasNext()){
             Finger finger = iterator.next();
-            if (finger.getNumberofFinger() == position){
+            if (finger.getPosition() == position){
                 finger.setHash(newnodeInfo.getHash());
                 fingerTable.put(finger,newnodeInfo);
             }
@@ -68,7 +75,7 @@ public class FingerTable{
     //positions go from 0 to 15
     public NodeInfo getFinger(int position){
         for (Map.Entry<Finger, NodeInfo> entry : fingerTable.entrySet()) {
-            if (entry.getKey().getNumberofFinger() == position) {
+            if (entry.getKey().getPosition() == position) {
                 return entry.getValue();
             }
         }
@@ -83,7 +90,7 @@ public class FingerTable{
     public void printTable(){
         System.out.println("FINGER TABLE");
         for (Finger finger: this.fingerTable.keySet()){
-            System.out.println("finger " + finger.getNumberofFinger() + ": " + finger.getHash());
+            System.out.println("finger " + finger.getPosition() + ": " + finger.getHash());
 
         }
     }
@@ -94,13 +101,13 @@ public class FingerTable{
         NodeInfo nodeInfo = null;
         while (iterator.hasNext()){
             Finger finger = iterator.next();
-            if (finger.getNumberofFinger() == position){
+            if (finger.getPosition() == position){
                  nodeInfo = fingerTable.remove(finger);
 
                 //check the correctness of the other fingers
                 Iterator<Finger> tailIterator = fingerTable.tailMap(finger,false).keySet().iterator();
                 while (tailIterator.hasNext()){
-                    iterator.next().setNumberofFinger(position);
+                    iterator.next().setPosition(position);
                     position++;
 
                 }
