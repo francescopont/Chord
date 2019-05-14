@@ -1,6 +1,10 @@
 package chord.model;
 
 import chord.Exceptions.PortException;
+import chord.Exceptions.TimerExpiredException;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Hello world!
@@ -25,7 +29,19 @@ public class App
             e.printStackTrace();
         }
 
+        try{
+            Chord.join("127.0.0.1",10002, "127.0.0.1", actual_port );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
+        Timer timer=new Timer();
 
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Chord.printChord();
+            }
+        }, 240000);
     }
 }

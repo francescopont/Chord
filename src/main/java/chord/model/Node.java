@@ -56,18 +56,16 @@ public class Node {
     public void stabilize() {
         try {
             NodeInfo successor = this.successorList.getFirstElement();
-            NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
-            String successorKey = successor.getHash();
-            String potentialSuccessorKey = potentialSuccessor.getHash();
+                NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
+                String successorKey = successor.getHash();
+                String potentialSuccessorKey = potentialSuccessor.getHash();
 
-            if((comparator.compare(potentialSuccessorKey,nodeidentifier)>=0)&& (comparator.compare(potentialSuccessorKey,successorKey)<=0)){
-                this.successorList.modifyEntry(0,potentialSuccessor);
-            }
-
+                if((comparator.compare(potentialSuccessorKey,nodeidentifier)>=0)&& (comparator.compare(potentialSuccessorKey,successorKey)<=0)){
+                    this.successorList.modifyEntry(0,potentialSuccessor);
+                }
         } catch (TimerExpiredException e) {
             //put code here
         }
-
         try {
             NodeInfo successor = this.successorList.getFirstElement();
             this.dispatcher.sendNotify(successor, this.nodeInfo);
