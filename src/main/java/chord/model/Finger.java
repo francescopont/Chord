@@ -5,9 +5,12 @@ public class Finger {
     //position goes from 0 to 15
     private  int position;
 
+    private boolean initializing;
+
     public Finger(String hash){
         this.position = -1;
         this.hash = hash;
+        this.initializing=false;
     }
 
     public int getPosition(){
@@ -26,10 +29,15 @@ public class Finger {
         this.hash = hash;
     }
 
+    public void setInitializing(boolean initializing) {this.initializing=initializing;}
+
+    public boolean getInitializing(){ return this.initializing; }
+
     //useful for testing
     public Finger(String hash, int position){
         this.position = position;
         this.hash = hash;
+        this.initializing=false;
     }
 
     @Override

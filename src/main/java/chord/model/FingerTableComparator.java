@@ -17,6 +17,9 @@ public class FingerTableComparator implements Comparator<Finger> {
     public int compare(Finger finger1, Finger finger2){
         String hash1 = finger1.getHash();
         String hash2 = finger2.getHash();
+        if(finger1.getInitializing()|| finger2.getInitializing()){
+            return finger1.getPosition()- finger2.getPosition();
+        }
         //case1: both values are greater than the nodeidentifier
         if (hash1.compareTo(nodeidentifier)>0 && hash2.compareTo(nodeidentifier) >0){
             //we compare them as usual

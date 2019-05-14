@@ -14,29 +14,23 @@ public class FingerTable{
     }
 
     //to add an entry when the finger table is not full
+    //this
     public synchronized void addFinger(NodeInfo node){
         if (fingerTable.size() < Utilities.numberOfBit()){
-            String key = node.getHash();
+            if(fingerTable.size()==0){
+                Finger finger= new Finger(node.getHash(),0);
+                finger.setInitializing(true);
+                fingerTable.put(finger,node);
+                finger.setInitializing(false);
+            }
             printTable();
-            Finger finger = new Finger(key);
+            int position= this.fingerTable.lastKey().getPosition()+1;
+            Finger finger = new Finger(node.getHash(),position);
+            finger.setInitializing(true);
             fingerTable.put(finger, node);
+            finger.setInitializing(false);
             System.out.println("sto aggiungendo un nuovo elemento");
-            int position;
-            if (fingerTable.lowerKey(finger) != null){
-                position = fingerTable.lowerKey(finger).getPosition();
-                position++;
-            }else{
-                position =0;
-            }
             printTable();
-
-            finger.setPosition(position);
-
-            //check the correctness of the other fingers
-            for (Finger finger1 : fingerTable.tailMap(finger, false).keySet()) {
-                position++;
-                finger1.setPosition(position);
-            }
 
         }
     }

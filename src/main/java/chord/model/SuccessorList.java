@@ -15,23 +15,17 @@ public class SuccessorList {
 
     public synchronized void addEntry( NodeInfo node){
         if (successorList.size() < 4){
-            String key = node.getHash();
-            Finger finger = new Finger(key);
+            if(successorList.size()==0){
+                Finger finger=new Finger(node.getHash(), 0);
+                finger.setInitializing(true);
+                successorList.put(finger,node);
+                finger.setInitializing(false);
+            }
+            int position=this.successorList.lastKey().getPosition()+1;
+            Finger finger = new Finger(node.getHash(), position);
+            finger.setInitializing(true);
             successorList.put(finger, node);
-            int position;
-            if (successorList.lowerKey(finger) != null){
-                position = successorList.lowerKey(finger).getPosition();
-                position++;
-            }else{
-                position =0;
-            }
-            finger.setPosition(position);
-
-            //check the correctness of the other fingers
-            for (Finger finger1 : successorList.tailMap(finger, false).keySet()) {
-                position++;
-                finger1.setPosition(position);
-            }
+            finger.setInitializing(false);
         }
     }
 

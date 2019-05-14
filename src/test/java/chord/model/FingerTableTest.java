@@ -64,9 +64,11 @@ public class FingerTableTest {
 
     @Test
     public void closestPredecessorTest(){
-        NodeInfo nodeInfo = new NodeInfo("0004");
+        NodeInfo nodeInfo = new NodeInfo("0000");
+        NodeInfo nodeInfo1= new NodeInfo("8000");
         NodeInfo response = fingerTable.closestPredecessor(nodeInfo.getHash());
-        assert (response.equals(nodeInfo));
+        //assert (response.equals(nodeInfo));
+        assert  (response.equals(nodeInfo1));
         fingerTable.printTable();
     }
 
