@@ -32,11 +32,13 @@ public class SuccessorList {
     //contiamo da 0 a 15
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
         Iterator<Finger> iterator = successorList.keySet().iterator();
-        while (iterator.hasNext()){
+        boolean end = false;
+        while (!end && iterator.hasNext()){
             Finger finger = iterator.next();
             if (finger.getPosition() == position){
                 finger.setHash(newnodeInfo.getHash());
                 successorList.put(finger,newnodeInfo);
+                end = false;
             }
         }
 

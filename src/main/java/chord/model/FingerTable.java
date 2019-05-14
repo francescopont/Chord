@@ -34,11 +34,13 @@ public class FingerTable{
     //contiamo da 0 A 15
     public synchronized void modifyFinger(int position,  NodeInfo newnodeInfo){
         Iterator<Finger> iterator = fingerTable.keySet().iterator();
-        while (iterator.hasNext()){
+        boolean end = false;
+        while (!end && iterator.hasNext()){
             Finger finger = iterator.next();
             if (finger.getPosition() == position){
                 finger.setHash(newnodeInfo.getHash());
                 fingerTable.put(finger,newnodeInfo);
+                end = true;
             }
         }
 
