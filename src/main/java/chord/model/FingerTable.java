@@ -23,15 +23,11 @@ public class FingerTable{
                 fingerTable.put(finger,node);
                 finger.setInitializing(false);
             }
-            printTable();
             int position= this.fingerTable.lastKey().getPosition()+1;
             Finger finger = new Finger(node.getHash(),position);
             finger.setInitializing(true);
             fingerTable.put(finger, node);
             finger.setInitializing(false);
-            System.out.println("sto aggiungendo un nuovo elemento");
-            printTable();
-
         }
     }
 

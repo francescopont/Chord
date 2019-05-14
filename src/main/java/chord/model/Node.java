@@ -195,6 +195,7 @@ public class Node {
                 }
             }
             initialized = true;
+            printStatus();
         }).start();
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), Utilities.getPeriod(), Utilities.getPeriod());

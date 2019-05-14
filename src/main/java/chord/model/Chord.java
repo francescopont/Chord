@@ -76,7 +76,6 @@ public class Chord{
     };
 
 
-
     public void deleteNode(int port){
         Router.terminate(port);
         for (Node virtualnode: virtualnodes){
