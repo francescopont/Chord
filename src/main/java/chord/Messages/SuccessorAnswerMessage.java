@@ -1,6 +1,5 @@
 package chord.Messages;
 
-import chord.Messages.Message;
 import chord.model.NodeInfo;
 
 public class SuccessorAnswerMessage extends Message {

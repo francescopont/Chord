@@ -1,5 +1,9 @@
 package chord.model;
-import java.util.*;
+
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class FingerTable{
     private final TreeMap<Finger, NodeInfo> fingerTable;
@@ -13,8 +17,10 @@ public class FingerTable{
     public synchronized void addFinger(NodeInfo node){
         if (fingerTable.size() < Utilities.numberOfBit()){
             String key = node.getHash();
+            printTable();
             Finger finger = new Finger(key);
             fingerTable.put(finger, node);
+            System.out.println("sto aggiungendo un nuovo elemento");
             int position;
             if (fingerTable.lowerKey(finger) != null){
                 position = fingerTable.lowerKey(finger).getPosition();
@@ -22,6 +28,7 @@ public class FingerTable{
             }else{
                 position =0;
             }
+            printTable();
 
             finger.setPosition(position);
 

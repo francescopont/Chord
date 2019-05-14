@@ -13,10 +13,10 @@ package chord.model;
 //TO DO
 
 
-
-import chord.Messages.Message;
 import chord.Exceptions.PortException;
+import chord.Messages.Message;
 import chord.network.Router;
+
 import java.util.LinkedList;
 import java.util.List;
 

@@ -18,11 +18,13 @@ public class App
         } catch (PortException e) {
             actual_port = e.getPort();
         }
+        /*
         try{
             Chord.join("127.0.0.1",10001, "127.0.0.1", actual_port );
         }catch (Exception e){
             e.printStackTrace();
         }
+        */
 
 
     }

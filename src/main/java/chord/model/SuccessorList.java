@@ -2,7 +2,9 @@ package chord.model;
 
 import chord.Exceptions.SuccessorListException;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class SuccessorList {
     private final TreeMap<Finger, NodeInfo> successorList;

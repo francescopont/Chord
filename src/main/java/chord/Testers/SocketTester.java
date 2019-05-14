@@ -1,7 +1,7 @@
 package chord.Testers;
 
-import chord.Messages.Message;
 import chord.Exceptions.PortException;
+import chord.Messages.Message;
 import chord.model.NodeInfo;
 import chord.network.Router;
 

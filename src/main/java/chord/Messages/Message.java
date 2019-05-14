@@ -4,7 +4,6 @@ package chord.Messages;
 import chord.Exceptions.TimerExpiredException;
 import chord.model.NodeInfo;
 
-
 import java.io.Serializable;
 
 

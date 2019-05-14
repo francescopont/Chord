@@ -2,8 +2,7 @@ package chord.model;
 
 import chord.Exceptions.SuccessorListException;
 import chord.Exceptions.TimerExpiredException;
-
-import java.util.*;
+import java.util.Timer;
 
 public class Node {
     private NodeInfo nodeInfo;
@@ -76,7 +75,6 @@ public class Node {
             //put code here
         }
 
-        //una volta che mi arriva la risposta cosa ci faccio?? niente???
     }
 
     public void fix_finger() {
@@ -137,7 +135,7 @@ public class Node {
     //when you create a new chord, you have to initialize all the stuff
     //this method is called when you create a new Chord
     public synchronized void initialize() {
-        for (int i = 0; i < 16; i++) { //mi servono sempre i contatori? si per forza
+        for (int i = 0; i < Utilities.numberOfBit(); i++) {
             fingerTable.addFinger( this.nodeInfo);
         }
         for (int i = 0; i < 4; i++) {
@@ -146,8 +144,7 @@ public class Node {
         this.predecessor = this.nodeInfo;
         this.initialized = true;
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this), 100000000,1000000);
-        System.out.println("questo nodo è inizializzato: "+ this.nodeidentifier);
+        timer.schedule(new Utilities(this), Utilities.getPeriod(),Utilities.getPeriod());
         this.printStatus();
     }
 
@@ -168,7 +165,6 @@ public class Node {
         new Thread(() -> {
             //first, the successor list
             for (int i = 1; i < 4; i++) {
-                successorList.printTable();
                 NodeInfo predecessor = successorList.getLastElement();
                 String key = predecessor.getHash();
                 NodeInfo successor = null;
@@ -187,7 +183,7 @@ public class Node {
                     successorList.addEntry(successor);
                 }
             }
-            for(int i=1; i<16; i++) {
+            for(int i=1; i<Utilities.numberOfBit(); i++) {
                 String hashedkey = Utilities.computefinger(nodeidentifier, i);
                 NodeInfo finger = null;
                 NodeInfo successor = successorList.getFirstElement();
@@ -199,10 +195,9 @@ public class Node {
                 }
             }
             initialized = true;
-            printStatus();
         }).start();
         Timer timer = new Timer();
-        timer.schedule(new Utilities(this), 10000, 10000);
+        timer.schedule(new Utilities(this), Utilities.getPeriod(), Utilities.getPeriod());
     }
 
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno

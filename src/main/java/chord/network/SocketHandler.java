@@ -1,9 +1,7 @@
 package chord.network;
 
 import chord.Messages.Message;
-import chord.Testers.SocketTester;
 import chord.model.Chord;
-
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

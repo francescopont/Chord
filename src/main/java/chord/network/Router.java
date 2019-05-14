@@ -1,7 +1,7 @@
 package chord.network;
 
-import chord.Messages.Message;
 import chord.Exceptions.PortException;
+import chord.Messages.Message;
 
 import java.io.IOException;
 import java.util.LinkedList;
