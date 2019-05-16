@@ -3,7 +3,7 @@ package chord.model;
 import java.util.Comparator;
 
 
-public class FingerTableComparator implements Comparator<Finger> {
+public class FingerTableComparator implements Comparator<String> {
     //the hash where we start from the ring
     private String nodeidentifier;
 
@@ -14,12 +14,8 @@ public class FingerTableComparator implements Comparator<Finger> {
 
     // ho fatto queste scelte di minori e uguali pensando alla successor list
     @Override
-    public int compare(Finger finger1, Finger finger2){
-        String hash1 = finger1.getHash();
-        String hash2 = finger2.getHash();
-        if(finger1.getInitializing()|| finger2.getInitializing()){
-            return finger1.getPosition()- finger2.getPosition();
-        }
+    public int compare(String hash1, String hash2){
+
         //case1: both values are greater than the nodeidentifier
         if (hash1.compareTo(nodeidentifier)>0 && hash2.compareTo(nodeidentifier) >0){
             //we compare them as usual

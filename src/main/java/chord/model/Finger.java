@@ -41,8 +41,10 @@ public class Finger {
     }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals (Object o){
         Finger finger = (Finger) o;
-        return this.hash.equals(finger.hash)  && position == finger.position;
+        return  hash.equals(finger.hash);
     }
+
+
 }

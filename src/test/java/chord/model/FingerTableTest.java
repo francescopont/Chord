@@ -6,9 +6,6 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.*;
-
 public class FingerTableTest {
     FingerTable fingerTable;
     FingerTable fingerTable2;
@@ -74,13 +71,13 @@ public class FingerTableTest {
 
     @Test
     public void modifyFingerTest(){
-        NodeInfo nodeInfo = new NodeInfo("eeee");
-        fingerTable.modifyFinger(15,nodeInfo);
+        NodeInfo nodeInfo = new NodeInfo("7000");
+        fingerTable.modifyFinger(0,nodeInfo);
 
         //asserts
         assert(fingerTable.checkMapping());
         assert (fingerTable.containsFinger(nodeInfo.getHash()));
-        assert (!(fingerTable.containsFinger(Utilities.computefinger("0000",15))));
+        assert (!(fingerTable.containsFinger(Utilities.computefinger("0000",0))));
         fingerTable.printTable();
     }
 

@@ -90,7 +90,7 @@ public class Chord{
         for (Node virtualnode: virtualnodes){
             if (virtualnode.getPort() == port){
                 MessageHandler handler = new MessageHandler(virtualnode,message);
-                System.out.println("destination: " + port + " message id: " +message.getId() + " messageType: " + message.getType());
+                System.out.println("destination: " + port + " message id: " +message.getId() + "  messageType: " + message.getType());
                 new Thread(handler).start();
             }
         }

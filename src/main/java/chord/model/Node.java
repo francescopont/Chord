@@ -2,6 +2,7 @@ package chord.model;
 
 import chord.Exceptions.SuccessorListException;
 import chord.Exceptions.TimerExpiredException;
+
 import java.util.Timer;
 
 public class Node {
