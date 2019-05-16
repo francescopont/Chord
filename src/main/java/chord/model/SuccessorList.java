@@ -21,18 +21,6 @@ public class SuccessorList {
     public synchronized void addEntry( NodeInfo node){
         if (successors.size() < 4){
             successors.addLast(node);
-            /*if(map.size()==0){
-                Finger finger=new Finger(node.getHash(), 0);
-                finger.setInitializing(true);
-                map.put(finger,node);
-                finger.setInitializing(false);
-            }
-            int position=this.map.lastKey().getPosition()+1;
-            Finger finger = new Finger(node.getHash(), position);
-            finger.setInitializing(true);
-            map.put(finger, node);
-            finger.setInitializing(false);
-            */
         }
     }
 
@@ -44,42 +32,6 @@ public class SuccessorList {
         this.successors.set(position, newnodeInfo);
         System.out.println("ho cambiato la posizione");
         printTable();
-
-
-        /*
-        Iterator<Finger> iterator = map.keySet().iterator();
-
-        boolean end = false;
-        Finger finger = null;
-        while (!end && iterator.hasNext()){
-            finger = iterator.next();
-            if (finger.getPosition() == position){
-                System.out.println("sto cambiando tramite modify la posizione "+ position);
-                System.out.println("voglio aggiungere l'hash "+ newnodeInfo.getHash());
-                end = true;
-
-            }
-        }
-
-        finger.setHash(newnodeInfo.getHash());
-        printTable();
-        NodeInfo nodeInfo = map.put(finger, newnodeInfo);
-        if (nodeInfo == null){
-            System.out.println("hai un problema");
-        }
-        printTable();
-
-        finger.setInitializing(true);
-        map.remove(finger);
-        printTable();
-        Finger finger1 = new Finger(newnodeInfo.getHash(), finger.getPosition());
-        finger1.setInitializing(true);
-        map.put(finger1,newnodeInfo);
-        printTable();
-        finger1.setInitializing(false);
-
-        printTable();
-        */
     }
 
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
@@ -118,7 +70,6 @@ public class SuccessorList {
         System.out.println("size: " + this.successors.size());
         for (NodeInfo nodeInfo: this.successors){
             System.out.println("finger " + i + " : " + nodeInfo.getHash() );
-
             i++;
         }
     }
