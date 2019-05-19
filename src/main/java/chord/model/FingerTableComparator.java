@@ -15,7 +15,6 @@ public class FingerTableComparator implements Comparator<String> {
     // ho fatto queste scelte di minori e uguali pensando alla successor list
     @Override
     public int compare(String hash1, String hash2){
-
         //case1: both values are greater than the nodeidentifier
         if (hash1.compareTo(nodeidentifier)>0 && hash2.compareTo(nodeidentifier) >0){
             //we compare them as usual

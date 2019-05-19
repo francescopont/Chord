@@ -39,7 +39,6 @@ public class FingerTable{
         for (NodeInfo nodeInfo : this.fingers){
             this.map.put(nodeInfo.getHash(), nodeInfo);
         }
-
         Map.Entry<String, NodeInfo> successor = this.map.floorEntry(node);
         return successor.getValue();
     }

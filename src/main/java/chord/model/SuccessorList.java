@@ -26,16 +26,10 @@ public class SuccessorList {
 
     //contiamo da 0 a 3
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
-        System.out.println("sto cambiando tramite modify la posizione "+ position);
-        System.out.println("voglio aggiungere l'hash "+ newnodeInfo.getHash());
-        printTable();
         this.successors.set(position, newnodeInfo);
-        System.out.println("ho cambiato la posizione");
-        printTable();
     }
 
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
-        System.out.println("ho chiamato la closest successor rispetto alla chiave " + node);
         this.map.clear();
         for (NodeInfo nodeInfo : this.successors){
             this.map.put(nodeInfo.getHash(), nodeInfo);
@@ -45,7 +39,6 @@ public class SuccessorList {
         if(successor == null){
             throw new SuccessorListException();
         }
-        System.out.println("ho trovato come closest successor " + successor.getValue().getHash());
         return successor.getValue();
     }
 
