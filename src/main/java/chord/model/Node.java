@@ -13,7 +13,7 @@ public class Node {
     private NodeInfo predecessor;
     private boolean initialized;
     private boolean terminated;
-    private final NodeDispatcher dispatcher;
+    private NodeDispatcher dispatcher;
     private int fix_finger_counter;
     private NodeComparator comparator;
 
@@ -21,8 +21,7 @@ public class Node {
     public Node(NodeInfo me) {
         this.nodeInfo = me;
         //I need to computer the identifier associated to this node, given the key
-        String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
-        this.nodeidentifier = Utilities.hashfunction(key);
+        this.nodeidentifier = me.getHash();
         this.fingerTable = new FingerTable(me.getHash());
         this.successorList = new SuccessorList(me.getHash());
         this.predecessor = null;
@@ -120,7 +119,6 @@ public class Node {
             successor = successorList.closestSuccessor(key);
             return successor;
             } catch (SuccessorListException e) {
-                //the key is beyond the last entry of the successor list
         }
 
         //look in the finger table
@@ -162,7 +160,6 @@ public class Node {
             this.fingerTable.addFinger( successor);
             this.predecessor=null;
         } catch (TimerExpiredException e) {
-
             //put code here
         }
 
@@ -260,6 +257,35 @@ public class Node {
     public NodeInfo getNodeInfo() {
         return nodeInfo;
     }
+
+
+    public void setNodeInfo(NodeInfo nodeInfo) {
+        this.nodeInfo = nodeInfo;
+    }
+
+    public void setNodeidentifier(String nodeidentifier) {
+        this.nodeidentifier = nodeidentifier;
+    }
+
+    public void setFingerTable(FingerTable fingerTable) {
+        this.fingerTable = fingerTable;
+    }
+
+    public void setSuccessorList(SuccessorList successorList) {
+        this.successorList = successorList;
+    }
+
+    public void setPredecessor(NodeInfo predecessor) {
+        this.predecessor = predecessor;
+    }
+
+    public void setDispatcher(NodeDispatcher nodeDispatcher){
+        this.dispatcher=nodeDispatcher;
+    }
+
+
+
+
 
 }
 
