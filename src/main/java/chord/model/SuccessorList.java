@@ -34,7 +34,6 @@ public class SuccessorList {
         for (NodeInfo nodeInfo : this.successors){
             this.map.put(nodeInfo.getHash(), nodeInfo);
         }
-
         Map.Entry<String, NodeInfo> successor = this.map.ceilingEntry(node);
         if(successor == null){
             throw new SuccessorListException();
@@ -66,6 +65,29 @@ public class SuccessorList {
             i++;
         }
     }
+
+    //getters
+    public TreeMap<String, NodeInfo> getMap() {
+        return map;
+    }
+
+    public LinkedList<NodeInfo> getSuccessors() {
+        return successors;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public boolean containsSuccessor(String key){
+        for (NodeInfo nodeInfo: this.successors) {
+            if (nodeInfo.getHash().equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 }
