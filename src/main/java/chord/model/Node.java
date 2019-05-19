@@ -96,6 +96,10 @@ public class Node {
         return;
     }
 
+    //ritorno il primo elemento della mia successorList
+    public NodeInfo getFirstSuccessor(){
+        return successorList.getFirstElement();
+    }
 
     //[in a recursive manner]
     //ask this node to find the successor of id
@@ -171,7 +175,7 @@ public class Node {
                 String key = predecessor.getHash();
                 NodeInfo successor = null;
                 try {
-                    successor = dispatcher.sendSuccessorRequest(predecessor, key, nodeInfo);
+                    successor = dispatcher.sendFirstSuccessorRequest(successor,nodeInfo);
                 } catch (TimerExpiredException e) {
                     //put code here
                 }

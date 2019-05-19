@@ -117,6 +117,38 @@ public class NodeDispatcher {
         return successorAnswerMessage.getSuccessor();
     }
 
+    public synchronized NodeInfo sendFirstSuccessorRequest(final NodeInfo destination,final NodeInfo sender)throws TimerExpiredException{
+        FirstSuccessorRequestMessage firstSuccessorRequestMessage= new FirstSuccessorRequestMessage(destination,sender);
+        final int ticket= Router.sendMessage(this.port, firstSuccessorRequestMessage);
+        this.waitingTickets.add(ticket);
+        Timer timer = new Timer(false);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        FirstSuccessorAnswerMessage firstSuccessorAnswerMessage = new FirstSuccessorAnswerMessage(sender,null,destination,ticket);
+                        firstSuccessorAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket,firstSuccessorAnswerMessage);
+                    }
+                }
+
+            }
+        }, 10000);
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        FirstSuccessorAnswerMessage firstSuccessorAnswerMessage= (FirstSuccessorAnswerMessage)this.answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        firstSuccessorAnswerMessage.check();
+        return firstSuccessorAnswerMessage.getSuccessor();
+    }
+
     public synchronized void sendPing(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException{
         PingRequestMessage pingRequestMessage = new PingRequestMessage(destination,sender);
         final int ticket=Router.sendMessage(this.port,pingRequestMessage);

@@ -38,6 +38,13 @@ public class MessageHandler implements Runnable {
                 NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
                 Router.sendAnswer(node.getPort(),notifyAnswerMessage);
                 break;
+
+            case 5:
+                NodeInfo firstSuccessor= node.getFirstSuccessor();
+                FirstSuccessorAnswerMessage firstSuccessorAnswerMessage= new FirstSuccessorAnswerMessage(message.getSender(),firstSuccessor,message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(),firstSuccessorAnswerMessage);
+                break;
+
             case 6:
                 NodeDispatcher dispatcher = node.getDispatcher();
                 dispatcher.addAnswer(message.getId(),message);
@@ -54,6 +61,7 @@ public class MessageHandler implements Runnable {
     request of predecessor 2
     find successor 3
     notify 4
+    first successor 5
 
 
 
