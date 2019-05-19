@@ -196,7 +196,7 @@ public class Node {
                 String key = predecessor.getHash();
                 NodeInfo successor = null;
                 try {
-                    successor = dispatcher.sendFirstSuccessorRequest(successor,nodeInfo);
+                    successor = dispatcher.sendFirstSuccessorRequest(predecessor,nodeInfo);
                 } catch (TimerExpiredException e) {
                     //put code here
                 }
