@@ -104,7 +104,7 @@ public class Node {
     public NodeInfo find_successor( String key){
         NodeInfo successor=null;
 
-        if(key==this.nodeidentifier){
+        if(key.equals(this.nodeidentifier)){
             return this.nodeInfo;
         }
         //am I responsible for that key? If yes return myself
@@ -248,5 +248,18 @@ public class Node {
         fingerTable.printTable();
         System.out.println("-------------------");
     }
+
+    public FingerTable getFingerTable() {
+        return fingerTable;
+    }
+
+    public SuccessorList getSuccessorList() {
+        return successorList;
+    }
+
+    public NodeInfo getNodeInfo() {
+        return nodeInfo;
+    }
+
 }
 
