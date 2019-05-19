@@ -110,7 +110,7 @@ public class Utilities extends TimerTask {
 
     //period of utilities
     public static int getPeriod(){
-        return 10000;
+        return 1000;
     }
 
 }

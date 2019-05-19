@@ -95,7 +95,7 @@ public class Node {
             }
 
             if (successor.getHash().equals(nodeidentifier)) {
-                while (i < 4) {
+                while (i < 3) {
                     successorList.modifyEntry(i+1, this.nodeInfo);
                     i++;
                 }

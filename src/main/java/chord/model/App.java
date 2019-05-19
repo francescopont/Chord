@@ -38,6 +38,7 @@ public class App
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                System.out.println("print cord");
                 Chord.printChord();
 
             }
