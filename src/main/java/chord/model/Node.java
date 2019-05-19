@@ -60,7 +60,6 @@ public class Node {
                 NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
                 String successorKey = successor.getHash();
                 String potentialSuccessorKey = potentialSuccessor.getHash();
-
                 if((comparator.compare(potentialSuccessorKey,nodeidentifier)>=0)&& (comparator.compare(potentialSuccessorKey,successorKey)<=0)){
                     this.successorList.modifyEntry(0,potentialSuccessor);
                 }
@@ -79,7 +78,6 @@ public class Node {
     public synchronized void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
-        System.out.println("sto chiamando fix finger sul nodo " +fix_finger_counter);
         this.fingerTable.modifyFinger(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == Utilities.numberOfBit()){
@@ -105,7 +103,9 @@ public class Node {
     //param = an hashed identifier of the item I want to retrieve
     public NodeInfo find_successor( String key){
         NodeInfo successor=null;
+
         //am I responsible for that key? If yes return myself
+        FingerTableComparator comparator= new FingerTableComparator(this.nodeidentifier);
         if(predecessor!=null){
             String predecessorKey= predecessor.getHash();
             if((comparator.compare(this.nodeidentifier,key)>=0)&& (comparator.compare(predecessorKey,key)<0)){
@@ -114,10 +114,10 @@ public class Node {
         }
         //Is anyone from the successor list responsable for that key?
         try {
-            successor= successorList.closestSuccessor(key);
+            successor = successorList.closestSuccessor(key);
             return successor;
-        } catch (SuccessorListException e) {
-            //the key is beyond the last entry of the successor list
+            } catch (SuccessorListException e) {
+                //the key is beyond the last entry of the successor list
         }
 
         //look in the finger table
@@ -131,6 +131,8 @@ public class Node {
         return successor;
 
     }
+
+
 
     //when you create a new chord, you have to initialize all the stuff
     //this method is called when you create a new Chord
@@ -195,8 +197,6 @@ public class Node {
                 }
             }
             initialized = true;
-            System.out.println("node initialized");
-            printStatus();
         }).start();
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), Utilities.getPeriod(), Utilities.getPeriod());
