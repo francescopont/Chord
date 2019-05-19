@@ -3,13 +3,14 @@ package chord.model;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class NodeTest {
     Node node;
     NodeDispatcher mockDispatcher;
+    Node node1;
+    NodeDispatcher mockDIspatcher1;
 
     @Before
     public void setUp() throws Exception{

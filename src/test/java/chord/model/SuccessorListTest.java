@@ -12,12 +12,14 @@ public class SuccessorListTest {
     SuccessorList successorList;
     SuccessorList successorList1;
     SuccessorList successorList2;
+    SuccessorList successorList3;
 
     @Before
     public void setUp() throws Exception {
         this.successorList = new SuccessorList("0000");
         this.successorList1 = new SuccessorList("aaaa");
         this.successorList2 = new SuccessorList("bbbb");
+        this.successorList3 = new SuccessorList("1000");
 
         //initializing the first variable
         for (int i=0; i<4; i++){
@@ -31,6 +33,12 @@ public class SuccessorListTest {
         }
 
         //the third variable is left uninitialized
+
+        //initializing the fourth variable
+        for (int i=0; i<4; i++){
+            NodeInfo nodeInfo = new NodeInfo(Utilities.computefinger("1000", i));
+            successorList.addEntry(nodeInfo);
+        }
     }
 
     @Test
@@ -117,12 +125,16 @@ public class SuccessorListTest {
 
     @Test
     public void closestSuccessorTest() {
+        for ( int i=0; i<4; i++){
+            successorList3.addEntry(new NodeInfo("eeee"));
+        }
         NodeInfo me = new NodeInfo("0000");
         NodeInfo nodeInfo = new NodeInfo("0001");
         NodeInfo nodeInfo1 = new NodeInfo("0002");
         NodeInfo nodeInfo2 = new NodeInfo("0004");
         NodeInfo nodeInfo3 = new NodeInfo("0008");
-
+        NodeInfo nodeInfo4 = new NodeInfo("0001");
+        NodeInfo nodeInfo5 = new NodeInfo("aaaa");
 
         //asserts on the fly
         NodeInfo response = null;
@@ -153,7 +165,7 @@ public class SuccessorListTest {
 
         //I look for me
         try{
-            response = successorList.closestSuccessor("0000");
+            response = successorList.closestSuccessor("0002");
         }catch (SuccessorListException e){
             failed = true;
         }
@@ -166,6 +178,35 @@ public class SuccessorListTest {
             failed = true;
         }
         assert (response.equals(nodeInfo2));
+
+        //i check the correct behaviour with the zero
+        try{
+            response = successorList.closestSuccessor("9999");
+        }catch (SuccessorListException e){
+            failed = true;
+        }
+        assert (response.equals(nodeInfo4));
+
+        //I look for me
+        try{
+            response = successorList1.closestSuccessor("aaaa");
+        }catch (SuccessorListException e){
+            failed = true;
+        }
+        assert (response.equals(nodeInfo5));
+
+        try{
+            response = successorList3.closestSuccessor("eeea");
+        }catch (SuccessorListException e){
+            failed = true;
+        }
+        assert(response.equals(new NodeInfo("eeee")));
+
+
+
+
+
+
     }
 
 
@@ -181,7 +222,7 @@ public class SuccessorListTest {
         NodeInfo nodeInfo = new NodeInfo("1000");
         successorList.modifyEntry(0,nodeInfo);
 
-        //asserts on the fly
+
         NodeInfo response = null;
         try {
             response = successorList.closestSuccessor("0100");

@@ -84,6 +84,27 @@ public class Node {
         }
     }
 
+    public synchronized void fix_successor_list(){
+        for (int i = 0; i<3; i++){
+            NodeInfo predecessor = successorList.getElement(i);
+            NodeInfo successor = null;
+            try {
+                successor = dispatcher.sendFirstSuccessorRequest(predecessor,nodeInfo);
+            } catch (TimerExpiredException e) {
+                //put code here
+            }
+
+            if (successor.getHash().equals(nodeidentifier)) {
+                while (i < 4) {
+                    successorList.modifyEntry(i+1, this.nodeInfo);
+                    i++;
+                }
+            } else {
+                successorList.modifyEntry(i+1, successor);
+            }
+        }
+    }
+
     public void check_predecessor() {
         if (predecessor != null) {
             try {

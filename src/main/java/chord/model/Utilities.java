@@ -25,6 +25,7 @@ public class Utilities extends TimerTask {
                 virtualnode.stabilize();
                 virtualnode.fix_finger();
                 virtualnode.check_predecessor();
+                virtualnode.fix_successor_list();
             }
         }
     }
