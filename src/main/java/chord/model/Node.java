@@ -104,6 +104,9 @@ public class Node {
     public NodeInfo find_successor( String key){
         NodeInfo successor=null;
 
+        if(key==this.nodeidentifier){
+            return this.nodeInfo;
+        }
         //am I responsible for that key? If yes return myself
         FingerTableComparator comparator= new FingerTableComparator(this.nodeidentifier);
         if(predecessor!=null){

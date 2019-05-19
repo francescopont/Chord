@@ -89,6 +89,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         NodeInfo response4= fingerTable.closestPredecessor(nodeInfo4.getHash());
         NodeInfo response5= fingerTable.closestPredecessor(nodeInfo5.getHash());
         NodeInfo response6= fingerTable.closestPredecessor(nodeInfo6.getHash());
@@ -96,7 +97,6 @@ public class FingerTableTest {
         assert  (response.getHash().equals("8000"));
         assert  (response1.getHash().equals("4000"));
         assert  (response2.getHash().equals("4000"));
-        assert  (failed==true);
         assert  (response4.getHash().equals("4000"));
         assert  (response5.getHash().equals("0080"));
         assert  (response6.getHash().equals("8000"));
@@ -110,6 +110,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         failed=false;
         try {
             NodeInfo response8 = fingerTable1.closestPredecessor(nodeInfo1.getHash());
@@ -117,6 +118,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         failed= false;
         try {
             NodeInfo response9 = fingerTable1.closestPredecessor(nodeInfo2.getHash());
@@ -124,6 +126,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         failed=false;
         try {
             NodeInfo response10 = fingerTable1.closestPredecessor(nodeInfo3.getHash());
@@ -131,11 +134,8 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         //asserts
-        assert  (failed==true);
-        assert  (failed==true);
-        assert  (failed==true);
-        assert  (failed==true);
 
 
         //fingerTable with only other
@@ -149,6 +149,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         NodeInfo response15= fingerTable2.closestPredecessor(nodeInfo4.getHash());
         failed=false;
         try {
@@ -157,14 +158,13 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         NodeInfo response17= fingerTable2.closestPredecessor(nodeInfo6.getHash());
         //asserts
         assert  (response11.getHash().equals("4000"));
         assert  (response12.getHash().equals("4000"));
         assert  (response13.getHash().equals("4000"));
-        assert  (failed==true);
         assert  (response15.getHash().equals("4000"));
-        assert  (failed==true);
         assert  (response17.getHash().equals("4000"));
 
         fingerTable.printTable();
@@ -239,6 +239,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert (failed);
         failed=false;
         try{
             NodeInfo response6= fingerTable1.closestPredecessor("0010");
@@ -246,7 +247,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
-
+        assert  (failed);
         NodeInfo nodeInfo1= new NodeInfo("3100");
         for(int i=4; i<12;i++){
             fingerTable1.modifyFinger(i,nodeInfo1);
@@ -262,6 +263,7 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         failed=false;
         try{
             NodeInfo response11= fingerTable1.closestPredecessor("1000");
@@ -269,22 +271,17 @@ public class FingerTableTest {
         catch (NullPointerException e){
             failed=true;
         }
+        assert  (failed);
         //asserts
         assert (response4.getHash().equals("3000"));
-        assert  (failed=true);
-        assert  (failed=true);
         assert (response7.getHash().equals("3100"));
         assert (response8.getHash().equals("3100"));
         assert (response9.getHash().equals("3000"));
-        assert (failed=true);
-        assert (failed=true);
 
         //print
         fingerTable.printTable();
         fingerTable1.printTable();
         fingerTable2.printTable();
-
-
 
     }
 
