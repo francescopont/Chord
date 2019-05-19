@@ -185,11 +185,11 @@ public class Node {
             this.fingerTable.addFinger( successor);
             this.predecessor=null;
         } catch (TimerExpiredException e) {
-            //put code here
+            System.out.println("tempo finito");
         }
 
         //now I populate the successor list and the finger table on a separate thread
-        new Thread(() -> {
+        //new Thread(() -> {
             //first, the successor list
             for (int i = 1; i < 4; i++) {
                 NodeInfo predecessor = successorList.getLastElement();
@@ -222,13 +222,18 @@ public class Node {
                 }
             }
             initialized = true;
-        }).start();
+            this.printStatus();
+        //}).start();
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), Utilities.getPeriod(), Utilities.getPeriod());
+
     }
 
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
     public void notify(NodeInfo potential_predecessor) {
+        if(potential_predecessor.equals(this.nodeInfo)){
+            return;
+        }
         if (this.predecessor == null) {
             this.predecessor = potential_predecessor;
         } else {
@@ -236,7 +241,7 @@ public class Node {
             String predecessor_key = this.predecessor.getHash();
             String potential_key = potential_predecessor.getHash();
             //se la chiave del potenziale successore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
-            if((comparator.compare(predecessor_key,potential_key)<=0) && (comparator.compare(potential_key,nodeidentifier)>=0)){
+            if((comparator.compare(predecessor_key,potential_key)<0) && (comparator.compare(potential_key,nodeidentifier)>0)){
                 this.predecessor=potential_predecessor;
             }
         }
