@@ -39,7 +39,7 @@ public class FingerTable{
         for (NodeInfo nodeInfo : this.fingers){
             this.map.put(nodeInfo.getHash(), nodeInfo);
         }
-        Map.Entry<String, NodeInfo> successor = this.map.floorEntry(node);
+        Map.Entry<String, NodeInfo> successor = this.map.lowerEntry(node);
         return successor.getValue();
     }
 
@@ -71,6 +71,20 @@ public class FingerTable{
         }
         return false;
     }
+
+    public TreeMap<String, NodeInfo> getMap() {
+        return map;
+    }
+
+    public LinkedList<NodeInfo> getFingers() {
+        return fingers;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+
 
 
 }
