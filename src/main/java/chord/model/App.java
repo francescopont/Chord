@@ -28,20 +28,22 @@ public class App
             e.printStackTrace();
         }
 
-        /*
+
         try{
             Chord.join("127.0.0.1",10002, "127.0.0.1", actual_port );
         }catch (Exception e){
             e.printStackTrace();
         }
-        */
+
 
         Timer timer=new Timer();
 
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                System.out.println("print chrd");
                 Chord.printChord();
+
             }
         }, 240000);
     }

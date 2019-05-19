@@ -17,7 +17,6 @@ public class FingerTable{
     }
 
     //to add an entry when the finger table is not full
-
     public synchronized void addFinger(NodeInfo node){
         if (fingers.size() < Utilities.numberOfBit()) {
             fingers.addLast(node);
@@ -27,6 +26,11 @@ public class FingerTable{
     //contiamo da 0 A 15
     public synchronized void modifyFinger(int position,  NodeInfo newnodeInfo){
         this.fingers.set(position, newnodeInfo);
+    }
+
+    //positions go from 0 to 15
+    public NodeInfo getFinger(int position){
+        return this.fingers.get(position);
     }
 
     //to get the closest precedessor of a given nodeidentifier
@@ -54,10 +58,6 @@ public class FingerTable{
     //useful for testing
 
     //to get a specific nodeinfo
-    //positions go from 0 to 15
-    public NodeInfo getFinger(int position){
-        return this.fingers.get(position);
-    }
 
     // to remove a finger ( it should never be used without calling addfinger immediately after
     public synchronized NodeInfo removeFinger(int position){

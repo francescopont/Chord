@@ -76,9 +76,10 @@ public class Node {
 
     }
 
-    public void fix_finger() {
+    public synchronized void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
+        System.out.println("sto chiamando fix finger sul nodo " +fix_finger_counter);
         this.fingerTable.modifyFinger(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == Utilities.numberOfBit()){
@@ -194,6 +195,7 @@ public class Node {
                 }
             }
             initialized = true;
+            System.out.println("node initialized");
             printStatus();
         }).start();
         Timer timer = new Timer();
