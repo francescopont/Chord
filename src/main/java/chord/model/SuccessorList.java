@@ -58,7 +58,7 @@ public class SuccessorList {
     //to print the state of the map
     public void printTable(){
         int i=0;
-        System.out.println("SUCCESSOR LIST OF "+ node);
+        System.out.println("SUCCESSOR LIST ");
         System.out.println("size: " + this.successors.size());
         for (NodeInfo nodeInfo: this.successors){
             System.out.println("finger " + i + " : " + nodeInfo.getHash() );

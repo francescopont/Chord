@@ -13,6 +13,7 @@ public class Node {
     private SuccessorList successorList;
     private NodeInfo predecessor;
     private boolean initialized;
+    private boolean alone;
     private boolean terminated;
     private NodeDispatcher dispatcher;
     private int fix_finger_counter;
@@ -31,6 +32,7 @@ public class Node {
         this.dispatcher = new NodeDispatcher(this.getPort());
         this.fix_finger_counter = 0;
         this.comparator=new NodeComparator(me.getHash());
+        this.alone = true;
     }
 
     //getters
@@ -43,6 +45,15 @@ public class Node {
         }
         return predecessor;
     }
+
+    public boolean isAlone() {
+        return alone;
+    }
+
+    public void setAlone(boolean alone) {
+        this.alone = alone;
+    }
+
 
     //this method is called from messageHandler
     public NodeDispatcher getDispatcher() {
@@ -60,7 +71,7 @@ public class Node {
     public void stabilize() {
         try {
             NodeInfo successor = this.successorList.getFirstElement();
-            System.out.println("Stabilize from :"+this.nodeidentifier+ "to "+successor.getHash());
+            //System.out.println("I'm : "+this.nodeidentifier+ " and I'm asking stabilize to "+successor.getHash());
                 NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
                 if(potentialSuccessor.getHash().equals(this.nodeidentifier)) {
                     return;
@@ -68,7 +79,7 @@ public class Node {
                 String successorKey = successor.getHash();
                 String potentialSuccessorKey = potentialSuccessor.getHash();
                 if(comparator.compare(potentialSuccessorKey,successorKey)<0){
-                    System.out.println("sono " + this.nodeidentifier + "comparo tra :" +potentialSuccessorKey +" e " + successorKey);
+                    System.out.println("I'm : " + this.nodeidentifier + "and I'm modifying the successor due to stabilize :" +potentialSuccessorKey);
                     this.successorList.modifyEntry(0,potentialSuccessor);
                 }
         } catch (TimerExpiredException e) {
@@ -78,6 +89,7 @@ public class Node {
         }
         try {
             NodeInfo successor = this.successorList.getFirstElement();
+            //System.out.println("I'm : "+ this.nodeidentifier + " and I'm notifying "+ successor.getHash());
             this.dispatcher.sendNotify(successor, this.nodeInfo);
         } catch (TimerExpiredException e) {
             //put code here
@@ -88,6 +100,13 @@ public class Node {
     public synchronized void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
+        if (nodeInfo == null){
+            System.out.println("troppo lento!");
+        }
+        if (this.nodeidentifier.equals("a289")){
+            System.out.println("I'm: "+ nodeidentifier + " and I'm going to modify the finger " + fix_finger_counter + ": oldvalue="+ fingerTable.getFinger(fix_finger_counter).getHash()+ ", newvalue=" + nodeInfo.getHash() );
+
+        }
         this.fingerTable.modifyFinger(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == Utilities.numberOfBit()){
@@ -101,18 +120,20 @@ public class Node {
             NodeInfo successor = null;
             try {
                 successor = dispatcher.sendFirstSuccessorRequest(predecessor,nodeInfo);
+                if (successor.getHash().equals(nodeidentifier)) {
+                    while (i < 3) {
+                        successorList.modifyEntry(i+1, this.nodeInfo);
+                        i++;
+                    }
+                } else {
+                    successorList.modifyEntry(i+1, successor);
+                }
             } catch (TimerExpiredException e) {
+                System.out.println("ECCEZIONE NELLA FIX SUCCESSOR LIST");
                 //put code here
             }
 
-            if (successor.getHash().equals(nodeidentifier)) {
-                while (i < 3) {
-                    successorList.modifyEntry(i+1, this.nodeInfo);
-                    i++;
-                }
-            } else {
-                successorList.modifyEntry(i+1, successor);
-            }
+
         }
     }
 
@@ -153,7 +174,6 @@ public class Node {
         //Is anyone from the successor list responsable for that key?
         try {
             successor = successorList.closestSuccessor(key);
-            System.out.println("sono: "+ this.nodeidentifier+ "il mio closest successor is: "+ successor.getHash());
             return successor;
             } catch (SuccessorListException e) {
         }
@@ -186,6 +206,18 @@ public class Node {
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), Utilities.getPeriod(),Utilities.getPeriod());
         this.printStatus();
+        this.printUtilities();
+
+    }
+
+    public synchronized void start(NodeInfo nodeInfo){
+        if (alone){
+            System.out.println("I'm : "+ nodeidentifier + " and I'm starting with "+ nodeInfo.getHash());
+            this.successorList.modifyEntry(0, nodeInfo);
+            this.fingerTable.modifyFinger(0, nodeInfo);
+            setAlone(false);
+        }
+
     }
 
 
@@ -197,7 +229,7 @@ public class Node {
             this.fingerTable.addFinger( successor);
             this.predecessor=null;
         } catch (TimerExpiredException e) {
-            System.out.println("tempo finito");
+            System.out.println("tempo finito sull'inizialize di " + nodeidentifier);
         }
 
         //now I populate the successor list and the finger table on a separate thread
@@ -233,7 +265,15 @@ public class Node {
                 }
             }
             initialized = true;
+            setAlone(false);
             this.printStatus();
+            this.printUtilities();
+            try{
+                dispatcher.sendStartRequest(myfriend, this.nodeInfo);
+            }catch (TimerExpiredException e){
+                //put code here
+            }
+
         //}).start();
         Timer timer = new Timer();
         timer.schedule(new Utilities(this), Utilities.getPeriod(), Utilities.getPeriod());
@@ -286,6 +326,13 @@ public class Node {
         successorList.printTable();
         fingerTable.printTable();
         System.out.println("-------------------");
+    }
+
+    public void printUtilities(){
+        System.out.println("FINGERS ->");
+        for (int i=0; i< 16; i++){
+            System.out.println("finger "+ i + ": " + Utilities.computefinger(nodeidentifier, i));
+        }
     }
 
     public FingerTable getFingerTable() {

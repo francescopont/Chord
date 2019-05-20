@@ -2,6 +2,7 @@ package chord.network;
 
 import chord.Exceptions.PortException;
 import chord.Messages.Message;
+import chord.model.Chord;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -43,12 +44,24 @@ public class Router {
     public static int sendMessage(int port, Message message) {
         int ticket = Ticket.getTicket();
         message.setId(ticket);
+        if (message.getDestination().getHash().equals(message.getSender().getHash())){
+            System.out.println("il destinatario e il mittente coincidono!");
+        }
+        boolean delivered = false;
         for (SocketNode node: nodes){
-            if (node.getPort() == port){
-                node.sendMessage(message);
+            if (node.getPort() == message.getDestination().getPort()){
+                Chord.deliverMessage(node.getPort(),message);
+                delivered = true;
             }
         }
-
+        if (!delivered){
+            System.out.println("devo inviare sulla rete");
+            for (SocketNode node: nodes){
+                if (node.getPort() == port){
+                    node.sendMessage(message);
+                }
+            }
+        }
         return ticket;
     }
 

@@ -21,7 +21,7 @@ public class Utilities extends TimerTask {
     @Override
     public void run() {
         synchronized (virtualnode) {
-            if (virtualnode.isInitialized() && !virtualnode.isTerminated()) {
+            if (virtualnode.isInitialized() && !virtualnode.isTerminated() && !virtualnode.isAlone()) {
                 virtualnode.stabilize();
                 virtualnode.fix_finger();
                 virtualnode.check_predecessor();
@@ -110,7 +110,14 @@ public class Utilities extends TimerTask {
 
     //period of utilities
     public static int getPeriod(){
-        return 1000;
+        //5 secondi
+        return 5000;
+    }
+
+    //timer for message
+    public static int getTimer(){
+        // 3 minuti
+        return 180000;
     }
 
 }

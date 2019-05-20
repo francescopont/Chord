@@ -37,7 +37,7 @@ public class NodeDispatcher {
                     }
                 }
             }
-        }, 10000);
+        }, Utilities.getTimer());
 
         while (!this.answers.containsKey(ticket)) {
             try {
@@ -69,7 +69,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, 10000);
+        }, Utilities.getTimer());
 
         while (!this.answers.containsKey(ticket)){
             try{
@@ -104,7 +104,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, 10000);
+        }, Utilities.getTimer());
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -136,7 +136,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, 10000);
+        }, Utilities.getTimer());
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -161,14 +161,14 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        PingAnswerMessage successorAnswerMessage = new PingAnswerMessage(sender,destination, ticket);
-                        successorAnswerMessage.setException(new TimerExpiredException());
-                        addAnswer(ticket, successorAnswerMessage);
+                        PingAnswerMessage pingAnswerMessage = new PingAnswerMessage(sender,destination, ticket);
+                        pingAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, pingAnswerMessage);
                     }
                 }
 
             }
-        }, 10000);
+        }, Utilities.getTimer());
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -180,6 +180,38 @@ public class NodeDispatcher {
         waitingTickets.remove((Integer) ticket);
         answers.remove(ticket);
         pingAnswerMessage.check();
+    }
+
+
+    public synchronized void sendStartRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException{
+        StartRequestMessage startRequestMessage = new StartRequestMessage(destination,sender);
+        final int ticket=Router.sendMessage(this.port,startRequestMessage);
+        this.waitingTickets.add(ticket);
+        Timer timer = new Timer(false);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        StartAnswerMessage startAnswerMessage = new StartAnswerMessage(sender,destination, ticket);
+                        startAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, startAnswerMessage);
+                    }
+                }
+
+            }
+        }, Utilities.getTimer());
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        StartAnswerMessage startAnswerMessage = (StartAnswerMessage) answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        startAnswerMessage.check();
     }
 
     //this method is used when an answer is received

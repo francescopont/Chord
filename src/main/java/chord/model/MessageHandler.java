@@ -16,8 +16,10 @@ public class MessageHandler implements Runnable {
 
     @Override
     public void run() {
+        //System.out.println("Message: "+ message.getId() + "; destination: "+ message.getDestination().getHash() + "; sender: "+ message.getSender().getHash()+ "; type: "+ message.getType());
         switch (message.getType()){
             case 1:
+                //ping
                 PingAnswerMessage pingAnswerMessage= new PingAnswerMessage(message.getSender(),message.getDestination(),message.getId());
                 Router.sendAnswer(node.getPort(),pingAnswerMessage);
                 break;
@@ -40,9 +42,7 @@ public class MessageHandler implements Runnable {
                 break;
 
             case 4:
-                //chi riceve la notify controlla se chi gliel'ha mandata possa essere il suo predecessore o meno giusto?
                 node.notify(message.getSender());
-                System.out.println("notify to "+ message.getDestination().getHash()+ "from: "+message.getSender().getHash());
                 NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
                 Router.sendAnswer(node.getPort(),notifyAnswerMessage);
                 break;
@@ -57,7 +57,10 @@ public class MessageHandler implements Runnable {
                 NodeDispatcher dispatcher = node.getDispatcher();
                 dispatcher.addAnswer(message.getId(),message);
                 break;
-
+            case 33:
+                node.start(message.getSender());
+                StartAnswerMessage startAnswerMessage = new StartAnswerMessage(message.getSender(), message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), startAnswerMessage);
         }
     }
 }
@@ -71,7 +74,7 @@ public class MessageHandler implements Runnable {
     notify 4
     first successor 5
 
-
+    start 33
 
     reply 6
  */

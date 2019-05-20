@@ -41,7 +41,6 @@ public class Chord{
                 node.modifyPort(e.getPort());
                 throw e;
             }
-
             node.initialize(knownnode);
         }
 

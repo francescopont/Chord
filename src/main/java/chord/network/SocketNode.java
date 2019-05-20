@@ -83,12 +83,10 @@ public class SocketNode implements Runnable {
             }
             catch (IOException e ){
                 this.activeconnections.remove(nodeInfo);
-
             }
         }
 
         if (!yetsend){
-
             try (Socket socket = new Socket(nodeInfo.getIPAddress(),nodeInfo.getPort())){
 
                 //REPEAT THE CODE AS ABOVE
