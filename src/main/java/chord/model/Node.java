@@ -103,10 +103,6 @@ public class Node {
         if (nodeInfo == null){
             System.out.println("troppo lento!");
         }
-        if (this.nodeidentifier.equals("a289")){
-            System.out.println("I'm: "+ nodeidentifier + " and I'm going to modify the finger " + fix_finger_counter + ": oldvalue="+ fingerTable.getFinger(fix_finger_counter).getHash()+ ", newvalue=" + nodeInfo.getHash() );
-
-        }
         this.fingerTable.modifyFinger(fix_finger_counter, nodeInfo);
         fix_finger_counter++;
         if (fix_finger_counter == Utilities.numberOfBit()){
@@ -132,7 +128,6 @@ public class Node {
                 System.out.println("ECCEZIONE NELLA FIX SUCCESSOR LIST");
                 //put code here
             }
-
 
         }
     }
@@ -212,15 +207,12 @@ public class Node {
 
     public synchronized void start(NodeInfo nodeInfo){
         if (alone){
-            System.out.println("I'm : "+ nodeidentifier + " and I'm starting with "+ nodeInfo.getHash());
             this.successorList.modifyEntry(0, nodeInfo);
             this.fingerTable.modifyFinger(0, nodeInfo);
             setAlone(false);
         }
 
     }
-
-
 
     public synchronized void initialize(final NodeInfo myfriend) {
         try {
