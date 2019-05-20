@@ -42,6 +42,7 @@ public class MessageHandler implements Runnable {
             case 4:
                 //chi riceve la notify controlla se chi gliel'ha mandata possa essere il suo predecessore o meno giusto?
                 node.notify(message.getSender());
+                System.out.println("notify to "+ message.getDestination().getHash()+ "from: "+message.getSender().getHash());
                 NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
                 Router.sendAnswer(node.getPort(),notifyAnswerMessage);
                 break;

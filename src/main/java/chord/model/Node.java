@@ -60,16 +60,21 @@ public class Node {
     public void stabilize() {
         try {
             NodeInfo successor = this.successorList.getFirstElement();
+            System.out.println("Stabilize from :"+this.nodeidentifier+ "to "+successor.getHash());
                 NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
+                if(potentialSuccessor.getHash().equals(this.nodeidentifier)) {
+                    return;
+                }
                 String successorKey = successor.getHash();
                 String potentialSuccessorKey = potentialSuccessor.getHash();
                 if(comparator.compare(potentialSuccessorKey,successorKey)<0){
+                    System.out.println("sono " + this.nodeidentifier + "comparo tra :" +potentialSuccessorKey +" e " + successorKey);
                     this.successorList.modifyEntry(0,potentialSuccessor);
                 }
         } catch (TimerExpiredException e) {
             //put code here
         }catch (PredecessorException e){
-            // do nothing
+            System.out.println("Predecessor Exception");
         }
         try {
             NodeInfo successor = this.successorList.getFirstElement();
@@ -116,6 +121,7 @@ public class Node {
             try {
                 dispatcher.sendPing(this.predecessor, this.nodeInfo);
             } catch (TimerExpiredException e) {
+                System.out.println("tempo finito");
                 predecessor = null;
                 //put code here
             }
@@ -147,6 +153,7 @@ public class Node {
         //Is anyone from the successor list responsable for that key?
         try {
             successor = successorList.closestSuccessor(key);
+            System.out.println("sono: "+ this.nodeidentifier+ "il mio closest successor is: "+ successor.getHash());
             return successor;
             } catch (SuccessorListException e) {
         }
@@ -198,7 +205,6 @@ public class Node {
             //first, the successor list
             for (int i = 1; i < 4; i++) {
                 NodeInfo predecessor = successorList.getLastElement();
-                String key = predecessor.getHash();
                 NodeInfo successor = null;
                 try {
                     successor = dispatcher.sendFirstSuccessorRequest(predecessor,nodeInfo);
@@ -237,6 +243,7 @@ public class Node {
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
     public void notify(NodeInfo potential_predecessor) {
         if(potential_predecessor.equals(this.nodeInfo)){
+            System.out.println("sto notificando me stesso e sono: "+this.nodeidentifier);
             return;
         }
         if (this.predecessor == null) {
