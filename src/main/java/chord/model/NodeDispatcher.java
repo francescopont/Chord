@@ -1,5 +1,6 @@
 package chord.model;
 
+import chord.Exceptions.PredecessorException;
 import chord.Exceptions.TimerExpiredException;
 import chord.Messages.*;
 import chord.network.Router;
@@ -51,7 +52,7 @@ public class NodeDispatcher {
         notifyAnswerMessage.check();
     }
 
-    public synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException{
+    public synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException, PredecessorException {
         PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(destination, sender);
         final int ticket = Router.sendMessage(this.port, predecessorRequestMessage);
         this.waitingTickets.add(ticket);
@@ -61,7 +62,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(sender,null, destination,ticket);
+                        PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(sender,null, destination,ticket, false);
                         predecessorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,predecessorAnswerMessage);
                     }
@@ -81,6 +82,7 @@ public class NodeDispatcher {
         waitingTickets.remove((Integer) ticket);
         answers.remove(ticket);
         answerMessage.check();
+        answerMessage.checkPredecessorException();
         return answerMessage.getPredecessor();
     }
 

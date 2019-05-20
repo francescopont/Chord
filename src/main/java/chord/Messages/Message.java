@@ -13,7 +13,7 @@ public class  Message implements Serializable{
     private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
     private final boolean ack; //indica se è il messaggio richiede una risposta
     protected int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
-    private TimerExpiredException exception;
+    protected TimerExpiredException exception;
     private final NodeInfo sender;
 
     //constructor

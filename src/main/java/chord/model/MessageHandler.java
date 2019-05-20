@@ -1,5 +1,6 @@
 package chord.model;
 
+import chord.Exceptions.PredecessorException;
 import chord.Messages.*;
 import chord.network.Router;
 
@@ -21,8 +22,14 @@ public class MessageHandler implements Runnable {
                 Router.sendAnswer(node.getPort(),pingAnswerMessage);
                 break;
             case 2:
-                NodeInfo predecessor = node.getPredecessor();
-                PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(message.getSender(), predecessor,message.getDestination(),message.getId());
+                boolean exception = false;
+                NodeInfo predecessor = null;
+                try{
+                    predecessor = node.getPredecessor();
+                }catch (PredecessorException e){
+                    exception = true;
+                }
+                PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(message.getSender(), predecessor,message.getDestination(),message.getId(), exception);
                 Router.sendAnswer(node.getPort(), predecessorAnswerMessage);
                 break;
 

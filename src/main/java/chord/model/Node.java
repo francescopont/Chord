@@ -1,5 +1,6 @@
 package chord.model;
 
+import chord.Exceptions.PredecessorException;
 import chord.Exceptions.SuccessorListException;
 import chord.Exceptions.TimerExpiredException;
 
@@ -36,7 +37,10 @@ public class Node {
     public int getPort() {
         return this.nodeInfo.getPort();
     }
-    public NodeInfo getPredecessor() {
+    public NodeInfo getPredecessor()throws PredecessorException {
+        if (this.predecessor == null){
+            throw new PredecessorException();
+        }
         return predecessor;
     }
 
@@ -59,11 +63,13 @@ public class Node {
                 NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
                 String successorKey = successor.getHash();
                 String potentialSuccessorKey = potentialSuccessor.getHash();
-                if((comparator.compare(potentialSuccessorKey,nodeidentifier)>=0)&& (comparator.compare(potentialSuccessorKey,successorKey)<=0)){
+                if(comparator.compare(potentialSuccessorKey,successorKey)<0){
                     this.successorList.modifyEntry(0,potentialSuccessor);
                 }
         } catch (TimerExpiredException e) {
             //put code here
+        }catch (PredecessorException e){
+            // do nothing
         }
         try {
             NodeInfo successor = this.successorList.getFirstElement();
@@ -127,7 +133,6 @@ public class Node {
     //param = an hashed identifier of the item I want to retrieve
     public NodeInfo find_successor( String key){
         NodeInfo successor=null;
-
         if(key.equals(this.nodeidentifier)){
             return this.nodeInfo;
         }
@@ -241,7 +246,7 @@ public class Node {
             String predecessor_key = this.predecessor.getHash();
             String potential_key = potential_predecessor.getHash();
             //se la chiave del potenziale successore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
-            if((comparator.compare(predecessor_key,potential_key)<0) && (comparator.compare(potential_key,nodeidentifier)>0)){
+            if(comparator.compare(predecessor_key,potential_key)<0){
                 this.predecessor=potential_predecessor;
             }
         }

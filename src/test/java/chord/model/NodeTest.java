@@ -1,5 +1,6 @@
 package chord.model;
 
+import chord.Exceptions.PredecessorException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,29 +11,35 @@ public class NodeTest {
     Node node;
     NodeDispatcher mockDispatcher;
     Node node1;
-    NodeDispatcher mockDIspatcher1;
+    NodeDispatcher mockDispatcher1;
 
     @Before
     public void setUp() throws Exception{
         NodeInfo nodeInfo= new NodeInfo("0000");
+        NodeInfo nodeInfo1 = new NodeInfo("aaaa");
         node= new Node(nodeInfo);
+        node1 = new Node(nodeInfo1);
+
 
         //mock dispatcher
         mockDispatcher=mock(NodeDispatcher.class);
+        mockDispatcher1 = mock(NodeDispatcher.class);
         node.setDispatcher(mockDispatcher);
+        node1.setDispatcher(mockDispatcher1);
         when(mockDispatcher.sendSuccessorRequest(new NodeInfo("0008"), "0009",nodeInfo)).thenReturn(new NodeInfo("zoro"));
-
+        when (mockDispatcher1.sendSuccessorRequest(nodeInfo, "aaaa", nodeInfo1)).thenReturn(node.find_successor("aaaa"));
+        when (mockDispatcher1.sendFirstSuccessorRequest(nodeInfo, nodeInfo1)).thenReturn(node.getFirstSuccessor());
         //setting FingerTable and SuccessorList
         FingerTable fingerTable= new FingerTable("0000");
         SuccessorList successorList= new SuccessorList("0000");
         for (int i = 0; i< 16; i++){
             //we use here the fake constructor
-            NodeInfo nodeInfo1 = new NodeInfo(Utilities.computefinger("0000",i));
-            fingerTable.addFinger(nodeInfo1);
+            NodeInfo nodeInfo2 = new NodeInfo(Utilities.computefinger("0000",i));
+            fingerTable.addFinger(nodeInfo2);
         }
         for (int i=0; i<4; i++){
-            NodeInfo nodeInfo1= new NodeInfo(Utilities.computefinger("0000", i));
-            successorList.addEntry(nodeInfo1);
+            NodeInfo nodeInfo2= new NodeInfo(Utilities.computefinger("0000", i));
+            successorList.addEntry(nodeInfo2);
         }
 
         node.setFingerTable(fingerTable);
@@ -45,6 +52,7 @@ public class NodeTest {
 
     @Test
     public void stabilize() {
+
     }
 
     @Test
@@ -84,7 +92,13 @@ public class NodeTest {
         for(NodeInfo nodeInfo: node.getFingerTable().getFingers()){
             assert (nodeInfo.equals(node.getNodeInfo()));
         }
-        assert(node.getPredecessor().equals(node.getNodeInfo()));
+        try {
+            NodeInfo nodeInfo = node.getPredecessor();
+            assert(nodeInfo.equals(node.getNodeInfo()));
+        } catch (PredecessorException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Test
