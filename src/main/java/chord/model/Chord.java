@@ -31,6 +31,9 @@ public class Chord{
     //static methods to be used from the application layer
     public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws PortException {
         synchronized (virtualnodes){
+            if (virtualnodes.isEmpty()){
+                Router.setIPAddress(IPAddress);
+            }
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             NodeInfo knownnode = new NodeInfo(knownIPAddress,knownPort);
             Node node = new Node(nodeInfo);
@@ -48,6 +51,9 @@ public class Chord{
 
     public static void create(String IPAddress, int port)throws PortException {
         synchronized (virtualnodes){
+            if (virtualnodes.isEmpty()){
+                Router.setIPAddress(IPAddress);
+            }
             NodeInfo nodeInfo = new NodeInfo(IPAddress,port);
             Node node = new Node(nodeInfo);
             virtualnodes.add(node);

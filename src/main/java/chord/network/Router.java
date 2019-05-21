@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Router {
     private static List<SocketNode> nodes = new LinkedList<>();
+    private static String IPAddress = null;
 
     //don't let anyone instantiate this class
     private Router(){};
@@ -48,11 +49,9 @@ public class Router {
             System.out.println("il destinatario e il mittente coincidono!");
         }
         boolean delivered = false;
-        for (SocketNode node: nodes){
-            if (node.getPort() == message.getDestination().getPort()){
-                Chord.deliverMessage(node.getPort(),message);
-                delivered = true;
-            }
+        if (message.getDestination().getIPAddress().equals(IPAddress)){
+            Chord.deliverMessage(message.getDestination().getPort(), message);
+            delivered = true;
         }
         if (!delivered){
             System.out.println("devo inviare sulla rete");
@@ -79,5 +78,9 @@ public class Router {
                 node.terminate();
             }
         }
+    }
+
+    public static void setIPAddress( String IPAddress){
+        IPAddress = IPAddress;
     }
 }
