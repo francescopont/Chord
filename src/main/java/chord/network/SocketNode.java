@@ -21,26 +21,40 @@ public class SocketNode implements Runnable {
     //PROBLEMA: AGGIORNARE QUESTA LISTA TOGLIENDO LE CONNESSIONI CHE SONO STATE CHIUSE
     // soluzione artigianale: se quando mando un messaggio non riesco, allora sicuramente la connessione ha un problema
 
+    //porta effettivamente in uso
+    private int actual_port;
+
 
     //constructor
-    public SocketNode(int port)throws IOException{
+    public SocketNode(int port) {
         this.terminate = false;
         this.activeconnections = new HashMap<>();
-        this.serverSocket = new ServerSocket(port);
-        this.port = serverSocket.getLocalPort();
+        this.port=port;
+        this.actual_port=-1;
         System.out.println("Sto creando un nodo con la porta "+ port);
     }
 
     @Override
     public void run() {
         try {
-            while (!terminate) {
+            this.serverSocket= new ServerSocket(port);
+            this.actual_port= port;
+        } catch (IOException e) {
+            try {
+                this.serverSocket= new ServerSocket(0);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            this.actual_port= serverSocket.getLocalPort();
+        }
+        while (!terminate) {
 
+            try {
                 // I got a new connection!!!
                 Socket clientSocket = serverSocket.accept();
 
                 //a new handler for this connection
-                SocketHandler handler = new SocketHandler(this.port,clientSocket);
+                SocketHandler handler = new SocketHandler(this.actual_port, clientSocket);
 
                 //handle the new connection!!
                 Threads.executeImmediately(handler);
@@ -48,20 +62,20 @@ public class SocketNode implements Runnable {
                 //add the new connection to the list of active connections
                 boolean got = false;
                 NodeInfo nodeInfo = null;
-                while (!got){
-                    try{
+                while (!got) {
+                    try {
                         nodeInfo = handler.getEndpoint();
                         got = true;
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         //do nothing
                     }
                 }
-                System.out.println("I'm: " + port + " and I'm adding a new routing element "+ nodeInfo.getPort());
+                System.out.println("I'm: " + port + " and I'm adding a new routing element " + nodeInfo.getPort());
                 this.activeconnections.put(nodeInfo, handler);
+            } catch (IOException e) {
+                System.out.println("errore nella socketnode");
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            System.out.println("errore nella socketnode");
-            e.printStackTrace();
         }
     }
 
@@ -113,7 +127,7 @@ public class SocketNode implements Runnable {
                 System.out.println("sto creando un nuovo handler perchè voglio inviare un messggio ad un nodo nuovo e ho inviato il messaggio");
                 //REPEAT THE CODE AS ABOVE
                 //a new handler for this connection
-                SocketHandler handler = new SocketHandler(this.port,socket);
+                SocketHandler handler = new SocketHandler(this.actual_port,socket);
 
                 //add the new connection to the list of active connections
                 this.activeconnections.put(nodeInfo,handler);
@@ -125,17 +139,22 @@ public class SocketNode implements Runnable {
             }catch(IOException e){
                 e.printStackTrace();
 
-            }finally {
+            }/*finally {
                 try{
                     socket.close();
                 }catch (IOException e){
                     e.printStackTrace();
                 }
-            }
+            }*/
 
                 //andrebbe rilanciato??? gestito diversamente??
 
         }
     }
+
+    public int getActual_port() {
+        return actual_port;
+    }
+
 }
 

@@ -21,6 +21,7 @@ public class SocketHandler implements Runnable{
         this.port = port;
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
+        this.in = new ObjectInputStream(socket.getInputStream());
 
     }
 
@@ -31,13 +32,6 @@ public class SocketHandler implements Runnable{
     @Override
     public void run() {
 
-        try {
-            in = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("non ho l'in e l'out e sono "+ this.port);
-        }
-        System.out.println("ho l'in e l'out e sono ");
         while(!terminate){
             try {
 
@@ -63,13 +57,16 @@ public class SocketHandler implements Runnable{
         System.out.println("sto cercando di terminare");
         try{
             in.close();
+            out.close();
+            socket.close();
         }catch (IOException e){
             e.printStackTrace();
         }
 
     }
 
-    public synchronized void sendMessage(Message message)throws IOException{
+    public void sendMessage(Message message)throws IOException{
+
         out.writeObject(message);
         out.flush();
     }
