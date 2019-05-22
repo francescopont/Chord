@@ -3,6 +3,7 @@ package chord.network;
 import chord.Exceptions.PortException;
 import chord.Messages.Message;
 import chord.model.Chord;
+import chord.model.Threads;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -22,13 +23,13 @@ public class Router {
             try{
                 node = new SocketNode(port);
                 nodes.add(node);
-                new Thread(node).start();
+                Threads.executeImmediately(node);
             }catch (IOException e){
                 try {
                     node = new SocketNode(0);
                     int actual_port = node.getPort();
                     nodes.add(node);
-                    new Thread(node).start();
+                    Threads.executeImmediately(node);
                     throw new PortException(actual_port);
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -50,11 +51,12 @@ public class Router {
         }
         boolean delivered = false;
         if (message.getDestination().getIPAddress().equals(IPAddress)){
-            Chord.deliverMessage(message.getDestination().getPort(), message);
             delivered = true;
+            Chord.deliverMessage(message.getDestination().getPort(), message);
         }
+
         if (!delivered){
-            System.out.println("devo inviare sulla rete");
+            System.out.println(message.getDestination().getIPAddress() + " e invece " + IPAddress);
             for (SocketNode node: nodes){
                 if (node.getPort() == port){
                     node.sendMessage(message);
@@ -65,9 +67,18 @@ public class Router {
     }
 
     public static void sendAnswer(int port, Message message){
-        for (SocketNode node: nodes){
-            if (node.getPort() == port){
-                node.sendMessage(message);
+        boolean delivered = false;
+        if (message.getDestination().getIPAddress().equals(IPAddress)){
+            delivered = true;
+            Chord.deliverMessage(message.getDestination().getPort(), message);
+        }
+
+        if (!delivered){
+            for (SocketNode node: nodes){
+                if (node.getPort() == port){
+                    node.sendMessage(message);
+
+                }
             }
         }
     }
@@ -80,7 +91,7 @@ public class Router {
         }
     }
 
-    public static void setIPAddress( String IPAddress){
-        IPAddress = IPAddress;
+    public static void setIPAddress( String newIPAddress){
+        IPAddress = newIPAddress;
     }
 }

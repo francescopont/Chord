@@ -4,7 +4,7 @@ import chord.Exceptions.PredecessorException;
 import chord.Exceptions.SuccessorListException;
 import chord.Exceptions.TimerExpiredException;
 
-import java.util.Timer;
+import java.util.concurrent.ScheduledFuture;
 
 public class Node {
     private NodeInfo nodeInfo;
@@ -18,6 +18,7 @@ public class Node {
     private NodeDispatcher dispatcher;
     private int fix_finger_counter;
     private NodeComparator comparator;
+    private ScheduledFuture terminate;
 
     //this constructor is called when you CREATE and when you JOIN an existent Chord
     public Node(NodeInfo me) {
@@ -198,8 +199,7 @@ public class Node {
         }
         this.predecessor = this.nodeInfo;
         this.initialized = true;
-        Timer timer = new Timer();
-        timer.schedule(new Utilities(this), Utilities.getPeriod(),Utilities.getPeriod());
+        this.terminate  = Threads.executePeriodically(new Utilities(this));
         this.printStatus();
         this.printUtilities();
 
@@ -224,51 +224,45 @@ public class Node {
             System.out.println("tempo finito sull'inizialize di " + nodeidentifier);
         }
 
-        //now I populate the successor list and the finger table on a separate thread
-        //new Thread(() -> {
-            //first, the successor list
-            for (int i = 1; i < 4; i++) {
-                NodeInfo predecessor = successorList.getLastElement();
-                NodeInfo successor = null;
-                try {
-                    successor = dispatcher.sendFirstSuccessorRequest(predecessor,nodeInfo);
-                } catch (TimerExpiredException e) {
-                    //put code here
-                }
-
-                if (successor.getHash().equals(nodeidentifier)) {
-                    while (i < 4) {
-                        successorList.addEntry( nodeInfo);
-                        i++;
-                    }
-                } else {
-                    successorList.addEntry(successor);
-                }
-            }
-            for(int i=1; i<Utilities.numberOfBit(); i++) {
-                String hashedkey = Utilities.computefinger(nodeidentifier, i);
-                NodeInfo finger = null;
-                NodeInfo successor = successorList.getFirstElement();
-                try {
-                    finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
-                    fingerTable.addFinger(finger);
-                } catch (TimerExpiredException e) {
-                    e.printStackTrace();
-                }
-            }
-            initialized = true;
-            setAlone(false);
-            this.printStatus();
-            this.printUtilities();
-            try{
-                dispatcher.sendStartRequest(myfriend, this.nodeInfo);
-            }catch (TimerExpiredException e){
+        //first, the successor list
+        for (int i = 1; i < 4; i++) {
+            NodeInfo predecessor = successorList.getLastElement();
+            NodeInfo successor = null;
+            try {
+                successor = dispatcher.sendFirstSuccessorRequest(predecessor,nodeInfo);
+            } catch (TimerExpiredException e) {
                 //put code here
             }
-
-        //}).start();
-        Timer timer = new Timer();
-        timer.schedule(new Utilities(this), Utilities.getPeriod(), Utilities.getPeriod());
+            if (successor.getHash().equals(nodeidentifier)) {
+                while (i < 4) {
+                    successorList.addEntry( nodeInfo);
+                    i++;
+                }
+            } else {
+                successorList.addEntry(successor);
+            }
+        }
+        for(int i=1; i<Utilities.numberOfBit(); i++) {
+            String hashedkey = Utilities.computefinger(nodeidentifier, i);
+            NodeInfo finger = null;
+            NodeInfo successor = successorList.getFirstElement();
+            try {
+                finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
+                fingerTable.addFinger(finger);
+            } catch (TimerExpiredException e) {
+                e.printStackTrace();
+            }
+        }
+        initialized = true;
+        setAlone(false);
+        this.printStatus();
+        this.printUtilities();
+        try{
+            dispatcher.sendStartRequest(myfriend, this.nodeInfo);
+        }catch (TimerExpiredException e){
+            //put code here
+        }
+        this.terminate  = Threads.executePeriodically(new Utilities(this));
 
     }
 
@@ -296,7 +290,7 @@ public class Node {
     }
 
     public void terminate() {
-        this.terminated = true;
+        terminate.cancel(true);
     }
 
     public boolean isTerminated() {

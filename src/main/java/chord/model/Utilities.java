@@ -3,13 +3,10 @@ package chord.model;
 // this class contains all the operations we need to run periodically on each node, and the code for the hash function
 
 
-
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.TimerTask;
-public class Utilities extends TimerTask {
+public class Utilities implements Runnable {
     private final Node virtualnode;
 
     //constructor
@@ -110,14 +107,14 @@ public class Utilities extends TimerTask {
 
     //period of utilities
     public static int getPeriod(){
-        //5 secondi
-        return 5000;
+        //0.5 secondi
+        return 500;
     }
 
     //timer for message
     public static int getTimer(){
-        // 3 minuti
-        return 180000;
+        // 10 secondi
+        return 10000;
     }
 
 }

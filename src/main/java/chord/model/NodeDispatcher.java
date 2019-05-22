@@ -5,7 +5,10 @@ import chord.Exceptions.TimerExpiredException;
 import chord.Messages.*;
 import chord.network.Router;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TimerTask;
 
 //problema: la sincronizzazione
 
@@ -25,8 +28,7 @@ public class NodeDispatcher {
         NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
         final int ticket= Router.sendMessage(this.port,notifyRequestMessage);
         this.waitingTickets.add(ticket);
-        Timer timer = new Timer(false);
-        timer.schedule(new TimerTask() {
+        Threads.executeAfterDelay(new Runnable() {
             @Override
             public void run(){
                 synchronized (this){
@@ -37,7 +39,7 @@ public class NodeDispatcher {
                     }
                 }
             }
-        }, Utilities.getTimer());
+        });
 
         while (!this.answers.containsKey(ticket)) {
             try {
@@ -56,8 +58,7 @@ public class NodeDispatcher {
         PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(destination, sender);
         final int ticket = Router.sendMessage(this.port, predecessorRequestMessage);
         this.waitingTickets.add(ticket);
-        Timer timer = new Timer(false);
-        timer.schedule(new TimerTask() {
+        Threads.executeAfterDelay(new Runnable() {
             @Override
             public void run() {
                 synchronized (this){
@@ -69,8 +70,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, Utilities.getTimer());
-
+        });
         while (!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -91,8 +91,7 @@ public class NodeDispatcher {
         SuccessorRequestMessage successorRequestMessage= new SuccessorRequestMessage(destination, node, sender);
         final int ticket= Router.sendMessage(this.port, successorRequestMessage);
         this.waitingTickets.add(ticket);
-        Timer timer = new Timer(false);
-        timer.schedule(new TimerTask() {
+        Threads.executeAfterDelay(new Runnable() {
             @Override
             public void run() {
                 synchronized (this){
@@ -104,7 +103,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, Utilities.getTimer());
+        });
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -123,8 +122,7 @@ public class NodeDispatcher {
         FirstSuccessorRequestMessage firstSuccessorRequestMessage= new FirstSuccessorRequestMessage(destination,sender);
         final int ticket= Router.sendMessage(this.port, firstSuccessorRequestMessage);
         this.waitingTickets.add(ticket);
-        Timer timer = new Timer(false);
-        timer.schedule(new TimerTask() {
+        Threads.executeAfterDelay(new Runnable() {
             @Override
             public void run() {
                 synchronized (this){
@@ -136,7 +134,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, Utilities.getTimer());
+        });
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -155,8 +153,7 @@ public class NodeDispatcher {
         PingRequestMessage pingRequestMessage = new PingRequestMessage(destination,sender);
         final int ticket=Router.sendMessage(this.port,pingRequestMessage);
         this.waitingTickets.add(ticket);
-        Timer timer = new Timer(false);
-        timer.schedule(new TimerTask() {
+        Threads.executeAfterDelay(new TimerTask() {
             @Override
             public void run() {
                 synchronized (this){
@@ -168,7 +165,8 @@ public class NodeDispatcher {
                 }
 
             }
-        }, Utilities.getTimer());
+        });
+
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();
@@ -187,8 +185,7 @@ public class NodeDispatcher {
         StartRequestMessage startRequestMessage = new StartRequestMessage(destination,sender);
         final int ticket=Router.sendMessage(this.port,startRequestMessage);
         this.waitingTickets.add(ticket);
-        Timer timer = new Timer(false);
-        timer.schedule(new TimerTask() {
+        Threads.executeAfterDelay(new TimerTask() {
             @Override
             public void run() {
                 synchronized (this){
@@ -200,7 +197,7 @@ public class NodeDispatcher {
                 }
 
             }
-        }, Utilities.getTimer());
+        });
         while(!this.answers.containsKey(ticket)){
             try{
                 wait();

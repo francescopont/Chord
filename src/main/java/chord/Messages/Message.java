@@ -62,4 +62,8 @@ public class  Message implements Serializable{
         }
     }
 
+    public void printMessage(){
+        System.out.println("Sender: "+ getSender().getPort() + " destination: "+ getDestination().getPort() + " id: " + id + " type: "+ type );
+    }
+
 }

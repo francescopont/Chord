@@ -83,11 +83,14 @@ public class Chord{
 
     public void deleteNode(int port){
         Router.terminate(port);
+        Node node = null;
         for (Node virtualnode: virtualnodes){
             if (virtualnode.getPort() == port){
-                virtualnode.terminate();
+                node = virtualnode;
             }
         }
+        node.terminate();
+        virtualnodes.remove(node);
     }
 
     //this method is called from the socket layer to delived a message to the chord layer
@@ -95,7 +98,8 @@ public class Chord{
         for (Node virtualnode: virtualnodes){
             if (virtualnode.getPort() == port){
                 MessageHandler handler = new MessageHandler(virtualnode,message);
-                new Thread(handler).start();
+                //System.out.println("sto facendo eseguire un gestore del messaggio "+ message.getId() + " di tipo "+ message.getType() );
+                Threads.executeImmediately(handler);
             }
         }
     }

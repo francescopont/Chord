@@ -2,6 +2,7 @@ package chord.network;
 
 import chord.Messages.Message;
 import chord.model.Chord;
+import chord.model.NodeInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,16 +11,16 @@ import java.net.Socket;
 
 public class SocketHandler implements Runnable{
     private int port;
+    private NodeInfo endpoint = null;
     private Socket socket;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
     private boolean terminate = false;
+    ObjectInputStream in = null;
+    ObjectOutputStream out = null;
 
     public SocketHandler(int port, Socket socket) throws IOException{
         this.port = port;
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
-        this.in = new ObjectInputStream(socket.getInputStream());
 
     }
 
@@ -30,11 +31,23 @@ public class SocketHandler implements Runnable{
     @Override
     public void run() {
 
+        try {
+            in = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("non ho l'in e l'out e sono "+ this.port);
+        }
+        System.out.println("ho l'in e l'out e sono ");
         while(!terminate){
             try {
 
                 //read the message from the buffer
                 Message message= (Message) in.readObject();
+                System.out.println("I'm: "+ port + " and I've received a message from: "+ message.getSender().getPort());
+                if (this.endpoint == null){
+                    this.endpoint = message.getSender();
+                    System.out.println("ho settato l'endpoint");
+                }
 
                 //deliver the message to the above layer
                 //note: since we do not have actors like in Erlang, when we get something from another layer
@@ -47,8 +60,9 @@ public class SocketHandler implements Runnable{
             }
         }
 
+        System.out.println("sto cercando di terminare");
         try{
-            socket.close();
+            in.close();
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -64,11 +78,15 @@ public class SocketHandler implements Runnable{
         this.terminate = true;
     }
 
+    public NodeInfo getEndpoint () throws Exception {
+        if (endpoint == null){
+            throw new Exception();
+        }
+        return endpoint;
+    }
 
-
-
-
-
-
+    public int getPort() {
+        return port;
+    }
 }
 

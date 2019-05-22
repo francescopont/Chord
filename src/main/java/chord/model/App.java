@@ -30,7 +30,7 @@ public class App
 
 
         try{
-            Chord.join("127.0.0.1",10002, "127.0.0.1", actual_port );
+            Chord.join("127.0.0.1",1002, "127.0.0.1", actual_port );
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -42,6 +42,6 @@ public class App
                 Chord.printChord();
 
             }
-        }, 1200000);
+        }, 60000);
     }
 }
