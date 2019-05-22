@@ -34,6 +34,13 @@ public class App
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        try{
+            Chord.join("127.0.0.1",1003, "127.0.0.1", actual_port );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -42,6 +49,6 @@ public class App
                 Chord.printChord();
 
             }
-        }, 10000);
+        }, 15000);
     }
 }

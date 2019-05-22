@@ -2,9 +2,9 @@ package chord.network;
 
 import chord.Exceptions.PortException;
 import chord.Messages.Message;
-import chord.model.Chord;
 import chord.model.Threads;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,15 +19,23 @@ public class Router {
     public static void addnode(int port) throws PortException {
         synchronized (nodes){
             SocketNode node;
-            node = new SocketNode(port);
-            nodes.add(node);
-            Threads.executeImmediately(node);
-            while (node.getActual_port()==-1){
-                //
+            try{
+                node = new SocketNode(port);
+                nodes.add(node);
+                Threads.executeImmediately(node);
+            }catch (IOException e){
+                try{
+                    node = new SocketNode(0);
+                    nodes.add(node);
+                    throw new PortException(node.getPort());
+                }catch (IOException e1){
+                    e.printStackTrace();
+                    e1.printStackTrace();
+                }
+
             }
-            if(node.getActual_port()!=port){
-                throw new PortException(node.getActual_port());
-            }
+
+
         }
 
     }
@@ -42,14 +50,15 @@ public class Router {
             System.out.println("il destinatario e il mittente coincidono!");
         }
         boolean delivered = false;
-        if (message.getDestination().getIPAddress().equals(IPAddress)){
+        /*if (message.getDestination().getIPAddress().equals(IPAddress)){
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(), message);
         }
+        */
 
         if (!delivered){
             for (SocketNode node: nodes){
-                if (node.getActual_port() == port){
+                if (node.getPort() == port){
                     node.sendMessage(message);
                 }
             }
@@ -59,14 +68,15 @@ public class Router {
 
     public static void sendAnswer(int port, Message message){
         boolean delivered = false;
-        if (message.getDestination().getIPAddress().equals(IPAddress)){
+        /*if (message.getDestination().getIPAddress().equals(IPAddress)){
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(), message);
         }
+        */
 
         if (!delivered){
             for (SocketNode node: nodes){
-                if (node.getActual_port() == port){
+                if (node.getPort() == port){
                     node.sendMessage(message);
 
                 }
@@ -76,7 +86,7 @@ public class Router {
 
     public static void terminate(int port){
         for (SocketNode node: nodes){
-            if (node.getActual_port() == port){
+            if (node.getPort() == port){
                 node.terminate();
             }
         }
