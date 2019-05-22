@@ -1,0 +1,55 @@
+
+-------------------
+FINGERS -> a289
+finger 0: a28a
+finger 1: a28b
+finger 2: a28d
+finger 3: a291
+finger 4: a299
+finger 5: a2a9
+finger 6: a2c9
+finger 7: a309
+finger 8: a389
+finger 9: a489
+finger 10: a689
+finger 11: aa89
+finger 12: b289
+finger 13: c289
+finger 14: e289
+finger 15: 2289
+-------------------
+FINGERS -> 8c44
+finger 0: 8c45
+finger 1: 8c46
+finger 2: 8c48
+finger 3: 8c4c
+finger 4: 8c54
+finger 5: 8c64
+finger 6: 8c84
+finger 7: 8cc4
+finger 8: 8d44
+finger 9: 8e44
+finger 10: 9044
+finger 11: 9444
+finger 12: 9c44
+finger 13: ac44
+finger 14: cc44
+finger 15: 0c44
+-------------------
+FINGERS -> db5e
+finger 0: db5f
+finger 1: db60
+finger 2: db62
+finger 3: db66
+finger 4: db6e
+finger 5: db7e
+finger 6: db9e
+finger 7: dbde
+finger 8: dc5e
+finger 9: dd5e
+finger 10: df5e
+finger 11: e35e
+finger 12: eb5e
+finger 13: fb5e
+finger 14: 1b5e
+finger 15: 5b5e

@@ -21,7 +21,7 @@ public class SocketHandler implements Runnable{
         this.port = port;
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
-        in = new ObjectInputStream(socket.getInputStream());
+        this.in = new ObjectInputStream(socket.getInputStream());
 
     }
 

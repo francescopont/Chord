@@ -1,0 +1,7 @@
+chord\model\FingerTableTest.class
+chord\model\UtilitiesTest.class
+chord\model\NodeDispatcherTest.class
+chord\model\SuccessorListTest.class
+chord\network\RouterTest.class
+chord\model\NodeTest.class
+chord\AppTest.class
