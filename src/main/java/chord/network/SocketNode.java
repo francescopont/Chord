@@ -70,7 +70,6 @@ public class SocketNode implements Runnable {
                         //do nothing
                     }
                 }
-                System.out.println("I'm: " + port + " and I'm adding a new routing element " + nodeInfo.getPort());
                 this.activeconnections.put(nodeInfo, handler);
             } catch (IOException e) {
                 System.out.println("errore nella socketnode");
@@ -101,16 +100,13 @@ public class SocketNode implements Runnable {
     public void sendMessage(Message message){
         boolean yetsend = false;
         NodeInfo nodeInfo = message.getDestination();
-        System.out.println("I'm: "+ this.port + " and I'm trying to send a message to: "+ message.getDestination().getPort());
 
         // we check if we already have an active connection open with the receiver
         if ( this.activeconnections.containsKey(nodeInfo)){
-            System.out.println("già ho la connessione con questo nodo");
             try{
                 //send the message
                 this.activeconnections.get(nodeInfo).sendMessage(message);
                 yetsend = true;
-                System.out.println("yetsend = true");
             }
             catch (IOException e ){
                 this.activeconnections.remove(nodeInfo);
@@ -123,8 +119,6 @@ public class SocketNode implements Runnable {
             try {
                 socket = new Socket(nodeInfo.getIPAddress(),nodeInfo.getPort());
 
-
-                System.out.println("sto creando un nuovo handler perchè voglio inviare un messggio ad un nodo nuovo e ho inviato il messaggio");
                 //REPEAT THE CODE AS ABOVE
                 //a new handler for this connection
                 SocketHandler handler = new SocketHandler(this.actual_port,socket);

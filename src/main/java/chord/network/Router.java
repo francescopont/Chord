@@ -5,7 +5,6 @@ import chord.Messages.Message;
 import chord.model.Chord;
 import chord.model.Threads;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,13 +42,12 @@ public class Router {
             System.out.println("il destinatario e il mittente coincidono!");
         }
         boolean delivered = false;
-        /*if (message.getDestination().getIPAddress().equals(IPAddress)){
+        if (message.getDestination().getIPAddress().equals(IPAddress)){
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(), message);
-        }*/
+        }
 
         if (!delivered){
-            System.out.println(message.getDestination().getIPAddress() + " e invece " + IPAddress);
             for (SocketNode node: nodes){
                 if (node.getActual_port() == port){
                     node.sendMessage(message);

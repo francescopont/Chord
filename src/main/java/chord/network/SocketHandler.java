@@ -37,10 +37,8 @@ public class SocketHandler implements Runnable{
 
                 //read the message from the buffer
                 Message message= (Message) in.readObject();
-                System.out.println("I'm: "+ port + " and I've received a message from: "+ message.getSender().getPort());
                 if (this.endpoint == null){
                     this.endpoint = message.getSender();
-                    System.out.println("ho settato l'endpoint");
                 }
 
                 //deliver the message to the above layer
@@ -54,7 +52,6 @@ public class SocketHandler implements Runnable{
             }
         }
 
-        System.out.println("sto cercando di terminare");
         try{
             in.close();
             out.close();
