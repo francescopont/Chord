@@ -57,13 +57,16 @@ public class SocketHandler implements Runnable{
         System.out.println("sto cercando di terminare");
         try{
             in.close();
+            out.close();
+            socket.close();
         }catch (IOException e){
             e.printStackTrace();
         }
 
     }
 
-    public synchronized void sendMessage(Message message)throws IOException{
+    public void sendMessage(Message message)throws IOException{
+
         out.writeObject(message);
         out.flush();
     }
