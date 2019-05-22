@@ -107,8 +107,8 @@ public class Utilities implements Runnable {
 
     //period of utilities
     public static int getPeriod(){
-        //0.5 secondi
-        return 500;
+        //0.2 secondi
+        return 200;
     }
 
     //timer for message

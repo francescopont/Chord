@@ -20,26 +20,22 @@ public class App
             Chord.create("127.0.0.1", 1000);
         } catch (PortException e) {
             actual_port = e.getPort();
+            System.out.println(actual_port);
         }
-
         try{
             Chord.join("127.0.0.1",10001, "127.0.0.1", actual_port );
         }catch (Exception e){
             e.printStackTrace();
         }
 
-
-        try{
-            Chord.join("127.0.0.1",1002, "127.0.0.1", actual_port );
-        }catch (Exception e){
-            e.printStackTrace();
+        for (int i=1; i<8; i++){
+            try{
+                Chord.join("127.0.0.1",1000 + i, "127.0.0.1", actual_port );
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
-        try{
-            Chord.join("127.0.0.1",1003, "127.0.0.1", actual_port );
-        }catch (Exception e){
-            e.printStackTrace();
-        }
 
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
@@ -49,6 +45,6 @@ public class App
                 Chord.printChord();
 
             }
-        }, 15000);
+        }, 60000);
     }
 }

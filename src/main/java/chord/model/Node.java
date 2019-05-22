@@ -72,7 +72,6 @@ public class Node {
     public void stabilize() {
         try {
             NodeInfo successor = this.successorList.getFirstElement();
-            //System.out.println("I'm : "+this.nodeidentifier+ " and I'm asking stabilize to "+successor.getHash());
                 NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
                 if(potentialSuccessor.getHash().equals(this.nodeidentifier)) {
                     return;
@@ -86,11 +85,10 @@ public class Node {
         } catch (TimerExpiredException e) {
             //put code here
         }catch (PredecessorException e){
-            System.out.println("Predecessor Exception");
+            System.out.println("My successor said me he does not have a predecessor: " + this.nodeidentifier);
         }
         try {
             NodeInfo successor = this.successorList.getFirstElement();
-            //System.out.println("I'm : "+ this.nodeidentifier + " and I'm notifying "+ successor.getHash());
             this.dispatcher.sendNotify(successor, this.nodeInfo);
         } catch (TimerExpiredException e) {
             //put code here
@@ -126,7 +124,7 @@ public class Node {
                     successorList.modifyEntry(i+1, successor);
                 }
             } catch (TimerExpiredException e) {
-                System.out.println("ECCEZIONE NELLA FIX SUCCESSOR LIST");
+                System.out.println("I'm " + this.nodeidentifier + " and I experienced an exception in the successor list, getting the element "+ i);
                 //put code here
             }
 
@@ -138,7 +136,7 @@ public class Node {
             try {
                 dispatcher.sendPing(this.predecessor, this.nodeInfo);
             } catch (TimerExpiredException e) {
-                System.out.println("tempo finito");
+                System.out.println("I'm trying to ping my predecessor, but time expired");
                 predecessor = null;
                 //put code here
             }

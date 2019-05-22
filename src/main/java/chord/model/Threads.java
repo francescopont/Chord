@@ -6,7 +6,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Threads {
-    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(100);
+
+    //don't let anyone to instantiate this class
+    private Threads(){
+
+    }
+    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(500);
 
     //periodic functions on nodes
     public static ScheduledFuture<?> executePeriodically(Runnable runnable){
