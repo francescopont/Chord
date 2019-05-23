@@ -46,7 +46,6 @@ public class Chord{
             }
             node.initialize(knownnode);
         }
-
     }
 
     public static void create(String IPAddress, int port)throws PortException {

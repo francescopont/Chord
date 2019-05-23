@@ -37,6 +37,7 @@ public class App
         }
 
 
+        System.out.println("finita la computazione");
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -45,6 +46,6 @@ public class App
                 Chord.printChord();
 
             }
-        }, 60000);
+        }, 10000);
     }
 }

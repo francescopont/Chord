@@ -114,7 +114,7 @@ public class Utilities implements Runnable {
     //timer for message
     public static int getTimer(){
         // 10 secondi
-        return 10000;
+        return 100000;
     }
 
 }
