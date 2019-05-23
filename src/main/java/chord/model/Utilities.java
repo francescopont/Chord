@@ -17,13 +17,11 @@ public class Utilities implements Runnable {
     //calls periodic functions on the nodes
     @Override
     public void run() {
-        synchronized (virtualnode) {
-            if (virtualnode.isInitialized() && !virtualnode.isTerminated() && !virtualnode.isAlone()) {
-                virtualnode.stabilize();
-                virtualnode.fix_finger();
-                virtualnode.check_predecessor();
-                virtualnode.fix_successor_list();
-            }
+        if (virtualnode.isInitialized() && !virtualnode.isTerminated() && !virtualnode.isAlone()) {
+            virtualnode.stabilize();
+            virtualnode.fix_finger();
+            virtualnode.check_predecessor();
+            virtualnode.fix_successor_list();
         }
     }
 

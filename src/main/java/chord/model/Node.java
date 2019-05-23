@@ -96,7 +96,7 @@ public class Node {
 
     }
 
-    public synchronized void fix_finger() {
+    public void fix_finger() {
         String hashedkey = Utilities.computefinger(this.nodeidentifier, fix_finger_counter);
         NodeInfo nodeInfo = find_successor(hashedkey);
         if (nodeInfo == null){
@@ -109,7 +109,7 @@ public class Node {
         }
     }
 
-    public synchronized void fix_successor_list(){
+    public void fix_successor_list(){
         for (int i = 0; i<3; i++){
             NodeInfo predecessor = successorList.getElement(i);
             NodeInfo successor = null;
@@ -136,7 +136,7 @@ public class Node {
             try {
                 dispatcher.sendPing(this.predecessor, this.nodeInfo);
             } catch (TimerExpiredException e) {
-                System.out.println("I'm trying to ping my predecessor, but time expired");
+                System.out.println("I'm "+ this.nodeidentifier+ " and I'm trying to ping my predecessor, but time expired");
                 predecessor = null;
                 //put code here
             }

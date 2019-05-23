@@ -18,7 +18,7 @@ public class SuccessorList {
     }
 
     //to add an entry in the last position
-    public synchronized void addEntry( NodeInfo node){
+    public void addEntry( NodeInfo node){
         if (successors.size() < 4){
             successors.addLast(node);
         }

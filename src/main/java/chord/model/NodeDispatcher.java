@@ -54,7 +54,7 @@ public class NodeDispatcher {
         notifyAnswerMessage.check();
     }
 
-    public synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException, PredecessorException {
+    public  synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException, PredecessorException {
         PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(destination, sender);
         final int ticket = Router.sendMessage(this.port, predecessorRequestMessage);
         this.waitingTickets.add(ticket);

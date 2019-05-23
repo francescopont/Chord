@@ -2,7 +2,6 @@ package chord.model;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.matchers.Null;
 
 public class FingerTableTest {
     FingerTable fingerTable;

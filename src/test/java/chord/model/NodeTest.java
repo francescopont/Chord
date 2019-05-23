@@ -4,8 +4,9 @@ import chord.Exceptions.PredecessorException;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+//import static org.mockito.Mockito.mock;
+//import static org.mockito.Mockito.when;
 
 public class NodeTest {
     Node node;
@@ -21,14 +22,13 @@ public class NodeTest {
         node1 = new Node(nodeInfo1);
 
 
-        //mock dispatcher
-        mockDispatcher=mock(NodeDispatcher.class);
-        mockDispatcher1 = mock(NodeDispatcher.class);
+        //mockDispatcher=mock(NodeDispatcher.class);
+        //mockDispatcher1 = mock(NodeDispatcher.class);
         node.setDispatcher(mockDispatcher);
         node1.setDispatcher(mockDispatcher1);
-        when(mockDispatcher.sendSuccessorRequest(new NodeInfo("0008"), "0009",nodeInfo)).thenReturn(new NodeInfo("zoro"));
-        when (mockDispatcher1.sendSuccessorRequest(nodeInfo, "aaaa", nodeInfo1)).thenReturn(node.find_successor("aaaa"));
-        when (mockDispatcher1.sendFirstSuccessorRequest(nodeInfo, nodeInfo1)).thenReturn(node.getFirstSuccessor());
+        //when(mockDispatcher.sendSuccessorRequest(new NodeInfo("0008"), "0009",nodeInfo)).thenReturn(new NodeInfo("zoro"));
+        //when (mockDispatcher1.sendSuccessorRequest(nodeInfo, "aaaa", nodeInfo1)).thenReturn(node.find_successor("aaaa"));
+        //when (mockDispatcher1.sendFirstSuccessorRequest(nodeInfo, nodeInfo1)).thenReturn(node.getFirstSuccessor());
         //setting FingerTable and SuccessorList
         FingerTable fingerTable= new FingerTable("0000");
         SuccessorList successorList= new SuccessorList("0000");

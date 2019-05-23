@@ -46,6 +46,8 @@ public class App
                 Chord.printChord();
 
             }
-        }, 10000);
+        }, 150000, 150000);
     }
+
+
 }

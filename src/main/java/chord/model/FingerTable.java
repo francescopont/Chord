@@ -17,7 +17,7 @@ public class FingerTable{
     }
 
     //to add an entry when the finger table is not full
-    public synchronized void addFinger(NodeInfo node){
+    public void addFinger(NodeInfo node){
         if (fingers.size() < Utilities.numberOfBit()) {
             fingers.addLast(node);
         }

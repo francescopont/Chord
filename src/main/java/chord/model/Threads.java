@@ -11,7 +11,7 @@ public class Threads {
     private Threads(){
 
     }
-    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(100);
+    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(1000);
 
     //periodic functions on nodes
     public static ScheduledFuture<?> executePeriodically(Runnable runnable){
