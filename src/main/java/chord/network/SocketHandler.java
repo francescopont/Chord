@@ -63,7 +63,6 @@ public class SocketHandler implements Runnable{
     }
 
     public void sendMessage(Message message)throws IOException{
-
         out.writeObject(message);
         out.flush();
     }

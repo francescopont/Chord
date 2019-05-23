@@ -33,6 +33,7 @@ public class NodeDispatcher {
             public void run(){
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
+                        System.out.println("method: notify "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
                         NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,ticket);
                         notifyAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, notifyAnswerMessage);
@@ -63,6 +64,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
+                        System.out.println("method: sendPredecessorRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
                         PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(sender,null, destination,ticket, false);
                         predecessorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,predecessorAnswerMessage);
@@ -96,6 +98,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
+                        System.out.println("method: sendSuccessroRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
                         SuccessorAnswerMessage successorAnswerMessage = new SuccessorAnswerMessage(sender,null, destination,ticket);
                         successorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,successorAnswerMessage);
@@ -127,6 +130,8 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
+                        System.out.println("method: sendFirstSuccessorRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+
                         FirstSuccessorAnswerMessage firstSuccessorAnswerMessage = new FirstSuccessorAnswerMessage(sender,null,destination,ticket);
                         firstSuccessorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,firstSuccessorAnswerMessage);
@@ -158,6 +163,8 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
+                        System.out.println("method: ping "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+
                         PingAnswerMessage pingAnswerMessage = new PingAnswerMessage(sender,destination, ticket);
                         pingAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, pingAnswerMessage);
@@ -190,6 +197,8 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
+                        System.out.println("method: sendStartRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+
                         StartAnswerMessage startAnswerMessage = new StartAnswerMessage(sender,destination, ticket);
                         startAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, startAnswerMessage);
