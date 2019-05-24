@@ -1,0 +1,6 @@
+TO DO DISTRIBUTED
+controllo dei lock/deadlocks/synchronized
+menu
+modularizzare la lunghezza della successorList
+gestire le disconnessioni
+gestire l'invio dei file

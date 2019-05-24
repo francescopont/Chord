@@ -2,6 +2,7 @@ package chord.network;
 
 import chord.Exceptions.PortException;
 import chord.Messages.Message;
+import chord.model.Chord;
 import chord.model.Threads;
 
 import java.io.IOException;
@@ -46,10 +47,15 @@ public class Router {
     public static int sendMessage(int port, Message message) {
         int ticket = Ticket.getTicket();
         message.setId(ticket);
+        boolean delivered = false;
+
         if (message.getDestination().getHash().equals(message.getSender().getHash())){
             System.out.println("il destinatario e il mittente coincidono!");
+            delivered = true;
+            Chord.deliverMessage(message.getDestination().getPort(),message);
         }
-        boolean delivered = false;
+
+
         /*if (message.getDestination().getIPAddress().equals(IPAddress)){
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(), message);
@@ -68,6 +74,11 @@ public class Router {
 
     public static void sendAnswer(int port, Message message){
         boolean delivered = false;
+        if (message.getDestination().getHash().equals(message.getSender().getHash())){
+            System.out.println("il destinatario e il mittente coincidono!");
+            delivered = true;
+            Chord.deliverMessage(message.getDestination().getPort(),message);
+        }
         /*if (message.getDestination().getIPAddress().equals(IPAddress)){
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(), message);
@@ -94,5 +105,11 @@ public class Router {
 
     public static void setIPAddress( String newIPAddress){
         IPAddress = newIPAddress;
+    }
+
+    public static void printRouter(){
+        for(SocketNode socketNode: nodes){
+            socketNode.printSOcketNode();
+        }
     }
 }

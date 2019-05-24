@@ -46,7 +46,7 @@ public class NodeInfo implements Serializable{
     @Override
     public boolean equals(Object o){
         NodeInfo nodeInfo = (NodeInfo) o;
-        return hash.compareTo(nodeInfo.hash) == 0;
+        return this.port == nodeInfo.getPort();
     }
 
     //fake constructor used only for testing

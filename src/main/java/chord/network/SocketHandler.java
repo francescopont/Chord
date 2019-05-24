@@ -37,6 +37,11 @@ public class SocketHandler implements Runnable{
 
                 //read the message from the buffer
                 Message message= (Message) in.readObject();
+                if (message.getSender().getPort() == message.getDestination().getPort()){
+                    message.printMessage();
+                }
+
+                //set the endpoint if not done yet
                 if (this.endpoint == null){
                     this.endpoint = message.getSender();
                 }
@@ -59,10 +64,13 @@ public class SocketHandler implements Runnable{
         }catch (IOException e){
             e.printStackTrace();
         }
-
     }
 
     public void sendMessage(Message message)throws IOException{
+        //set the endpoint
+        if (this.endpoint == null){
+            this.endpoint = message.getDestination();
+        }
         out.writeObject(message);
         out.flush();
     }

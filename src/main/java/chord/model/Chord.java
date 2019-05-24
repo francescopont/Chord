@@ -97,7 +97,6 @@ public class Chord{
         for (Node virtualnode: virtualnodes){
             if (virtualnode.getPort() == port){
                 MessageHandler handler = new MessageHandler(virtualnode,message);
-                //System.out.println("sto facendo eseguire un gestore del messaggio "+ message.getId() + " di tipo "+ message.getType() );
                 Threads.executeImmediately(handler);
             }
         }

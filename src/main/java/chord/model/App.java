@@ -1,6 +1,7 @@
 package chord.model;
 
 import chord.Exceptions.PortException;
+import chord.network.Router;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,7 +29,7 @@ public class App
             e.printStackTrace();
         }
 
-        for (int i=1; i<4; i++){
+        for (int i=1; i<8; i++){
             try{
                 Chord.join("127.0.0.1",1000 + i, "127.0.0.1", actual_port );
             }catch (Exception e){
@@ -44,9 +45,11 @@ public class App
             public void run() {
                 System.out.println("print cord");
                 Chord.printChord();
+                System.out.println("Pinta di birra");
+                Router.printRouter();
 
             }
-        }, 30000, 30000);
+        }, 120000, 60000);
     }
 
 
