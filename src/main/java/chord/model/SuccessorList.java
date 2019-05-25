@@ -24,7 +24,7 @@ public class SuccessorList {
         }
     }
 
-    //contiamo da 0 a 3
+    //we count from 0 to 3
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
         this.successors.set(position, newnodeInfo);
     }
@@ -41,7 +41,7 @@ public class SuccessorList {
         return successor.getValue();
     }
 
-    //to get a specific nodeinfo (indexes go from 0 to 4)
+    //to get a specific nodeinfo (indexes go from 0 to 3)
     public NodeInfo getElement(int position){
         return this.successors.get(position);
     }
@@ -52,6 +52,10 @@ public class SuccessorList {
 
     public NodeInfo getFirstElement(){
         return this.successors.getFirst();
+    }
+
+    public void removeLast(){
+        this.successors.removeLast();
     }
 
     //useful for testing

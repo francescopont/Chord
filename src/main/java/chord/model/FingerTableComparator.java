@@ -4,15 +4,15 @@ import java.util.Comparator;
 
 
 public class FingerTableComparator implements Comparator<String> {
-    //the hash where we start from the ring
+    //the hash which we consider as the "0" on the ring
     private String nodeidentifier;
 
-
+    //constructor
     public FingerTableComparator(String nodeidentifier) {
         this.nodeidentifier = nodeidentifier;
     }
 
-    // ho fatto queste scelte di minori e uguali pensando alla successor list
+    // this comparator set the nodeidentifier as the BIGGEST value on the ring
     @Override
     public int compare(String hash1, String hash2){
         //case1: both values are greater than the nodeidentifier

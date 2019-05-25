@@ -27,7 +27,7 @@ public class NodeTest {
         node.setDispatcher(mockDispatcher);
         node1.setDispatcher(mockDispatcher1);
         //when(mockDispatcher.sendSuccessorRequest(new NodeInfo("0008"), "0009",nodeInfo)).thenReturn(new NodeInfo("zoro"));
-        //when (mockDispatcher1.sendSuccessorRequest(nodeInfo, "aaaa", nodeInfo1)).thenReturn(node.find_successor("aaaa"));
+        //when (mockDispatcher1.sendSuccessorRequest(nodeInfo, "aaaa", nodeInfo1)).thenReturn(node.findSuccessor("aaaa"));
         //when (mockDispatcher1.sendFirstSuccessorRequest(nodeInfo, nodeInfo1)).thenReturn(node.getFirstSuccessor());
         //setting FingerTable and SuccessorList
         FingerTable fingerTable= new FingerTable("0000");
@@ -66,11 +66,11 @@ public class NodeTest {
     @Test
     public void find_successor() {
 
-        NodeInfo response= node.find_successor("0000");
-        NodeInfo response1= node.find_successor("0002");
-        NodeInfo response2= node.find_successor("0003");
-        NodeInfo response3= node.find_successor("0007");
-        NodeInfo response4= node.find_successor("0009");
+        NodeInfo response= node.findSuccessor("0000");
+        NodeInfo response1= node.findSuccessor("0002");
+        NodeInfo response2= node.findSuccessor("0003");
+        NodeInfo response3= node.findSuccessor("0007");
+        NodeInfo response4= node.findSuccessor("0009");
 
 
 

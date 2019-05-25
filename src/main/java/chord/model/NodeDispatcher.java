@@ -10,13 +10,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimerTask;
 
-//problema: la sincronizzazione
-
 public class NodeDispatcher {
-    private HashMap<Integer, Message> answers;
+
+    //the port associated to this node
     private int port;
+
+    // the tickets that are waiting for an answer
     private List<Integer> waitingTickets;
 
+    //the answers
+    private HashMap<Integer, Message> answers;
+
+    //constrcutor
     public NodeDispatcher(int port){
         this.answers = new HashMap<>();
         this.port = port;
@@ -33,7 +38,7 @@ public class NodeDispatcher {
             public void run(){
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: notify "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+                        System.out.println("method: notify "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
                         NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,ticket);
                         notifyAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, notifyAnswerMessage);
@@ -64,7 +69,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: sendPredecessorRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+                        System.out.println("method: sendPredecessorRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
                         PredecessorAnswerMessage predecessorAnswerMessage = new PredecessorAnswerMessage(sender,null, destination,ticket, false);
                         predecessorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,predecessorAnswerMessage);
@@ -98,7 +103,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: sendSuccessroRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+                        System.out.println("method: sendSuccessroRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
                         SuccessorAnswerMessage successorAnswerMessage = new SuccessorAnswerMessage(sender,null, destination,ticket);
                         successorAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket,successorAnswerMessage);
@@ -130,7 +135,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: sendFirstSuccessorRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+                        System.out.println("method: sendFirstSuccessorRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
 
                         FirstSuccessorAnswerMessage firstSuccessorAnswerMessage = new FirstSuccessorAnswerMessage(sender,null,destination,ticket);
                         firstSuccessorAnswerMessage.setException(new TimerExpiredException());
@@ -163,7 +168,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: ping "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+                        System.out.println("method: ping "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
 
                         PingAnswerMessage pingAnswerMessage = new PingAnswerMessage(sender,destination, ticket);
                         pingAnswerMessage.setException(new TimerExpiredException());
@@ -197,7 +202,7 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: sendStartRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + "destination: "+ destination.getHash() );
+                        System.out.println("method: sendStartRequest "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
 
                         StartAnswerMessage startAnswerMessage = new StartAnswerMessage(sender,destination, ticket);
                         startAnswerMessage.setException(new TimerExpiredException());
@@ -218,6 +223,70 @@ public class NodeDispatcher {
         waitingTickets.remove((Integer) ticket);
         answers.remove(ticket);
         startAnswerMessage.check();
+    }
+
+    public synchronized void sendLeavingPredecessorRequest(final NodeInfo destination, final NodeInfo newPredecessor, final NodeInfo sender) throws TimerExpiredException{
+        LeavingPredecessorRequestMessage leavingPredecessorRequestMessage = new LeavingPredecessorRequestMessage(destination,newPredecessor,sender);
+        final int ticket=Router.sendMessage(this.port, leavingPredecessorRequestMessage);
+        this.waitingTickets.add(ticket);
+        Threads.executeAfterDelay(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        System.out.println("method: leavingPredecessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
+
+                        LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = new LeavingPredecessorAnswerMessage(sender,destination, ticket);
+                        leavingPredecessorAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, leavingPredecessorAnswerMessage);
+                    }
+                }
+
+            }
+        });
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = (LeavingPredecessorAnswerMessage) answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        leavingPredecessorAnswerMessage.check();
+    }
+
+    public synchronized void sendLeavingSuccessorRequest(final NodeInfo destination, final NodeInfo newSuccessor, final NodeInfo sender) throws TimerExpiredException{
+        LeavingSuccessorRequestMessage leavingSuccessorRequestMessage = new LeavingSuccessorRequestMessage(destination,newSuccessor,sender);
+        final int ticket=Router.sendMessage(this.port, leavingSuccessorRequestMessage);
+        this.waitingTickets.add(ticket);
+        Threads.executeAfterDelay(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
+
+                        LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = new LeavingSuccessorAnswerMessage(sender,destination, ticket);
+                        leavingSuccessorAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, leavingSuccessorAnswerMessage);
+                    }
+                }
+
+            }
+        });
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = (LeavingSuccessorAnswerMessage) answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        leavingSuccessorAnswerMessage.check();
     }
 
     //this method is used when an answer is received

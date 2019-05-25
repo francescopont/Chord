@@ -18,7 +18,7 @@ public class SocketNode implements Runnable {
     //to delete the node
     private boolean terminate;
 
-    private List<SocketHandler> handlers;
+    private final List<SocketHandler> handlers;
     //PROBLEMA: AGGIORNARE QUESTA LISTA TOGLIENDO LE CONNESSIONI CHE SONO STATE CHIUSE
     // soluzione artigianale: se quando mando un messaggio non riesco, allora sicuramente la connessione ha un problema
 
@@ -32,7 +32,6 @@ public class SocketNode implements Runnable {
         this.handlers = new LinkedList<>();
         this.serverSocket= new ServerSocket(port);
         this.port=serverSocket.getLocalPort();
-        System.out.println("Sto creando un nodo con la porta "+ port);
     }
 
     @Override
@@ -70,6 +69,11 @@ public class SocketNode implements Runnable {
                 e.printStackTrace();
             }
         }
+        try{
+            serverSocket.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     //to delete this socketnode
@@ -78,12 +82,6 @@ public class SocketNode implements Runnable {
             handler.terminate();
         }
         this.terminate = true;
-        try{
-            serverSocket.close();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
     }
 
     //used by Router Class, it may be deleted in future improvements of code
@@ -95,7 +93,6 @@ public class SocketNode implements Runnable {
     public  void sendMessage(Message message){
         boolean yetsend = false;
         NodeInfo nodeInfo = message.getDestination();
-
         // we check if we already have an active connection open with the receiver
         synchronized (this.handlers){
             for (SocketHandler handler: this.handlers){
@@ -107,7 +104,7 @@ public class SocketNode implements Runnable {
                 }catch (Exception e ){
                     handler.terminate();
                     this.handlers.remove(handler);
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
             if (!yetsend){
@@ -128,7 +125,7 @@ public class SocketNode implements Runnable {
                     //finally send the message
                     handler.sendMessage(message);
                 }catch(IOException e){
-                    e.printStackTrace();
+                    //e.printStackTrace();
 
                 }
 
@@ -140,7 +137,7 @@ public class SocketNode implements Runnable {
         }
     }
 
-    public void printSOcketNode(){
+    public void printSocketNode(){
         System.out.println("It's socketME! "+ this.port +  " and I've " + this.handlers.size() + " connections");
         for (SocketHandler socketHandler: this.handlers){
             try{

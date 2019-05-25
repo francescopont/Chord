@@ -2,14 +2,12 @@ package chord.model;
 
 import java.io.Serializable;
 
-//è davvero molto utile: la usiamo ovunque, la consiglio
 public class NodeInfo implements Serializable{
-
     private String IPAddress;
     private int port;
     private String hash;
 
-    //only other classes from this library can create instances
+    //constructor
     public NodeInfo(String IPAddress, int port){
         this.IPAddress = IPAddress;
         this.port = port;
@@ -24,6 +22,9 @@ public class NodeInfo implements Serializable{
 
     public void setIPAddress(String IPAddress) {
         this.IPAddress = IPAddress;
+        // I need to update the hash function
+        String key = IPAddress.concat(Integer.toString(port));
+        this.hash = Utilities.hashfunction(key);
     }
 
     public void setPort(int port) {
@@ -41,12 +42,10 @@ public class NodeInfo implements Serializable{
     }
 
 
-
-    //useful for testing
     @Override
     public boolean equals(Object o){
         NodeInfo nodeInfo = (NodeInfo) o;
-        return this.port == nodeInfo.getPort();
+        return this.hash.equals(nodeInfo.hash);
     }
 
     //fake constructor used only for testing

@@ -13,6 +13,7 @@ package chord.model;
 //TO DO
 
 
+import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.PortException;
 import chord.Messages.Message;
 import chord.network.Router;
@@ -22,14 +23,14 @@ import java.util.List;
 
 public class Chord{
     //the list of virtual nodes this application is handling
-    private final static List<Node> virtualnodes = new LinkedList<>();
+    private static final  List<Node> virtualnodes = new LinkedList<>();
 
 
     //don't let anyone instantiate this class
     private Chord(){};
 
     //static methods to be used from the application layer
-    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws PortException {
+    public static void join(String IPAddress, int port, String knownIPAddress, int knownPort) throws PortException, NotInitializedException {
         synchronized (virtualnodes){
             if (virtualnodes.isEmpty()){
                 Router.setIPAddress(IPAddress);
@@ -43,8 +44,17 @@ public class Chord{
             }catch(PortException e){
                 node.modifyPort(e.getPort());
                 throw e;
+            }finally {
+                node.initialize(knownnode);
             }
-            node.initialize(knownnode);
+
+            //try{
+            /*}catch (NotInitializedException e){
+                virtualnodes.remove(node);
+                Router.terminate(node.getPort());
+                System.out.println(e.getMessage());
+                throw new NotInitializedException(e.getMessage());
+            }*/
         }
     }
 
@@ -61,8 +71,9 @@ public class Chord{
             }catch(PortException e){
                 node.modifyPort(e.getPort());
                 throw e;
+            }finally {
+                node.initialize();
             }
-            node.initialize();
         }
     }
 
@@ -73,22 +84,23 @@ public class Chord{
         //come gestiamo il fatto che un host possiede più nodi virtuali? deve poter selezionare
         //da quale nodo far partire la query?
         for (Node virtualnode: virtualnodes){
-            nodeInfo = virtualnode.find_successor(hashedkey);
+            nodeInfo = virtualnode.findSuccessor(hashedkey);
         }
         //dobbiamo accordarci su cosa debba ritornare?? una concat di ip e porta???
         return "not implemented yet";
     };
 
 
-    public void deleteNode(int port){
-        Router.terminate(port);
+    public static void deleteNode(int port){
         Node node = null;
         for (Node virtualnode: virtualnodes){
             if (virtualnode.getPort() == port){
                 node = virtualnode;
             }
         }
+        System.out.println("Sto cancellando il nodo "+ node.getNodeInfo().getHash());
         node.terminate();
+        Router.terminate(port);
         virtualnodes.remove(node);
     }
 

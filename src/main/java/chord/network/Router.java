@@ -43,7 +43,6 @@ public class Router {
 
     //returns the ticket for that message ( which is basically an incremental identifier)
     //porta= porta da cui mando
-    //forse qua è meglio controllare che la porta da cui sto mandando corrisponda alla porta del sender contenuto nel messaggio
     public static int sendMessage(int port, Message message) {
         int ticket = Ticket.getTicket();
         message.setId(ticket);
@@ -55,12 +54,11 @@ public class Router {
             Chord.deliverMessage(message.getDestination().getPort(),message);
         }
 
-
+        //code optmization we do not use in early releases
         /*if (message.getDestination().getIPAddress().equals(IPAddress)){
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(), message);
         }*/
-
 
         if (!delivered){
             for (SocketNode node: nodes){
@@ -72,6 +70,7 @@ public class Router {
         return ticket;
     }
 
+    //when we send an answe
     public static void sendAnswer(int port, Message message){
         boolean delivered = false;
         if (message.getDestination().getHash().equals(message.getSender().getHash())){
@@ -109,7 +108,7 @@ public class Router {
 
     public static void printRouter(){
         for(SocketNode socketNode: nodes){
-            socketNode.printSOcketNode();
+            socketNode.printSocketNode();
         }
     }
 }

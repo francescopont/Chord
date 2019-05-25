@@ -62,12 +62,12 @@ public class SocketHandler implements Runnable{
             out.close();
             socket.close();
         }catch (IOException e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
     public void sendMessage(Message message)throws IOException{
-        //set the endpoint
+        //set the endpoint ( if not already set)
         if (this.endpoint == null){
             this.endpoint = message.getDestination();
         }

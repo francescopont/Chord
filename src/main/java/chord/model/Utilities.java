@@ -17,11 +17,11 @@ public class Utilities implements Runnable {
     //calls periodic functions on the nodes
     @Override
     public void run() {
-        if (virtualnode.isInitialized() && !virtualnode.isTerminated() && !virtualnode.isAlone()) {
+        if ( !virtualnode.isTerminated() && !virtualnode.isAlone()) {
             virtualnode.stabilize();
-            virtualnode.fix_finger();
-            virtualnode.check_predecessor();
-            virtualnode.fix_successor_list();
+            virtualnode.fixFinger();
+            virtualnode.checkPredecessor();
+            virtualnode.fixSuccessorList();
         }
     }
 
@@ -97,7 +97,6 @@ public class Utilities implements Runnable {
         }
     }
 
-
     public static int numberOfBit(){
         //this is used to set the number of bits we want to use from the algorithm sha1, which uses 160 bits
         return 16;
@@ -105,13 +104,13 @@ public class Utilities implements Runnable {
 
     //period of utilities
     public static int getPeriod(){
-        //0.2 secondi
+        //0.5 secondi
         return 500;
     }
 
-    //timer for message
+    //timer for messages
     public static int getTimer(){
-        // 10 secondi
+        // 1 secondo
         return 1000;
     }
 

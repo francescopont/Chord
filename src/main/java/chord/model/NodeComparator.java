@@ -3,18 +3,18 @@ package chord.model;
 import java.util.Comparator;
 
 public class NodeComparator implements Comparator<String> {
-    //the hash where we start from the ring
+
+    //the hash which we consider as the "0" on the ring
     private String nodeidentifier;
 
-
+    //constructor
     public NodeComparator(String nodeidentifier) {
         this.nodeidentifier = nodeidentifier;
     }
 
 
 
-    //problema: quando gli passo il nodeidentifier che succede?
-    // ho fatto queste scelte di minori e uguali pensando alla successor list
+    // this comparator set the nodeidentifier as the smallest value on the ring
     @Override
     public int compare(String hash1, String hash2){
         //case1: both values are greater than the nodeidentifier

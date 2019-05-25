@@ -18,8 +18,8 @@ public class App
     //piccolo test
     public static void main( String[] args ) {
         Scanner scanner= new Scanner(System.in);
-        Scanner scanner1=new Scanner(System.in);
 
+/*
         System.out.println("Selezionare un'opzione: \n c for Create \n j for Join ");{
             String input= scanner.nextLine();
             if(input.equals("c")){
@@ -50,8 +50,8 @@ public class App
                 }
             }
 
-    }
-        /*
+    }*/
+
         int actual_port = 1000;
         try {
             Chord.create("127.0.0.1", 1000);
@@ -72,7 +72,7 @@ public class App
                 e.printStackTrace();
             }
         }
-        */
+
 
         System.out.println("finita la computazione");
         Timer timer=new Timer();
@@ -85,7 +85,18 @@ public class App
                 Router.printRouter();
 
             }
-        }, 120000, 60000);
+        }, 10000, 60000);
+
+        Timer timer1 = new Timer();
+        timer1.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Chord.deleteNode(1000);
+                Chord.deleteNode(1004);
+            }
+        }, 30000);
+
+
     }
 
 
