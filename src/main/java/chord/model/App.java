@@ -65,7 +65,7 @@ public class App
             e.printStackTrace();
         }
 
-        for (int i=1; i<8; i++){
+        for (int i=1; i<5; i++){
             try{
                 Chord.join("127.0.0.1",1000 + i, "127.0.0.1", actual_port );
             }catch (Exception e){

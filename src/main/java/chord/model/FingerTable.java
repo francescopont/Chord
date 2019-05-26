@@ -28,6 +28,8 @@ public class FingerTable{
         this.fingers.set(position, newnodeInfo);
     }
 
+
+
     //positions go from 0 to 15
     public NodeInfo getFinger(int position){
         return this.fingers.get(position);
@@ -39,9 +41,12 @@ public class FingerTable{
         for (NodeInfo nodeInfo : this.fingers){
             this.map.put(nodeInfo.getHash(), nodeInfo);
         }
-        Map.Entry<String, NodeInfo> successor = this.map.lowerEntry(node);
-        return successor.getValue();
+        Map.Entry<String, NodeInfo> predecessor = this.map.lowerEntry(node);
+        return predecessor.getValue();
     }
+
+
+
 
     //to print the state of the fingertable
     public void printTable() {
@@ -52,6 +57,7 @@ public class FingerTable{
             i++;
         }
     }
+
 
 
     //useful for testing

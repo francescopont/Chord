@@ -26,6 +26,9 @@ public class SuccessorList {
 
     //we count from 0 to 3
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
+        if (position == 0 && newnodeInfo.getHash().equals(this.node)){
+            System.out.println("stai creando un bug");
+        }
         this.successors.set(position, newnodeInfo);
     }
 
@@ -51,7 +54,7 @@ public class SuccessorList {
     }
 
     public NodeInfo getFirstElement(){
-        return this.successors.getFirst();
+        return successors.getFirst();
     }
 
     public void removeLast(){
@@ -70,6 +73,8 @@ public class SuccessorList {
         }
     }
 
+
+    //useful for testing
     //getters
     public TreeMap<String, NodeInfo> getMap() {
         return map;

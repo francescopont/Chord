@@ -71,8 +71,9 @@ public class Node {
 
     //periodic operations to handle changes in the chord
     public void stabilize() {
+        NodeInfo successor = null;
         try {
-            NodeInfo successor = this.successorList.getFirstElement();
+            successor = this.successorList.getFirstElement();
             NodeInfo potentialSuccessor = this.dispatcher.sendPredecessorRequest(successor, this.nodeInfo);
             if(potentialSuccessor.getHash().equals(this.nodeidentifier)) {
                 return;
@@ -84,17 +85,18 @@ public class Node {
                 this.successorList.modifyEntry(0,potentialSuccessor);
             }
         } catch (TimerExpiredException e) {
-            //repopulateSuccessorList(1);
+            System.out.println("timer expired exception on the stabilize");
+            repopulateSuccessorList(0);
             //put code here
         }catch (PredecessorException e){
             System.out.println("My successor said me he does not have a predecessor: " + this.nodeidentifier);
         }
+        NodeInfo newSuccessor = null;
         try {
-            NodeInfo successor = this.successorList.getFirstElement();
-            this.dispatcher.sendNotify(successor, this.nodeInfo);
+            newSuccessor = this.successorList.getFirstElement();
+            this.dispatcher.sendNotify(newSuccessor, this.nodeInfo);
         } catch (TimerExpiredException e) {
-            //repopulateSuccessorList(1);
-            //put code here
+            repopulateSuccessorList(0);
         }
 
     }
@@ -111,11 +113,11 @@ public class Node {
 
     public void fixSuccessorList(){
         int i=0;
+        NodeInfo lastKnown = null;
         try {
             for (i = 0; i<3; i++) {
-                NodeInfo lastKnown = successorList.getElement(i);
-                NodeInfo successor = null;
-                successor = dispatcher.sendFirstSuccessorRequest(lastKnown, nodeInfo);
+                lastKnown = successorList.getElement(i);
+                NodeInfo successor = dispatcher.sendFirstSuccessorRequest(lastKnown, nodeInfo);
                 if (successor.getHash().equals(nodeidentifier)) {
                     while (i < 3) {
                         successorList.modifyEntry(i + 1, this.nodeInfo);
@@ -127,7 +129,7 @@ public class Node {
             }
         } catch (TimerExpiredException e) {
                 System.out.println("I'm " + this.nodeidentifier + " and I experienced an exception while fixing the successor list, getting the element "+ i);
-                //repopulateSuccessorList(i-1);
+                repopulateSuccessorList(i);
                 //put code here
             }
 
@@ -177,10 +179,28 @@ public class Node {
         }
 
         //look in the finger table
+        NodeInfo closestPredecessor = null;
+
         try {
-            NodeInfo closestPredecessor = fingerTable.closestPredecessor(key);
+            closestPredecessor = fingerTable.closestPredecessor(key);
             successor = this.dispatcher.sendSuccessorRequest(closestPredecessor,key,this.nodeInfo);
         } catch (TimerExpiredException ex) {
+            System.out.println("sto entrando nel codice nuovo");
+            boolean found = false;
+            while (!found){
+                NodeInfo theprevious = fingerTable.closestPredecessor(closestPredecessor.getHash());
+                if (theprevious == null){
+                    found = true;
+                }
+                try{
+                    successor = dispatcher.sendSuccessorRequest(theprevious, key, this.nodeInfo);
+                    found = true;
+                }catch (TimerExpiredException e){
+                    closestPredecessor = theprevious;
+                }
+
+            }
+
             //put code here
         }
         return successor;
@@ -243,6 +263,8 @@ public class Node {
             }
 
         }
+
+        //secondly, the fingerTable
         for(int i=1; i<Utilities.numberOfBit(); i++) {
             String hashedkey = Utilities.computefinger(nodeidentifier, i);
             NodeInfo finger = null;
@@ -251,7 +273,7 @@ public class Node {
                 finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
                 fingerTable.addFinger(finger);
             } catch (TimerExpiredException e) {
-                //repopulateSuccessorList(1);
+                repopulateSuccessorList(0);
             }
         }
         setAlone(false);
@@ -278,7 +300,7 @@ public class Node {
             //ho le due chiavi
             String predecessor_key = this.predecessor.getHash();
             String potential_key = potential_predecessor.getHash();
-            //se la chiave del potenziale successore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
+            //se la chiave del potenziale predecessore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
             if(comparator.compare(predecessor_key,potential_key)<0){
                 this.predecessor=potential_predecessor;
             }
@@ -288,7 +310,8 @@ public class Node {
 
     public void terminate() {
         terminate.cancel(true);
-        try{
+
+        /*try{
             // I send a message to my successor
             this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getFirstElement(), this.predecessor, this.nodeInfo);
             if (this.predecessor != null){
@@ -297,6 +320,7 @@ public class Node {
         }catch (TimerExpiredException e){
             // do nothing
         }
+        */
     }
 
     //when my predecessor leaves
@@ -321,35 +345,29 @@ public class Node {
     }
 
 
-    /*
 
-    public void repopulateSuccessorList(int positionOfLastValidNode){
-        if (positionOfLastValidNode<0 || positionOfLastValidNode>3){
-            System.out.println("hai un problema di indici");
-            positionOfLastValidNode = 0;
-        }
-        System.out.println("Sto ripopolando la successorList");
-        boolean foundOne = false;
-        for (int j=positionOfLastValidNode; j<4 && !foundOne; j++){
-            NodeInfo validNode  = this.successorList.getElement(j);
-            NodeInfo successor = null;
-            try {
-                successor = this.dispatcher.sendSuccessorRequest(validNode, this.nodeidentifier, this.nodeInfo);
-                foundOne = true;
-                System.out.println("ho trovato un nodo valido: "+ validNode.getHash());
-                System.out.println("It's me! "+ this.nodeidentifier + " and I'm putting as successor "+ successor.getHash());
-                this.successorList.modifyEntry(0, successor);
-                this.fingerTable.modifyFinger(0, successor);
-            } catch (TimerExpiredException e1) {
-                //this node is not valid
+
+    public void repopulateSuccessorList(int positionOFUnvalidNode){
+        if (positionOFUnvalidNode==0){
+            try{
+                this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(1), this.nodeInfo, this.nodeInfo);
+            }catch (TimerExpiredException e1){
+                //do something?
+            }
+        }else{
+            try{
+                this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(positionOFUnvalidNode +1), this.successorList.getElement(positionOFUnvalidNode-1), this.nodeInfo);
+                this.dispatcher.sendLeavingSuccessorRequest(this.successorList.getElement(positionOFUnvalidNode -1), this.successorList.getElement(positionOFUnvalidNode+1),this.nodeInfo);
+            }catch (TimerExpiredException e1){
+                //do something?
             }
         }
-        if (foundOne){
-            fixSuccessorList();
-        }
+
+        this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFUnvalidNode +1));
+
     }
 
-    */
+
 
 
 
