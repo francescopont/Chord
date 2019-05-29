@@ -20,7 +20,12 @@ public class App
         Scanner scanner= new Scanner(System.in);
 
 /*
-        System.out.println("Selezionare un'opzione: \n c for Create \n j for Join ");{
+        System.out.println("Selezionare un'opzione:
+        \n c for Create
+        \n j for Join
+        \n p for publish
+        \n d for delete
+        ");{
             String input= scanner.nextLine();
             if(input.equals("c")){
                 System.out.println("Insert IP Address: ");
@@ -49,6 +54,7 @@ public class App
                     e.printStackTrace();
                 }
             }
+            else if()
 
     }*/
 

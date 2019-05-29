@@ -95,11 +95,14 @@ public class Router {
     }
 
     public static void terminate(int port){
+        SocketNode removedNode=null;
         for (SocketNode node: nodes){
             if (node.getPort() == port){
                 node.terminate();
+                removedNode= node;
             }
         }
+        nodes.remove(removedNode);
     }
 
     public static void setIPAddress( String newIPAddress){
@@ -111,4 +114,5 @@ public class Router {
             socketNode.printSocketNode();
         }
     }
+
 }

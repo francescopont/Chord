@@ -102,8 +102,13 @@ public class SocketNode implements Runnable {
                         yetsend = true;
                     }
                 }catch (Exception e ){
-                    handler.terminate();
                     this.handlers.remove(handler);
+                    try {
+                        System.out.println("sono "+ this.port + "rimuovo : " + handler.getEndpoint().getPort());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    handler.terminate();
                     //e.printStackTrace();
                 }
             }
@@ -136,6 +141,21 @@ public class SocketNode implements Runnable {
 
         }
     }
+
+    /*public void closeConnection(NodeInfo nodeInfo){
+        SocketHandler removedHandler= null;
+        for(SocketHandler socketHandler: this.handlers){
+            try {
+                if(socketHandler.getEndpoint().equals(nodeInfo)){
+                    removedHandler=socketHandler;
+                    removedHandler.terminate();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        this.handlers.remove(removedHandler);
+    }*/
 
     public void printSocketNode(){
         System.out.println("It's socketME! "+ this.port +  " and I've " + this.handlers.size() + " connections");
