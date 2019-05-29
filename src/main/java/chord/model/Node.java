@@ -367,9 +367,38 @@ public class Node {
 
     }
 
+    //cerco il responsabile e gli invio i dati
+    public void publish(String data, String key){
+        NodeInfo successor=findSuccessor(key);
+        try {
+            this.dispatcher.sendPublishRequest(successor, data, key, this.nodeInfo);
+        }
+        catch (TimerExpiredException e){
+            //boh??
+        }
+    }
 
+    //pubblisco i dati nel mio file system
+    public void publishFile(String data, String key){
+        this.fileSystem.publish(data, key);
+    }
 
+    //cerco il responsabile e gli chiedo i dati
+    public String getFile(String key){
+        String file=null;
+        NodeInfo successor= findSuccessor(key);
+        try {
+            file= this.dispatcher.sendFileRequest(successor,key, this.nodeInfo);
+        } catch (TimerExpiredException e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
 
+    //chiedo i dati al mio filesystem
+    public String getMyFile(String key){
+        return this.fileSystem.getFile(key);
+    }
 
     //useful for testing
     public void printStatus() {
@@ -430,7 +459,6 @@ public class Node {
     public void setDispatcher(NodeDispatcher nodeDispatcher){
         this.dispatcher=nodeDispatcher;
     }
-
 
 
 

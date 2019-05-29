@@ -71,6 +71,20 @@ public class MessageHandler implements Runnable {
                 node.notifyLeavingSuccessor(((LeavingSuccessorRequestMessage) message).getNewSuccessor());
                 LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = new LeavingSuccessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
                 Router.sendAnswer(node.getPort(), leavingSuccessorAnswerMessage);
+                break;
+
+            case 85: // publish message
+                node.publishFile(((PublishRequestMessage) message).getData(), ((PublishRequestMessage) message).getKey());
+                PublishAnswerMessage publishAnswerMessage= new PublishAnswerMessage(message.getSender(), message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), publishAnswerMessage);
+                break;
+
+            case 25: // file request
+                String file = node.getMyFile(((FileRequestMessage) message).getKey());
+                FileAnswerMessage fileAnswerMessage= new FileAnswerMessage(message.getSender(),file,message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), fileAnswerMessage);
+                break;
+
         }
     }
 }
@@ -87,6 +101,8 @@ public class MessageHandler implements Runnable {
     start 33
     leavingPredecessor 44
     leavingSuccessor 45
+    publish 85
+    getfile 25
 
     reply 6
  */

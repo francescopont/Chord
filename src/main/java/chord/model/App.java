@@ -1,5 +1,6 @@
 package chord.model;
 
+import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.PortException;
 import chord.network.Router;
 
@@ -19,13 +20,8 @@ public class App
     public static void main( String[] args ) {
         Scanner scanner= new Scanner(System.in);
 
-/*
-        System.out.println("Selezionare un'opzione:
-        \n c for Create
-        \n j for Join
-        \n p for publish
-        \n d for delete
-        ");{
+        System.out.println("Selezionare un'opzione:\n c for Create \n j for Join\n p for publish\n d for delete ");
+        {
             String input= scanner.nextLine();
             if(input.equals("c")){
                 System.out.println("Insert IP Address: ");
@@ -53,10 +49,20 @@ public class App
                 } catch (PortException e) {
                     e.printStackTrace();
                 }
+                catch (NotInitializedException e){
+                    e.printStackTrace();
+                }
             }
-            else if()
+            else if(input.equals("p")){
+                System.out.println("Inserisci i dati del file: ");
+                String info= scanner.nextLine();
+                Data data= new Data(info);
+                System.out.println("Inserisci la tua porta: ");
+                int port=scanner.nextInt();
+                Chord.publish(data,port);
+            }
 
-    }*/
+    }
 
         int actual_port = 1000;
         try {

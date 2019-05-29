@@ -17,6 +17,7 @@ import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.PortException;
 import chord.Messages.Message;
 import chord.network.Router;
+import com.google.gson.Gson;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -112,6 +113,30 @@ public class Chord{
                 Threads.executeImmediately(handler);
             }
         }
+    }
+
+    //publish method
+    public static void publish(Object o, int port){
+        Gson gson=new Gson();
+        String json=gson.toJson(o);
+        String key= Utilities.hashfunction(json);
+        Node me=null;
+        for(Node node: virtualnodes){
+            if(node.getPort()==port){
+                me=node;
+            }
+        }
+        me.publish(json,key);
+    }
+
+    public static void getFile(String key, int port){
+        Node me=null;
+        for(Node node: virtualnodes){
+            if(node.getPort()==port){
+                me=node;
+            }
+        }
+
     }
 
     //useful for testing

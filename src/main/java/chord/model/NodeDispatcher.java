@@ -289,6 +289,67 @@ public class NodeDispatcher {
         leavingSuccessorAnswerMessage.check();
     }
 
+    public synchronized void sendPublishRequest(final NodeInfo destination, final String data, final String key, final NodeInfo sender) throws TimerExpiredException{
+        PublishRequestMessage publishRequestMessage= new PublishRequestMessage(destination,data,key,sender);
+        final int ticket=Router.sendMessage(this.port, publishRequestMessage);
+        this.waitingTickets.add(ticket);
+        Threads.executeAfterDelay(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
+                        PublishAnswerMessage publishAnswerMessage = new PublishAnswerMessage(sender,destination,ticket);
+                        publishAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, publishAnswerMessage);
+                    }
+                }
+            }
+        });
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        PublishAnswerMessage publishAnswerMessage = (PublishAnswerMessage) answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        publishAnswerMessage.check();
+    }
+
+    public synchronized String sendFileRequest(final NodeInfo destination,final String key, final NodeInfo sender) throws TimerExpiredException{
+        FileRequestMessage fileRequestMessage= new FileRequestMessage(destination,key,sender);
+        final int ticket=Router.sendMessage(this.port, fileRequestMessage);
+        this.waitingTickets.add(ticket);
+        Threads.executeAfterDelay(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
+                        FileAnswerMessage fileAnswerMessage= new FileAnswerMessage(sender,null,destination,ticket);
+                        fileAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, fileAnswerMessage);
+                    }
+                }
+            }
+        });
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        FileAnswerMessage fileAnswerMessage = (FileAnswerMessage) answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        fileAnswerMessage.check();
+        return fileAnswerMessage.getFile();
+    }
+
     //this method is used when an answer is received
     public synchronized void addAnswer(int ticket, Message message){
         if( waitingTickets.contains(ticket) && !answers.containsKey(ticket)){
