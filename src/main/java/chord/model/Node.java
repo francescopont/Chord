@@ -1,9 +1,6 @@
 package chord.model;
 
-import chord.Exceptions.NotInitializedException;
-import chord.Exceptions.PredecessorException;
-import chord.Exceptions.SuccessorListException;
-import chord.Exceptions.TimerExpiredException;
+import chord.Exceptions.*;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -381,23 +378,40 @@ public class Node {
     //pubblisco i dati nel mio file system
     public void publishFile(String data, String key){
         this.fileSystem.publish(data, key);
+        try {
+            System.out.println("Sono : "+ this.nodeidentifier+ "ho il file: " + fileSystem.getFile(key));
+        } catch (FileSystemException e) {
+            e.printStackTrace();
+        }
+
     }
 
     //cerco il responsabile e gli chiedo i dati
     public String getFile(String key){
         String file=null;
         NodeInfo successor= findSuccessor(key);
-        try {
-            file= this.dispatcher.sendFileRequest(successor,key, this.nodeInfo);
-        } catch (TimerExpiredException e) {
-            e.printStackTrace();
+        if(successor.getHash().equals(this.nodeidentifier)){
+            file=getMyFile(key);
+        }
+        else {
+            try {
+                file = this.dispatcher.sendFileRequest(successor, key, this.nodeInfo);
+            } catch (TimerExpiredException e) {
+                e.printStackTrace();
+            }
         }
         return file;
     }
 
     //chiedo i dati al mio filesystem
-    public String getMyFile(String key){
-        return this.fileSystem.getFile(key);
+    public String getMyFile(String key)  {
+        String file=null;
+        try {
+            file= this.fileSystem.getFile(key);
+        } catch (FileSystemException e) {
+            System.out.println("Nessun nodo possiede questo file");
+        }
+        return file;
     }
 
     //useful for testing

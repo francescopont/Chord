@@ -1,10 +1,8 @@
 package chord.model;
 
-import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.PortException;
 import chord.network.Router;
 
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,12 +13,11 @@ import java.util.TimerTask;
 public class App
 
 {
-
     //piccolo test
     public static void main( String[] args ) {
-        Scanner scanner= new Scanner(System.in);
+        /*Scanner scanner= new Scanner(System.in);
 
-        System.out.println("Selezionare un'opzione:\n c for Create \n j for Join\n p for publish\n d for delete ");
+        System.out.println("Selezionare un'opzione:\n c for Create \n j for Join\n p for publish\ng for get a file\n d for delete ");
         {
             String input= scanner.nextLine();
             if(input.equals("c")){
@@ -60,9 +57,11 @@ public class App
                 System.out.println("Inserisci la tua porta: ");
                 int port=scanner.nextInt();
                 Chord.publish(data,port);
+                //alternativa in cui calcolo la chiave nell'oggetto e lo passo come argomento (fa più cagare secodno me)
+                //Chord.publish(data,data.getKey(),port);
             }
 
-    }
+    }*/
 
         int actual_port = 1000;
         try {
@@ -85,28 +84,42 @@ public class App
             }
         }
 
-
         System.out.println("finita la computazione");
+
+        Data data= new Data("sono una fugaaaaaa");
+        Data data1= new Data("giorgio ti amoooo");
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                String key= Chord.publish(data,1000);
+                System.out.println(key);
+                String key1= Chord.publish(data1,1004);
+                System.out.println(key1);
                 System.out.println("print cord");
                 Chord.printChord();
                 System.out.println("Pinta di birra");
                 Router.printRouter();
+                System.out.println("Mungi la vacca");
+                Chord.getFile(key,1000);
+                Chord.getFile(key1,1000);
+                Chord.getFile("000",1000);
+                Chord.getFile(key,1001);
+                Chord.getFile(key1,1002);
+                Chord.getFile(key,1003);
+                Chord.getFile(key1,1004);
 
             }
         }, 10000, 60000);
 
-        Timer timer1 = new Timer();
+        /*Timer timer1 = new Timer();
         timer1.schedule(new TimerTask() {
             @Override
             public void run() {
                 Chord.deleteNode(1000);
                 Chord.deleteNode(1004);
             }
-        }, 30000);
+        }, 30000);*/
 
 
     }

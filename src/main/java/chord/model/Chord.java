@@ -116,16 +116,32 @@ public class Chord{
     }
 
     //publish method
-    public static void publish(Object o, int port){
+    public static String publish(Object o, int port){
         Gson gson=new Gson();
         String json=gson.toJson(o);
         String key= Utilities.hashfunction(json);
+        System.out.println("Ecco la chiave: "+ key);
         Node me=null;
         for(Node node: virtualnodes){
             if(node.getPort()==port){
                 me=node;
             }
         }
+        System.out.println(json);
+        me.publish(json,key);
+        return key;
+    }
+
+    public static void publish(Object o, String key, int port){
+        Gson gson=new Gson();
+        String json=gson.toJson(o);
+        Node me=null;
+        for(Node node: virtualnodes){
+            if(node.getPort()==port){
+                me=node;
+            }
+        }
+        System.out.println(json);
         me.publish(json,key);
     }
 
@@ -136,7 +152,13 @@ public class Chord{
                 me=node;
             }
         }
-
+        String file= me.getFile(key);
+        if(file!=null){
+            System.out.println(file);
+        }
+        else{
+            System.out.println("Nessuno ha questo file");
+        }
     }
 
     //useful for testing
