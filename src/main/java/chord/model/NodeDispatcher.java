@@ -350,6 +350,36 @@ public class NodeDispatcher {
         return fileAnswerMessage.getFile();
     }
 
+    public synchronized void sendDeeleteFileRequest(final NodeInfo destination,final String key, final NodeInfo sender) throws TimerExpiredException{
+        DeleteFileRequestMessage deleteFileRequestMessage= new DeleteFileRequestMessage(destination,key,sender);
+        final int ticket=Router.sendMessage(this.port, deleteFileRequestMessage);
+        this.waitingTickets.add(ticket);
+        Threads.executeAfterDelay(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    if(waitingTickets.contains(ticket)){
+                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
+                        DeleteFileAnswerMessage deleteFileAnswerMessage= new DeleteFileAnswerMessage(sender,destination,ticket);
+                        deleteFileAnswerMessage.setException(new TimerExpiredException());
+                        addAnswer(ticket, deleteFileAnswerMessage);
+                    }
+                }
+            }
+        });
+        while(!this.answers.containsKey(ticket)){
+            try{
+                wait();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        DeleteFileAnswerMessage deleteFileAnswerMessage = (DeleteFileAnswerMessage) answers.get(ticket);
+        waitingTickets.remove((Integer) ticket);
+        answers.remove(ticket);
+        deleteFileAnswerMessage.check();
+    }
+
     //this method is used when an answer is received
     public synchronized void addAnswer(int ticket, Message message){
         if( waitingTickets.contains(ticket) && !answers.containsKey(ticket)){

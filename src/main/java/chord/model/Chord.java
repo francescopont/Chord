@@ -161,6 +161,16 @@ public class Chord{
         }
     }
 
+    public static void deleteFile(String key, int port){
+        Node me=null;
+        for(Node node: virtualnodes){
+            if(node.getPort()==port){
+                me=node;
+            }
+        }
+        me.deleteFile(key);
+    }
+
     //useful for testing
     public static void addNodeTesting(Node node){
         virtualnodes.add(node);

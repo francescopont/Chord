@@ -414,6 +414,25 @@ public class Node {
         return file;
     }
 
+    public void deleteFile(String key){
+        NodeInfo successor= findSuccessor(key);
+        if(successor.getHash().equals(this.nodeidentifier)){
+            deleteMyFile(key);
+        }
+        else{
+            try {
+                this.dispatcher.sendDeeleteFileRequest(successor, key, this.nodeInfo);
+            }
+            catch (TimerExpiredException e){
+                //minchia boh
+            }
+        }
+    }
+
+    public void deleteMyFile(String key){
+        fileSystem.deleteFile(key);
+    }
+
     //useful for testing
     public void printStatus() {
         System.out.println("-------------------");

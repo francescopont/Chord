@@ -107,7 +107,8 @@ public class App
                 Chord.getFile(key,1001);
                 Chord.getFile(key1,1002);
                 Chord.getFile(key,1003);
-                Chord.getFile(key1,1004);
+                Chord.deleteFile(key,1000);
+                Chord.getFile(key,1002);
 
             }
         }, 10000, 60000);

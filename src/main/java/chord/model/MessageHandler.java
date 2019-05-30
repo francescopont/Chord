@@ -85,6 +85,12 @@ public class MessageHandler implements Runnable {
                 Router.sendAnswer(node.getPort(), fileAnswerMessage);
                 break;
 
+            case 17: // publish message
+                node.deleteMyFile(((DeleteFileRequestMessage) message).getKey());
+                DeleteFileAnswerMessage deleteFileAnswerMessage= new DeleteFileAnswerMessage(message.getSender(), message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), deleteFileAnswerMessage);
+                break;
+
         }
     }
 }
