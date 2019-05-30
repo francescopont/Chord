@@ -32,7 +32,13 @@ public class FileSystem {
 
     //serve davvero implementarlo??
     public void deleteFile(String key){
-        files.remove(key);
+        if(files.size()==0){
+            return;
+        }
+        else{
+            files.remove(key);
+        }
+
     }
 
 
