@@ -16,6 +16,8 @@ public class MessageHandler implements Runnable {
 
     @Override
     public void run() {
+        //node.start(message.getSender());
+
         switch (message.getType()){
             case 1://ping
                 PingAnswerMessage pingAnswerMessage= new PingAnswerMessage(message.getSender(),message.getDestination(),message.getId());

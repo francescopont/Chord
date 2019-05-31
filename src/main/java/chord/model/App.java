@@ -1,7 +1,6 @@
 package chord.model;
 
 import chord.Exceptions.PortException;
-import chord.network.Router;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -85,8 +84,7 @@ public class App
         }
 
         System.out.println("finita la computazione");
-
-        Data data= new Data("sono una fugaaaaaa");
+        /*Data data= new Data("sono una fugaaaaaa");
         Data data1= new Data("giorgio ti amoooo");
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
@@ -113,14 +111,19 @@ public class App
             }
         }, 10000, 60000);
 
-        /*Timer timer1 = new Timer();
+        */
+
+        Timer timer1 = new Timer();
         timer1.schedule(new TimerTask() {
             @Override
             public void run() {
+                Utilities.setTesting(true);
                 Chord.deleteNode(1000);
                 Chord.deleteNode(1004);
+                Chord.deleteNode(1002);
+                Chord.deleteNode(1003);
             }
-        }, 30000);*/
+        }, 30000);
 
 
     }

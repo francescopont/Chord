@@ -24,14 +24,14 @@ public class Router {
                 node = new SocketNode(port);
                 nodes.add(node);
                 Threads.executeImmediately(node);
+                node.initialize();
             }catch (IOException e){
                 try{
                     node = new SocketNode(0);
                     nodes.add(node);
                     throw new PortException(node.getPort());
                 }catch (IOException e1){
-                    e.printStackTrace();
-                    e1.printStackTrace();
+                    // do nothing
                 }
 
             }

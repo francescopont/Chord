@@ -9,6 +9,16 @@ import java.security.NoSuchAlgorithmException;
 public class Utilities implements Runnable {
     private final Node virtualnode;
 
+    public static boolean isTesting() {
+        return testing;
+    }
+
+    public static void setTesting(boolean testing) {
+        Utilities.testing = testing;
+    }
+
+    static boolean testing = false;
+
     //constructor
     public Utilities(Node node){
         this.virtualnode = node;
@@ -17,7 +27,7 @@ public class Utilities implements Runnable {
     //calls periodic functions on the nodes
     @Override
     public void run() {
-        if ( !virtualnode.isTerminated() && !virtualnode.isAlone()) {
+        if ( !virtualnode.isAlone()) {
             virtualnode.stabilize();
             virtualnode.fixFinger();
             virtualnode.checkPredecessor();

@@ -15,9 +15,11 @@ public class Threads {
 
     //periodic functions on nodes
     public static ScheduledFuture<?> executePeriodically(Runnable runnable){
-        return pool.scheduleWithFixedDelay(runnable, Utilities.getPeriod(), Utilities.getPeriod(), TimeUnit.MILLISECONDS);
+        return pool.scheduleAtFixedRate(runnable, Utilities.getPeriod(), Utilities.getPeriod(), TimeUnit.MILLISECONDS);
     }
-
+    public static ScheduledFuture<?> executeRarely(Runnable runnable){
+        return pool.scheduleWithFixedDelay(runnable, Utilities.getPeriod()*10, Utilities.getPeriod()*10, TimeUnit.MILLISECONDS);
+    }
     //free threads
     public static void executeImmediately(Runnable runnable){
         pool.submit(runnable);

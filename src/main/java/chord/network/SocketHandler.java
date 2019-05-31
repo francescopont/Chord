@@ -14,6 +14,7 @@ public class SocketHandler implements Runnable{
     private NodeInfo endpoint = null;
     private Socket socket;
     private boolean terminate = false;
+    private boolean usedRecently;
     ObjectInputStream in = null;
     ObjectOutputStream out = null;
 
@@ -22,38 +23,25 @@ public class SocketHandler implements Runnable{
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
         this.in = new ObjectInputStream(socket.getInputStream());
-
+        this.usedRecently = true;
     }
-
-    //PROBLEMA: COME FARLO TERMINARE SENZA SIDE EFFECTS ( CIOè AVVISANDO IL SOCKET NODE CHE è TERMINATO)
-    //per esempio quando mi accorgo che l'altro endpoint della connessione è morto????
-    //questa cosa potrebbe essere chatchata in un'eccezione
 
     @Override
     public void run() {
-
         while(!terminate){
             try {
-
                 //read the message from the buffer
                 Message message= (Message) in.readObject();
-                if (message.getSender().getPort() == message.getDestination().getPort()){
-                    message.printMessage();
-                }
-
+                setUsedRecently(true);
                 //set the endpoint if not done yet
                 if (this.endpoint == null){
                     this.endpoint = message.getSender();
                 }
-
                 //deliver the message to the above layer
-                //note: since we do not have actors like in Erlang, when we get something from another layer
-                //it's recommended to handle it on a separate thread
                 Chord.deliverMessage(this.port, message);
                 //note: the socket layer does not care about the content of the message
             }catch (IOException | ClassNotFoundException e) {
-                //do something
-                //e.printStackTrace();
+                //do nothing
             }
         }
 
@@ -62,23 +50,23 @@ public class SocketHandler implements Runnable{
             out.close();
             socket.close();
         }catch (IOException e){
-            //e.printStackTrace();
+            //do nothing
         }
     }
 
     public void sendMessage(Message message)throws IOException{
         //set the endpoint ( if not already set)
-        if (this.endpoint == null){
+        if (this.endpoint == null) {
             this.endpoint = message.getDestination();
         }
         out.writeObject(message);
         out.flush();
+        setUsedRecently(true);
     }
 
     public void terminate(){
         this.terminate = true;
     }
-
     public NodeInfo getEndpoint () throws Exception {
         if (endpoint == null){
             throw new Exception();
@@ -88,6 +76,14 @@ public class SocketHandler implements Runnable{
 
     public int getPort() {
         return port;
+    }
+
+    public boolean isUsedRecently() {
+        return usedRecently;
+    }
+
+    public void setUsedRecently(boolean usedRecently) {
+        this.usedRecently = usedRecently;
     }
 }
 

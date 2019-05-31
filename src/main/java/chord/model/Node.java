@@ -11,7 +11,6 @@ public class Node {
     private SuccessorList successorList;
     private NodeInfo predecessor;
     private boolean alone;
-    private boolean terminated;
     private NodeDispatcher dispatcher;
     private FileSystem fileSystem;
     private int fixFingerCounter;
@@ -26,7 +25,6 @@ public class Node {
         this.fingerTable = new FingerTable(me.getHash());
         this.successorList = new SuccessorList(me.getHash());
         this.predecessor = null;
-        this.terminated = false;
         this.dispatcher = new NodeDispatcher(this.getPort());
         this.fixFingerCounter = 0;
         this.comparator=new NodeComparator(me.getHash());
@@ -48,11 +46,9 @@ public class Node {
     public boolean isAlone() {
         return alone;
     }
-
     public void setAlone(boolean alone) {
         this.alone = alone;
     }
-
 
     //this method is called from messageHandler
     public NodeDispatcher getDispatcher() {
@@ -82,7 +78,6 @@ public class Node {
                 this.successorList.modifyEntry(0,potentialSuccessor);
             }
         } catch (TimerExpiredException e) {
-            System.out.println("timer expired exception on the stabilize");
             repopulateSuccessorList(0);
             //put code here
         }catch (PredecessorException e){
@@ -125,7 +120,6 @@ public class Node {
                 }
             }
         } catch (TimerExpiredException e) {
-                System.out.println("I'm " + this.nodeidentifier + " and I experienced an exception while fixing the successor list, getting the element "+ i);
                 repopulateSuccessorList(i);
                 //put code here
             }
@@ -138,7 +132,6 @@ public class Node {
             try {
                 dispatcher.sendPing(this.predecessor, this.nodeInfo);
             } catch (TimerExpiredException e) {
-                System.out.println("I'm "+ this.nodeidentifier+ " and I'm trying to ping my predecessor, but time expired");
                 predecessor = null;
                 //put code here
             }
@@ -183,22 +176,11 @@ public class Node {
             successor = this.dispatcher.sendSuccessorRequest(closestPredecessor,key,this.nodeInfo);
         } catch (TimerExpiredException ex) {
             System.out.println("sto entrando nel codice nuovo");
-            boolean found = false;
-            while (!found){
-                NodeInfo theprevious = fingerTable.closestPredecessor(closestPredecessor.getHash());
-                if (theprevious == null){
-                    found = true;
-                }
-                try{
-                    successor = dispatcher.sendSuccessorRequest(theprevious, key, this.nodeInfo);
-                    found = true;
-                }catch (TimerExpiredException e){
-                    closestPredecessor = theprevious;
-                }
-
+            try{
+                this.dispatcher.sendSuccessorRequest(this.successorList.getFirstElement(), key, this.nodeInfo);
+            }catch (TimerExpiredException e){
+                repopulateSuccessorList(0);
             }
-
-            //put code here
         }
         return successor;
     }
@@ -286,7 +268,7 @@ public class Node {
     }
 
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
-    public void notify(NodeInfo potential_predecessor) {
+    public  void notify(NodeInfo potential_predecessor) {
         if(potential_predecessor.equals(this.nodeInfo)){
             System.out.println("sto notificando me stesso e sono: "+this.nodeidentifier);
             return;
@@ -295,17 +277,17 @@ public class Node {
             this.predecessor = potential_predecessor;
         } else {
             //ho le due chiavi
-            String predecessor_key = this.predecessor.getHash();
-            String potential_key = potential_predecessor.getHash();
+            String predecessorKey = this.predecessor.getHash();
+            String potentialKey = potential_predecessor.getHash();
             //se la chiave del potenziale predecessore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
-            if(comparator.compare(predecessor_key,potential_key)<0){
+            if(comparator.compare(predecessorKey,potentialKey)<0){
                 this.predecessor=potential_predecessor;
             }
         }
     }
 
 
-    public void terminate() {
+    public  void terminate() {
         terminate.cancel(true);
 
         /*try{
@@ -321,7 +303,7 @@ public class Node {
     }
 
     //when my predecessor leaves
-    public void notifyLeavingPredecessor(NodeInfo newPredecessor){
+    public  void notifyLeavingPredecessor(NodeInfo newPredecessor){
         System.out.println("notify leaving predecessor on "+ this.nodeidentifier);
         if (newPredecessor != null){
             //qua dovremo mettere il codice di passaggio dei files
@@ -330,38 +312,61 @@ public class Node {
     }
 
     //when my successor leaves
-    public void notifyLeavingSuccessor (NodeInfo newSuccessor){
+    public  void notifyLeavingSuccessor (NodeInfo newSuccessor){
         System.out.println("notify leaving successor on "+ this.nodeidentifier);
         this.successorList.modifyEntry(0, newSuccessor);
         this.fingerTable.modifyFinger(0, newSuccessor);
         fixSuccessorList();
     }
 
-    public boolean isTerminated() {
-        return terminated;
-    }
 
-
-
-
-    public void repopulateSuccessorList(int positionOFUnvalidNode){
-        if (positionOFUnvalidNode==0){
-            try{
-                this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(1), this.nodeInfo, this.nodeInfo);
-            }catch (TimerExpiredException e1){
-                //do something?
-            }
-        }else{
-            try{
-                this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(positionOFUnvalidNode +1), this.successorList.getElement(positionOFUnvalidNode-1), this.nodeInfo);
-                this.dispatcher.sendLeavingSuccessorRequest(this.successorList.getElement(positionOFUnvalidNode -1), this.successorList.getElement(positionOFUnvalidNode+1),this.nodeInfo);
-            }catch (TimerExpiredException e1){
-                //do something?
+    public  void repopulateSuccessorList(int positionOFUnvalidNode){
+        int positionOFValidSuccessorNode = positionOFUnvalidNode +1;
+        if (positionOFUnvalidNode == 0){
+            boolean got = false;
+            while (!got && positionOFValidSuccessorNode<4){
+                try{
+                    this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(positionOFValidSuccessorNode), this.nodeInfo, this.nodeInfo);
+                    got = true;
+                }catch (TimerExpiredException e){
+                    positionOFValidSuccessorNode++;//check the next one
+                }
             }
         }
+        else{
+            boolean got = false;
+            while (!got && positionOFValidSuccessorNode<4){
+                try{
 
-        this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFUnvalidNode +1));
+                    NodeInfo nodeInfo33 = this.successorList.getElement(positionOFValidSuccessorNode);
+                    NodeInfo nodeInfo1 = this.successorList.getElement(positionOFUnvalidNode-1);
+                    this.dispatcher.sendLeavingPredecessorRequest(nodeInfo33,nodeInfo1 , this.nodeInfo);
+                    got = true;
+                }catch (TimerExpiredException e){
+                    positionOFValidSuccessorNode++;//check the next one
+                }
+            }
+            int positionOFValidPredecessorNode = positionOFUnvalidNode -1;
+            if (positionOFValidSuccessorNode == 4){
+                positionOFValidSuccessorNode--;
+            }
+            got = false;
+            while (!got && positionOFValidPredecessorNode >= 0){
+                try{
+                    System.out.println(this.successorList.getElement(positionOFValidPredecessorNode).getHash());
+                    System.out.println(this.successorList.getElement(positionOFValidSuccessorNode).getHash());
+                    this.dispatcher.sendLeavingSuccessorRequest(this.successorList.getElement(positionOFValidPredecessorNode), this.successorList.getElement(positionOFValidSuccessorNode),this.nodeInfo);
+                    got = true;
 
+                }catch (TimerExpiredException e){
+                    positionOFValidPredecessorNode--; //check the next one
+                }
+            }
+
+        }
+
+        System.out.println("sto modificando la finger "+ positionOFUnvalidNode + " con il nodo "+successorList.getElement(positionOFValidSuccessorNode).getHash() + " " + positionOFValidSuccessorNode + " e sono "+ this.nodeidentifier );
+        this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFValidSuccessorNode));
     }
 
     //cerco il responsabile e gli invio i dati
