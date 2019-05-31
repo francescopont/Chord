@@ -328,6 +328,12 @@ public class Node {
                     positionOFValidSuccessorNode++;//check the next one
                 }
             }
+            if (positionOFValidSuccessorNode == 4){
+                NodeInfo aNode = repopulateFingerTable();
+                this.successorList.modifyEntry(0,aNode);
+            }else{
+                this.successorList.modifyEntry(0,this.successorList.getElement(positionOFValidSuccessorNode));
+            }
         }
         else{
             boolean got = false;
@@ -341,7 +347,6 @@ public class Node {
                     positionOFValidSuccessorNode++;//check the next one
                 }
             }
-
             int positionOFValidPredecessorNode = positionOFUnvalidNode -1;
             if (positionOFValidSuccessorNode <4){
                 got = false;
@@ -354,17 +359,14 @@ public class Node {
                         positionOFValidPredecessorNode--; //check the next one
                     }
                 }
-
+                this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFValidSuccessorNode));
+            }else{
+                NodeInfo aNode = repopulateFingerTable();
+                this.successorList.modifyEntry(positionOFUnvalidNode,aNode);
             }
         }
         System.out.println("sto modificando la finger "+ positionOFUnvalidNode + " con il nodo "+successorList.getElement(positionOFValidSuccessorNode).getHash() + " " + positionOFValidSuccessorNode + " e sono "+ this.nodeidentifier );
-        if (positionOFValidSuccessorNode == 4){
-            NodeInfo aNode = repopulateFingerTable();
-            this.successorList.modifyEntry(positionOFUnvalidNode,aNode);
 
-        }else{
-            this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFValidSuccessorNode));
-        }
     }
 
     private NodeInfo repopulateFingerTable(){
