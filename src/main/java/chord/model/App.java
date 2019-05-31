@@ -118,12 +118,25 @@ public class App
             @Override
             public void run() {
                 Utilities.setTesting(true);
-                Chord.deleteNode(1000);
-                Chord.deleteNode(1004);
-                Chord.deleteNode(1002);
-                Chord.deleteNode(1003);
+                for (int i=1; i<5; i++){
+                    Chord.deleteNode(1000+i);
+                }
+                try{
+                    Chord.join("127.0.0.1",1100, "127.0.0.1", 10001 );
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
-        }, 30000);
+        }, 10000);
+
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Chord.printChord();
+            }
+        }, 30000, 30000);
 
 
     }

@@ -49,7 +49,7 @@ public class Router {
         boolean delivered = false;
 
         if (message.getDestination().getHash().equals(message.getSender().getHash())){
-            System.out.println("il destinatario e il mittente coincidono!");
+            System.out.println("il destinatario e il mittente coincidono!" + message.getSender().getHash() + " " + message.getType());
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(),message);
         }

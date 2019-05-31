@@ -1,12 +1,11 @@
 package chord.model;
 
 import chord.Exceptions.FileSystemException;
-import com.google.gson.Gson;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class FileSystem {
-    Gson gson;
     HashMap<String , String> files;
 
     public FileSystem(){
@@ -39,6 +38,16 @@ public class FileSystem {
             files.remove(key);
         }
 
+    }
+
+    public Map<String, String> freeFileSystem(){
+        Map<String, String> files = new HashMap();
+        for (String key: this.files.keySet()){
+            String value = this.files.remove(key);
+            files.put(key, value);
+        }
+        this.files.clear();
+        return files;
     }
 
 

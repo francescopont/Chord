@@ -10,11 +10,15 @@ public class SuccessorList {
     private final TreeMap<String, NodeInfo> map;
     private LinkedList<NodeInfo> successors;
     private String node;
+    // this boolean indicates if I'm alone on the chord
+    private boolean alone;
 
+    //constructor
     public SuccessorList(String nodeIdentifier){
         this.map = new TreeMap<>(new FingerTableComparator(nodeIdentifier));
         this.successors = new LinkedList<>();
         this.node =nodeIdentifier;
+        this.alone = true;
     }
 
     //to add an entry in the last position
@@ -28,8 +32,13 @@ public class SuccessorList {
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
         if (position == 0 && newnodeInfo.getHash().equals(this.node)){
             System.out.println("stai creando un bug");
+            setAlone(true);
+        }
+        if (position == 0 && !(newnodeInfo.getHash().equals(this.node))){
+            setAlone(false);
         }
         this.successors.set(position, newnodeInfo);
+
     }
 
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
@@ -60,6 +69,13 @@ public class SuccessorList {
     public void removeLast(){
         this.successors.removeLast();
     }
+
+    public boolean isAlone() { return alone; }
+
+    public void setAlone(boolean alone) {
+        this.alone = alone;
+    }
+
 
     //useful for testing
     //to print the state of the map

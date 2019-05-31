@@ -4,6 +4,8 @@ import chord.Exceptions.PredecessorException;
 import chord.Messages.*;
 import chord.network.Router;
 
+import java.util.Map;
+
 public class MessageHandler implements Runnable {
     private Message message;
     private Node node;
@@ -16,8 +18,9 @@ public class MessageHandler implements Runnable {
 
     @Override
     public void run() {
-        //node.start(message.getSender());
-
+        if (node.isStarted()){
+            node.start(message.getSender());
+        }
         switch (message.getType()){
             case 1://ping
                 PingAnswerMessage pingAnswerMessage= new PingAnswerMessage(message.getSender(),message.getDestination(),message.getId());
@@ -64,8 +67,14 @@ public class MessageHandler implements Runnable {
                 StartAnswerMessage startAnswerMessage = new StartAnswerMessage(message.getSender(), message.getDestination(),message.getId());
                 Router.sendAnswer(node.getPort(), startAnswerMessage);
                 break;
+
             case 44: // leavePredecessor message
                 node.notifyLeavingPredecessor( ((LeavingPredecessorRequestMessage) message).getNewPredecessor());
+                if (!((LeavingPredecessorRequestMessage) message).getFiles().isEmpty()){
+                    for (Map.Entry<String, String> file : ((LeavingPredecessorRequestMessage) message).getFiles().entrySet()){
+                        node.publishFile(file.getValue(), file.getKey());
+                    }
+                }
                 LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = new LeavingPredecessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
                 Router.sendAnswer(node.getPort(), leavingPredecessorAnswerMessage);
                 break;

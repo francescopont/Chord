@@ -11,11 +11,11 @@ public class Threads {
     private Threads(){
 
     }
-    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(10000);
+    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(100000);
 
     //periodic functions on nodes
     public static ScheduledFuture<?> executePeriodically(Runnable runnable){
-        return pool.scheduleAtFixedRate(runnable, Utilities.getPeriod(), Utilities.getPeriod(), TimeUnit.MILLISECONDS);
+        return pool.scheduleWithFixedDelay(runnable, Utilities.getPeriod(), Utilities.getPeriod(), TimeUnit.MILLISECONDS);
     }
     public static ScheduledFuture<?> executeRarely(Runnable runnable){
         return pool.scheduleWithFixedDelay(runnable, Utilities.getPeriod()*10, Utilities.getPeriod()*10, TimeUnit.MILLISECONDS);

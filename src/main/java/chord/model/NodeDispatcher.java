@@ -5,10 +5,7 @@ import chord.Exceptions.TimerExpiredException;
 import chord.Messages.*;
 import chord.network.Router;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TimerTask;
+import java.util.*;
 
 public class NodeDispatcher {
 
@@ -50,7 +47,7 @@ public class NodeDispatcher {
             try {
                 wait();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
         NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
@@ -216,8 +213,8 @@ public class NodeDispatcher {
         startAnswerMessage.check();
     }
 
-    public synchronized void sendLeavingPredecessorRequest(final NodeInfo destination, final NodeInfo newPredecessor, final NodeInfo sender) throws TimerExpiredException{
-        LeavingPredecessorRequestMessage leavingPredecessorRequestMessage = new LeavingPredecessorRequestMessage(destination,newPredecessor,sender);
+    public synchronized void sendLeavingPredecessorRequest(final NodeInfo destination, final NodeInfo newPredecessor, final Map<String, String> files, final NodeInfo sender) throws TimerExpiredException{
+        LeavingPredecessorRequestMessage leavingPredecessorRequestMessage = new LeavingPredecessorRequestMessage(destination,newPredecessor,files, sender);
         final int ticket=Router.sendMessage(this.port, leavingPredecessorRequestMessage);
         this.waitingTickets.add(ticket);
         Threads.executeAfterDelay(new TimerTask() {
@@ -337,7 +334,7 @@ public class NodeDispatcher {
         return fileAnswerMessage.getFile();
     }
 
-    public synchronized void sendDeeleteFileRequest(final NodeInfo destination,final String key, final NodeInfo sender) throws TimerExpiredException{
+    public synchronized void sendDeleteFileRequest(final NodeInfo destination, final String key, final NodeInfo sender) throws TimerExpiredException{
         DeleteFileRequestMessage deleteFileRequestMessage= new DeleteFileRequestMessage(destination,key,sender);
         final int ticket=Router.sendMessage(this.port, deleteFileRequestMessage);
         this.waitingTickets.add(ticket);

@@ -2,6 +2,7 @@ package chord.model;
 
 import chord.Exceptions.*;
 
+import java.util.HashMap;
 import java.util.concurrent.ScheduledFuture;
 
 public class Node {
@@ -10,26 +11,24 @@ public class Node {
     private FingerTable fingerTable;
     private SuccessorList successorList;
     private NodeInfo predecessor;
-    private boolean alone;
     private NodeDispatcher dispatcher;
-    private FileSystem fileSystem;
     private int fixFingerCounter;
+    private FileSystem fileSystem;
     private NodeComparator comparator;
-    private ScheduledFuture terminate;
+    private boolean started;
+    private ScheduledFuture UtilitiesThread;
 
-    //this constructor is called when you CREATE and when you JOIN an existent Chord
     public Node(NodeInfo me) {
         this.nodeInfo = me;
-        //I need to computer the identifier associated to this node, given the key
         this.nodeidentifier = me.getHash();
         this.fingerTable = new FingerTable(me.getHash());
         this.successorList = new SuccessorList(me.getHash());
         this.predecessor = null;
         this.dispatcher = new NodeDispatcher(this.getPort());
         this.fixFingerCounter = 0;
-        this.comparator=new NodeComparator(me.getHash());
-        this.alone = true;
         this.fileSystem = new FileSystem();
+        this.comparator=new NodeComparator(me.getHash());
+        this.started = false;
     }
 
     //getters
@@ -44,10 +43,16 @@ public class Node {
     }
 
     public boolean isAlone() {
-        return alone;
+        return this.successorList.isAlone();
     }
     public void setAlone(boolean alone) {
-        this.alone = alone;
+        this.successorList.setAlone(alone);
+    }
+    public boolean isStarted() {
+        return started;
+    }
+    public void setStarted(boolean started) {
+        this.started = started;
     }
 
     //this method is called from messageHandler
@@ -79,13 +84,12 @@ public class Node {
             }
         } catch (TimerExpiredException e) {
             repopulateSuccessorList(0);
-            //put code here
         }catch (PredecessorException e){
             System.out.println("My successor said me he does not have a predecessor: " + this.nodeidentifier);
         }
-        NodeInfo newSuccessor = null;
+
         try {
-            newSuccessor = this.successorList.getFirstElement();
+            NodeInfo newSuccessor = this.successorList.getFirstElement();
             this.dispatcher.sendNotify(newSuccessor, this.nodeInfo);
         } catch (TimerExpiredException e) {
             repopulateSuccessorList(0);
@@ -104,7 +108,7 @@ public class Node {
     }
 
     public void fixSuccessorList(){
-        int i=0;
+        int i;
         NodeInfo lastKnown = null;
         try {
             for (i = 0; i<3; i++) {
@@ -120,12 +124,9 @@ public class Node {
                 }
             }
         } catch (TimerExpiredException e) {
-                repopulateSuccessorList(i);
-                //put code here
-            }
-
+            //do nothing, we have to wait for periodic operations
         }
-
+    }
 
     public void checkPredecessor() {
         if (predecessor != null) {
@@ -133,10 +134,8 @@ public class Node {
                 dispatcher.sendPing(this.predecessor, this.nodeInfo);
             } catch (TimerExpiredException e) {
                 predecessor = null;
-                //put code here
             }
         }
-        return;
     }
 
     //ritorno il primo elemento della mia successorList
@@ -169,13 +168,10 @@ public class Node {
         }
 
         //look in the finger table
-        NodeInfo closestPredecessor = null;
-
         try {
-            closestPredecessor = fingerTable.closestPredecessor(key);
+            NodeInfo closestPredecessor = fingerTable.closestPredecessor(key);
             successor = this.dispatcher.sendSuccessorRequest(closestPredecessor,key,this.nodeInfo);
         } catch (TimerExpiredException ex) {
-            System.out.println("sto entrando nel codice nuovo");
             try{
                 this.dispatcher.sendSuccessorRequest(this.successorList.getFirstElement(), key, this.nodeInfo);
             }catch (TimerExpiredException e){
@@ -189,7 +185,7 @@ public class Node {
 
     //when you create a new chord, you have to initialize all the stuff
     //this method is called when you create a new Chord
-    public synchronized void initialize() {
+    public void initialize() {
         for (int i = 0; i < Utilities.numberOfBit(); i++) {
             fingerTable.addFinger( this.nodeInfo);
         }
@@ -197,22 +193,24 @@ public class Node {
             successorList.addEntry(this.nodeInfo);
         }
         this.predecessor = this.nodeInfo;
-        this.terminate  = Threads.executePeriodically(new Utilities(this));
+        this.UtilitiesThread = Threads.executePeriodically(new Utilities(this));
         this.printStatus();
         this.printUtilities();
 
     }
 
     //this method is called when you create a Chord and discover you're not alone
-    public synchronized void start(NodeInfo nodeInfo){
-        if (alone){
+    public  void start(NodeInfo nodeInfo){
+        setStarted(true);
+        if (isAlone() && ! (nodeInfo.equals(this.nodeInfo))){
+            System.out.println("sto eseguendo una start su "+ this.nodeidentifier + " con " + nodeInfo.getHash());
             this.successorList.modifyEntry(0, nodeInfo);
             this.fingerTable.modifyFinger(0, nodeInfo);
             setAlone(false);
         }
     }
 
-    public synchronized void initialize(final NodeInfo myfriend) throws NotInitializedException {
+    public  void initialize(final NodeInfo myfriend) throws NotInitializedException {
         try {
             NodeInfo successor = this.dispatcher.sendSuccessorRequest(myfriend, this.nodeidentifier, this.nodeInfo);
             this.successorList.addEntry(successor);
@@ -223,10 +221,11 @@ public class Node {
         }
 
         //first, the successor list
-        for (int i = 1; i < 4; i++) {
-            NodeInfo lastElement = successorList.getLastElement();
-            NodeInfo successor = null;
-            try {
+        int i=1;
+        try{
+            for (i = 1; i < 4; i++) {
+                NodeInfo lastElement = successorList.getLastElement();
+                NodeInfo successor = null;
                 successor = dispatcher.sendFirstSuccessorRequest(lastElement,nodeInfo);
                 if (successor.getHash().equals(nodeidentifier)) {
                     while (i < 4) {
@@ -236,26 +235,25 @@ public class Node {
                 } else {
                     successorList.addEntry(successor);
                 }
-            } catch (TimerExpiredException e) {
-                this.successorList.removeLast();
-                i--;
             }
-
+        }catch (TimerExpiredException e){
+            while (i < 4) {
+                successorList.addEntry( nodeInfo);
+                i++;
+            }
         }
 
+
         //secondly, the fingerTable
-        for(int i=1; i<Utilities.numberOfBit(); i++) {
-            String hashedkey = Utilities.computefinger(nodeidentifier, i);
-            NodeInfo finger = null;
-            NodeInfo successor = successorList.getFirstElement();
+        for(int j=1; j<Utilities.numberOfBit(); j++) {
+            String hashedkey = Utilities.computefinger(nodeidentifier, j);
             try {
-                finger = dispatcher.sendSuccessorRequest(successor, hashedkey, nodeInfo);
+                NodeInfo finger = dispatcher.sendSuccessorRequest(successorList.getFirstElement(), hashedkey, nodeInfo);
                 fingerTable.addFinger(finger);
             } catch (TimerExpiredException e) {
                 repopulateSuccessorList(0);
             }
         }
-        setAlone(false);
         this.printStatus();
         this.printUtilities();
         try{
@@ -263,50 +261,49 @@ public class Node {
         }catch (TimerExpiredException e){
             //put code here
         }
-        this.terminate  = Threads.executePeriodically(new Utilities(this));
+        this.UtilitiesThread = Threads.executePeriodically(new Utilities(this));
+        setAlone(false);
+        setStarted(true);
 
     }
 
     //quando ricevo la notify controllo il mio predecessore e in caso lo aggiorno
-    public  void notify(NodeInfo potential_predecessor) {
-        if(potential_predecessor.equals(this.nodeInfo)){
-            System.out.println("sto notificando me stesso e sono: "+this.nodeidentifier);
+    public  void notify(NodeInfo potentialPredecessor) {
+        if(potentialPredecessor.equals(this.nodeInfo)){
             return;
         }
         if (this.predecessor == null) {
-            this.predecessor = potential_predecessor;
+            this.predecessor = potentialPredecessor;
         } else {
             //ho le due chiavi
             String predecessorKey = this.predecessor.getHash();
-            String potentialKey = potential_predecessor.getHash();
+            String potentialKey = potentialPredecessor.getHash();
             //se la chiave del potenziale predecessore è più piccola del successore e più grande del nodo, allora ho trovato un nuovo predecessore
             if(comparator.compare(predecessorKey,potentialKey)<0){
-                this.predecessor=potential_predecessor;
+                this.predecessor=potentialPredecessor;
             }
         }
     }
 
 
     public  void terminate() {
-        terminate.cancel(true);
-
-        /*try{
+        UtilitiesThread.cancel(true);
+        try{
             // I send a message to my successor
-            this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getFirstElement(), this.predecessor, this.nodeInfo);
+            this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getFirstElement(), this.predecessor, this.fileSystem.freeFileSystem(),  this.nodeInfo);
+            // I send a message to my predecessor
             if (this.predecessor != null){
                 this.dispatcher.sendLeavingSuccessorRequest(this.predecessor, this.successorList.getFirstElement(), this.nodeInfo);
             }
         }catch (TimerExpiredException e){
             // do nothing
         }
-        */
+
     }
 
     //when my predecessor leaves
     public  void notifyLeavingPredecessor(NodeInfo newPredecessor){
-        System.out.println("notify leaving predecessor on "+ this.nodeidentifier);
         if (newPredecessor != null){
-            //qua dovremo mettere il codice di passaggio dei files
             this.predecessor = newPredecessor;
         }
     }
@@ -319,14 +316,13 @@ public class Node {
         fixSuccessorList();
     }
 
-
     public  void repopulateSuccessorList(int positionOFUnvalidNode){
         int positionOFValidSuccessorNode = positionOFUnvalidNode +1;
         if (positionOFUnvalidNode == 0){
             boolean got = false;
             while (!got && positionOFValidSuccessorNode<4){
                 try{
-                    this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(positionOFValidSuccessorNode), this.nodeInfo, this.nodeInfo);
+                    this.dispatcher.sendLeavingPredecessorRequest(this.successorList.getElement(positionOFValidSuccessorNode), this.nodeInfo,new HashMap<>(), this.nodeInfo);
                     got = true;
                 }catch (TimerExpiredException e){
                     positionOFValidSuccessorNode++;//check the next one
@@ -337,36 +333,52 @@ public class Node {
             boolean got = false;
             while (!got && positionOFValidSuccessorNode<4){
                 try{
-
-                    NodeInfo nodeInfo33 = this.successorList.getElement(positionOFValidSuccessorNode);
-                    NodeInfo nodeInfo1 = this.successorList.getElement(positionOFUnvalidNode-1);
-                    this.dispatcher.sendLeavingPredecessorRequest(nodeInfo33,nodeInfo1 , this.nodeInfo);
+                    NodeInfo validSuccessor = this.successorList.getElement(positionOFValidSuccessorNode);
+                    NodeInfo validPredecessor = this.successorList.getElement(positionOFUnvalidNode-1);
+                    this.dispatcher.sendLeavingPredecessorRequest(validSuccessor,validPredecessor , new HashMap<>(),  this.nodeInfo);
                     got = true;
                 }catch (TimerExpiredException e){
                     positionOFValidSuccessorNode++;//check the next one
                 }
             }
+
             int positionOFValidPredecessorNode = positionOFUnvalidNode -1;
-            if (positionOFValidSuccessorNode == 4){
-                positionOFValidSuccessorNode--;
-            }
-            got = false;
-            while (!got && positionOFValidPredecessorNode >= 0){
-                try{
-                    System.out.println(this.successorList.getElement(positionOFValidPredecessorNode).getHash());
-                    System.out.println(this.successorList.getElement(positionOFValidSuccessorNode).getHash());
-                    this.dispatcher.sendLeavingSuccessorRequest(this.successorList.getElement(positionOFValidPredecessorNode), this.successorList.getElement(positionOFValidSuccessorNode),this.nodeInfo);
-                    got = true;
+            if (positionOFValidSuccessorNode <4){
+                got = false;
+                while (!got && positionOFValidPredecessorNode >= 0){
+                    try{
+                        this.dispatcher.sendLeavingSuccessorRequest(this.successorList.getElement(positionOFValidPredecessorNode), this.successorList.getElement(positionOFValidSuccessorNode),this.nodeInfo);
+                        got = true;
 
-                }catch (TimerExpiredException e){
-                    positionOFValidPredecessorNode--; //check the next one
+                    }catch (TimerExpiredException e){
+                        positionOFValidPredecessorNode--; //check the next one
+                    }
                 }
+
             }
-
         }
-
         System.out.println("sto modificando la finger "+ positionOFUnvalidNode + " con il nodo "+successorList.getElement(positionOFValidSuccessorNode).getHash() + " " + positionOFValidSuccessorNode + " e sono "+ this.nodeidentifier );
-        this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFValidSuccessorNode));
+        if (positionOFValidSuccessorNode == 4){
+            NodeInfo aNode = repopulateFingerTable();
+            this.successorList.modifyEntry(positionOFUnvalidNode,aNode);
+
+        }else{
+            this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFValidSuccessorNode));
+        }
+    }
+
+    private NodeInfo repopulateFingerTable(){
+        for (int i=0; i<Utilities.numberOfBit(); i++){
+            NodeInfo nodeInfo = fingerTable.getFinger(i);
+            try{
+                this.dispatcher.sendPing(nodeInfo, this.nodeInfo);
+                return nodeInfo;
+            }catch (TimerExpiredException e){
+                //try next
+            }
+        }
+        return this.nodeInfo;
+
     }
 
     //cerco il responsabile e gli invio i dati
@@ -376,11 +388,11 @@ public class Node {
             this.dispatcher.sendPublishRequest(successor, data, key, this.nodeInfo);
         }
         catch (TimerExpiredException e){
-            //boh??
+            //do nothing
         }
     }
 
-    //pubblisco i dati nel mio file system
+    //pubblico i dati nel mio file system
     public void publishFile(String data, String key){
         this.fileSystem.publish(data, key);
         try {
@@ -388,7 +400,6 @@ public class Node {
         } catch (FileSystemException e) {
             e.printStackTrace();
         }
-
     }
 
     //cerco il responsabile e gli chiedo i dati
@@ -426,7 +437,7 @@ public class Node {
         }
         else{
             try {
-                this.dispatcher.sendDeeleteFileRequest(successor, key, this.nodeInfo);
+                this.dispatcher.sendDeleteFileRequest(successor, key, this.nodeInfo);
             }
             catch (TimerExpiredException e){
                 //minchia boh

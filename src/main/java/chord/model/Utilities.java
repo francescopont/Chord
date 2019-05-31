@@ -18,6 +18,7 @@ public class Utilities implements Runnable {
     }
 
     static boolean testing = false;
+    static boolean testing2 = false;
 
     //constructor
     public Utilities(Node node){
@@ -121,7 +122,7 @@ public class Utilities implements Runnable {
     //timer for messages
     public static int getTimer(){
         // 1 secondo
-        return 1000;
+        return 3000;
     }
 
 }
