@@ -3,14 +3,30 @@ package chord.model;
 import chord.Exceptions.PredecessorException;
 import chord.Messages.*;
 import chord.network.Router;
-
 import java.util.Map;
 
+/**
+ * Class to handle a message when it is delivered to a node and send the answer
+ *
+ * Message protocol:
+ * #1: Ping message
+ * #2: Request of predecessor message
+ * #3: Find successor message
+ * #4: Notify message
+ * #5: First successor request message
+ * #6: Reply message
+ * #17: Delete file message
+ * #25: Lookup message
+ * #33: Start message
+ * #44: Leaving predecessor message
+ * #45: Leaving successor message
+ * #85: Publish message
+ *
+ */
 public class MessageHandler implements Runnable {
     private Message message;
     private Node node;
 
-    //constructor
     public MessageHandler (Node node, Message message){
         this.node = node;
         this.message=message;
@@ -56,38 +72,15 @@ public class MessageHandler implements Runnable {
                 Router.sendAnswer(node.getPort(),firstSuccessorAnswerMessage);
                 break;
 
-            case 6: //answer message
+            case 6: //answer
                 NodeDispatcher dispatcher = node.getDispatcher();
                 dispatcher.addAnswer(message.getId(),message);
                 break;
 
-
-            case 33: //start message
-                node.start(message.getSender());
-                StartAnswerMessage startAnswerMessage = new StartAnswerMessage(message.getSender(), message.getDestination(),message.getId());
-                Router.sendAnswer(node.getPort(), startAnswerMessage);
-                break;
-
-            case 44: // leavePredecessor message
-                node.notifyLeavingPredecessor( ((LeavingPredecessorRequestMessage) message).getNewPredecessor());
-                if (!((LeavingPredecessorRequestMessage) message).getFiles().isEmpty()){
-                    for (Map.Entry<String, String> file : ((LeavingPredecessorRequestMessage) message).getFiles().entrySet()){
-                        node.publishFile(file.getValue(), file.getKey());
-                    }
-                }
-                LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = new LeavingPredecessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
-                Router.sendAnswer(node.getPort(), leavingPredecessorAnswerMessage);
-                break;
-            case 45: // leaveSuccessor message
-                node.notifyLeavingSuccessor(((LeavingSuccessorRequestMessage) message).getNewSuccessor());
-                LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = new LeavingSuccessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
-                Router.sendAnswer(node.getPort(), leavingSuccessorAnswerMessage);
-                break;
-
-            case 85: // publish message
-                node.publishFile(((PublishRequestMessage) message).getData(), ((PublishRequestMessage) message).getKey());
-                PublishAnswerMessage publishAnswerMessage= new PublishAnswerMessage(message.getSender(), message.getDestination(),message.getId());
-                Router.sendAnswer(node.getPort(), publishAnswerMessage);
+            case 17: // delete
+                node.deleteMyFile(((DeleteFileRequestMessage) message).getKey());
+                DeleteFileAnswerMessage deleteFileAnswerMessage= new DeleteFileAnswerMessage(message.getSender(), message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), deleteFileAnswerMessage);
                 break;
 
             case 25: // file request
@@ -96,31 +89,37 @@ public class MessageHandler implements Runnable {
                 Router.sendAnswer(node.getPort(), fileAnswerMessage);
                 break;
 
-            case 17: // publish message
-                node.deleteMyFile(((DeleteFileRequestMessage) message).getKey());
-                DeleteFileAnswerMessage deleteFileAnswerMessage= new DeleteFileAnswerMessage(message.getSender(), message.getDestination(),message.getId());
-                Router.sendAnswer(node.getPort(), deleteFileAnswerMessage);
+            case 33: //start
+                node.start(message.getSender());
+                StartAnswerMessage startAnswerMessage = new StartAnswerMessage(message.getSender(), message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), startAnswerMessage);
                 break;
+
+            case 44: // leavePredecessor
+                node.notifyLeavingPredecessor( ((LeavingPredecessorRequestMessage) message).getNewPredecessor());
+                if (!((LeavingPredecessorRequestMessage) message).getFiles().isEmpty()){
+                    for (Map.Entry<String, String> files : ((LeavingPredecessorRequestMessage) message).getFiles().entrySet()){
+                        node.publishFile(files.getValue(), files.getKey());
+                    }
+                }
+                LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = new LeavingPredecessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
+                Router.sendAnswer(node.getPort(), leavingPredecessorAnswerMessage);
+                break;
+            case 45: // leaveSuccessor
+                node.notifyLeavingSuccessor(((LeavingSuccessorRequestMessage) message).getNewSuccessor());
+                LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = new LeavingSuccessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
+                Router.sendAnswer(node.getPort(), leavingSuccessorAnswerMessage);
+                break;
+
+            case 85: // publish
+                node.publishFile(((PublishRequestMessage) message).getData(), ((PublishRequestMessage) message).getKey());
+                PublishAnswerMessage publishAnswerMessage= new PublishAnswerMessage(message.getSender(), message.getDestination(),message.getId());
+                Router.sendAnswer(node.getPort(), publishAnswerMessage);
+                break;
+
 
         }
     }
 }
 
-
-//protocol of types
-/*
-    ping 1
-    request of predecessor 2
-    find successor 3
-    notify 4
-    first successor 5
-
-    start 33
-    leavingPredecessor 44
-    leavingSuccessor 45
-    publish 85
-    getfile 25
-
-    reply 6
- */
 

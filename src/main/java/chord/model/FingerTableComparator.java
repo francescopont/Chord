@@ -2,19 +2,23 @@ package chord.model;
 
 import java.util.Comparator;
 
-
+/**
+ * Comparator to sort strings in the finger table
+ * This comparator sets the caller node as the biggest one on the Chord ring
+ */
 public class FingerTableComparator implements Comparator<String> {
-    //the hash which we consider as the "0" on the ring
+    /**
+     *The hash which we consider as the "0" on the ring
+     */
     private String nodeidentifier;
 
-    //constructor
     public FingerTableComparator(String nodeidentifier) {
         this.nodeidentifier = nodeidentifier;
     }
 
-    // this comparator set the nodeidentifier as the BIGGEST value on the ring
     @Override
     public int compare(String hash1, String hash2){
+
         //case1: both values are greater than the nodeidentifier
         if (hash1.compareTo(nodeidentifier)>0 && hash2.compareTo(nodeidentifier) >0){
             //we compare them as usual
