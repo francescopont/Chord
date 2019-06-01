@@ -396,7 +396,7 @@ public class Node {
 
     //pubblico i dati nel mio file system
     public void publishFile(String data, String key){
-        this.fileSystem.publish(data, key);
+        this.fileSystem.publish(key, data);
         try {
             System.out.println("Sono : "+ this.nodeidentifier+ "ho il file: " + fileSystem.getFile(key));
         } catch (FileSystemException e) {

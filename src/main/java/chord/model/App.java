@@ -1,9 +1,9 @@
 package chord.model;
 
+import chord.Exceptions.NotInitializedException;
 import chord.Exceptions.PortException;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Scanner;
 
 /**
  * Hello world!
@@ -14,55 +14,110 @@ public class App
 {
     //piccolo test
     public static void main( String[] args ) {
-        /*Scanner scanner= new Scanner(System.in);
+        Boolean exit=false;
+        Scanner scanner= new Scanner(System.in);
 
-        System.out.println("Selezionare un'opzione:\n c for Create \n j for Join\n p for publish\ng for get a file\n d for delete ");
-        {
-            String input= scanner.nextLine();
-            if(input.equals("c")){
-                System.out.println("Insert IP Address: ");
-                String ip=scanner.nextLine();
-                System.out.println("Insert port Number: ");
-                int port= scanner.nextInt();
-                try {
-                    Chord.create(ip,port);
-                } catch (PortException e) {
-                    e.printStackTrace();
+        while(!exit) {
+            System.out.println("Selezionare un'opzione:\n c for Create \n j for Join\n p for publish\n g for get a file\n d for delete a file\n t for terminate a node\n ps for print the Chord status\n e for exit ");
+                String input = scanner.nextLine();
+                if (input.equals("c")) {
+                    System.out.println("Insert IP Address: ");
+                    String ip = scanner.nextLine();
+                    System.out.println("Insert port Number: ");
+                    int port = scanner.nextInt();
+                    try {
+                        Chord.create(ip, port);
+                    } catch (PortException e) {
+                        e.printStackTrace();
+                    }
+                } else if (input.equals("j")) {
+                    System.out.println("Insert your IP Address: ");
+                    String ip = scanner.nextLine();
+                    System.out.println("Insert the IP address of your friend: ");
+                    String friendIp = scanner.nextLine();
+                    System.out.println("Insert your port Number: ");
+                    int port = scanner.nextInt();
+                    System.out.println("Insert the port Number of your BFF: ");
+                    int friendPort = scanner.nextInt();
+                    try {
+                        Chord.join(ip, port, friendIp, friendPort);
+                    } catch (PortException e) {
+                        e.printStackTrace();
+                    } catch (NotInitializedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-
-            else if(input.equals("j")){
-                System.out.println("Insert your IP Address: ");
-                String ip=scanner.nextLine();
-                System.out.println("Insert the IP address of your friend: ");
-                String friendIp=scanner.nextLine();
-                System.out.println("Insert your port Number: ");
-                int port=scanner.nextInt();
-                System.out.println("Insert the port Number of your BFF: ");
-                int friendPort= scanner.nextInt();
-                try {
-                    Chord.join(ip,port,friendIp,friendPort);
-                } catch (PortException e) {
-                    e.printStackTrace();
+                else if (input.equals("p")) {
+                    System.out.println("Insert file data : ");
+                    String info = scanner.nextLine();
+                    Data data = new Data(info);
+                    System.out.println("Insert your port number : ");
+                    int port = scanner.nextInt();
+                    String key= null;
+                    try {
+                        key = Chord.publish(data, port);
+                        System.out.println("The file key is: "+ key);
+                    } catch (NotInitializedException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
-                catch (NotInitializedException e){
-                    e.printStackTrace();
+                else if(input.equals("g")){
+                    System.out.println("Insert the file key :");
+                    String key= scanner.nextLine();
+                    if(key.length()==4){
+                        System.out.println("Insert your port number : ");
+                        int port=scanner.nextInt();
+                        try {
+                            String file = Chord.lookup(key,port);
+                            if(file!=null){
+                                System.out.println(file);
+                            }
+                            else{
+                                System.out.println("This file does not exist");
+                            }
+                        } catch (NotInitializedException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                    else{
+                        System.out.println("The key must be of 4 characters");
+                    }
+
                 }
-            }
-            else if(input.equals("p")){
-                System.out.println("Inserisci i dati del file: ");
-                String info= scanner.nextLine();
-                Data data= new Data(info);
-                System.out.println("Inserisci la tua porta: ");
-                int port=scanner.nextInt();
-                Chord.publish(data,port);
-                //alternativa in cui calcolo la chiave nell'oggetto e lo passo come argomento (fa più cagare secodno me)
-                //Chord.publish(data,data.getKey(),port);
-            }
+                else if(input.equals("d")){
+                    System.out.println("Insert the file key :");
+                    String key= scanner.nextLine();
+                    System.out.println("Insert your port number :");
+                    int port= scanner.nextInt();
+                    try {
+                        Chord.deleteFile(key,port);
+                    } catch (NotInitializedException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else if(input.equals("t")){
+                    System.out.println("Insert your port number : ");
+                    int port= scanner.nextInt();
+                    try {
+                        Chord.deleteNode(port);
+                    } catch (NotInitializedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(input.equals("ps")){
+                    Chord.printChord();
+                }
+                else if(input.equals("e")){
+                    exit=true;
+                }
+                else{
+                    System.out.println("Wrong input");
+                }
+        }
 
-    }*/
+        System.out.println("Program terminate");
 
-        int actual_port = 1000;
+        /*int actual_port = 1000;
         try {
             Chord.create("127.0.0.1", 1000);
         } catch (PortException e) {
@@ -84,7 +139,7 @@ public class App
         }
 
         System.out.println("finita la computazione");
-        /*Data data= new Data("sono una fugaaaaaa");
+        Data data= new Data("sono una fugaaaaaa");
         Data data1= new Data("giorgio ti amoooo");
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
@@ -99,19 +154,19 @@ public class App
                 System.out.println("Pinta di birra");
                 Router.printRouter();
                 System.out.println("Mungi la vacca");
-                Chord.getFile(key,1000);
-                Chord.getFile(key1,1000);
-                Chord.getFile("000",1000);
-                Chord.getFile(key,1001);
-                Chord.getFile(key1,1002);
-                Chord.getFile(key,1003);
+                Chord.lookup(key,1000);
+                Chord.lookup(key1,1000);
+                Chord.lookup("000",1000);
+                Chord.lookup(key,1001);
+                Chord.lookup(key1,1002);
+                Chord.lookup(key,1003);
                 Chord.deleteFile(key,1000);
-                Chord.getFile(key,1002);
+                Chord.lookup(key,1002);
 
             }
         }, 10000, 60000);
 
-        */
+
 
         Timer timer1 = new Timer();
         timer1.schedule(new TimerTask() {
@@ -138,7 +193,7 @@ public class App
             }
         }, 30000, 30000);
 
-
+        */
     }
 
 
