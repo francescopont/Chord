@@ -99,7 +99,7 @@ public class MessageHandler implements Runnable {
                 node.notifyLeavingPredecessor( ((LeavingPredecessorRequestMessage) message).getNewPredecessor());
                 if (!((LeavingPredecessorRequestMessage) message).getFiles().isEmpty()){
                     for (Map.Entry<String, String> files : ((LeavingPredecessorRequestMessage) message).getFiles().entrySet()){
-                        node.publishFile(files.getValue(), files.getKey());
+                        node.publishFile(files.getKey(), files.getValue());
                     }
                 }
                 LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = new LeavingPredecessorAnswerMessage(message.getSender(), message.getDestination(), message.getId());
@@ -112,7 +112,7 @@ public class MessageHandler implements Runnable {
                 break;
 
             case 85: // publish
-                node.publishFile(((PublishRequestMessage) message).getData(), ((PublishRequestMessage) message).getKey());
+                node.publishFile(((PublishRequestMessage) message).getKey(), ((PublishRequestMessage) message).getData());
                 PublishAnswerMessage publishAnswerMessage= new PublishAnswerMessage(message.getSender(), message.getDestination(),message.getId());
                 Router.sendAnswer(node.getPort(), publishAnswerMessage);
                 break;

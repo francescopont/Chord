@@ -54,14 +54,27 @@ public class FileSystem {
      * When a node terminates, it removes all the files in order to pass them to the successor
      * @return a copy of the filesystem
      */
-    public Map<String, String> freeFileSystem(){
+    public Map<String, String> freeFileSystem() {
         Map<String, String> files = new HashMap();
-        for (String key: this.files.keySet()){
+        for (String key : this.files.keySet()) {
             String value = this.files.remove(key);
             files.put(key, value);
         }
         this.files.clear();
         return files;
+    }
+
+    /**
+     * print the filesystem
+     */
+    public void print(){
+        System.out.println("FILESYSTEM: ");
+        if(files.size()==0){
+            System.out.println("Filesystem empty");
+        }
+        for(Map.Entry<String,String> file: this.files.entrySet()){
+            System.out.println("Key : "+ file.getKey()+ " File : "+ file.getValue());
+        }
     }
 
 }

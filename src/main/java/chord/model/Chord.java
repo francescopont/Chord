@@ -104,7 +104,7 @@ public class Chord{
             }
         }
         if(me!=null) {
-            me.publish(json, key);
+            me.publish(key, json);
         }
         else{
             throw new NotInitializedException("There is no node associated to this port, try with another port");

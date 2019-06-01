@@ -29,8 +29,7 @@ public class NodeDispatcherTester {
 
         Node node1 = new Node(node_info1);
         Node node2 = new Node(node_info2);
-        Chord.addNodeTesting(node1);
-        Chord.addNodeTesting(node2);
+
 
         try {
             node1.getDispatcher().sendPing(node_info2, node_info1);

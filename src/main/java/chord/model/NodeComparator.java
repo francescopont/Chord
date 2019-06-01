@@ -2,19 +2,19 @@ package chord.model;
 
 import java.util.Comparator;
 
+/**
+ * Comparator to sort strings in the Node class
+ * This comparator sets the caller node as the smallest one on the Chord ring
+ */
 public class NodeComparator implements Comparator<String> {
 
     //the hash which we consider as the "0" on the ring
     private String nodeidentifier;
 
-    //constructor
     public NodeComparator(String nodeidentifier) {
         this.nodeidentifier = nodeidentifier;
     }
 
-
-
-    // this comparator set the nodeidentifier as the smallest value on the ring
     @Override
     public int compare(String hash1, String hash2){
         //case1: both values are greater than the nodeidentifier
