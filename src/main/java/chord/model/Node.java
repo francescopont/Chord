@@ -329,7 +329,7 @@ public class Node {
                 }
             }
             if (positionOFValidSuccessorNode == 4){
-                NodeInfo aNode = repopulateFingerTable();
+                NodeInfo aNode = repopulateFingerTable(0);
                 this.successorList.modifyEntry(0,aNode);
             }else{
                 this.successorList.modifyEntry(0,this.successorList.getElement(positionOFValidSuccessorNode));
@@ -361,7 +361,7 @@ public class Node {
                 }
                 this.successorList.modifyEntry(positionOFUnvalidNode,this.successorList.getElement(positionOFValidSuccessorNode));
             }else{
-                NodeInfo aNode = repopulateFingerTable();
+                NodeInfo aNode = repopulateFingerTable(positionOFUnvalidNode);
                 this.successorList.modifyEntry(positionOFUnvalidNode,aNode);
             }
         }
@@ -369,8 +369,8 @@ public class Node {
 
     }
 
-    private NodeInfo repopulateFingerTable(){
-        for (int i=0; i<Utilities.numberOfBit(); i++){
+    private NodeInfo repopulateFingerTable(int position){
+        for (int i=position; i<Utilities.numberOfBit(); i++){
             NodeInfo nodeInfo = fingerTable.getFinger(i);
             try{
                 this.dispatcher.sendPing(nodeInfo, this.nodeInfo);

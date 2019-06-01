@@ -33,10 +33,7 @@ public class Router {
                 }catch (IOException e1){
                     // do nothing
                 }
-
             }
-
-
         }
 
     }
