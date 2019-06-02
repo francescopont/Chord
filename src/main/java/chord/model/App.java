@@ -26,7 +26,10 @@ public class App
                     System.out.println("Insert port Number: ");
                     int port = scanner.nextInt();
                     try {
+                        long previous = System.currentTimeMillis();
                         Chord.create(ip, port);
+                        long after = System.currentTimeMillis();
+                        System.out.println("time: " + (after - previous));
                     } catch (PortException e) {
                         e.printStackTrace();
                     }

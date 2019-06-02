@@ -3,6 +3,7 @@ package chord.model;
 import chord.Exceptions.PredecessorException;
 import chord.Messages.*;
 import chord.network.Router;
+
 import java.util.Map;
 
 /**
@@ -62,7 +63,8 @@ public class MessageHandler implements Runnable {
 
             case 4:  //notify
                 node.notify(message.getSender());
-                NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), message.getId());
+                Map<String, String> newFiles = node.getFileSystem().retrieveFiles(message.getSender().getHash());
+                NotifyAnswerMessage notifyAnswerMessage= new NotifyAnswerMessage(message.getSender(),message.getDestination(), newFiles, message.getId());
                 Router.sendAnswer(node.getPort(),notifyAnswerMessage);
                 break;
 

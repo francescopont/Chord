@@ -26,7 +26,7 @@ public class NodeDispatcher {
     }
 
     //a set of methods used to send a message and handle the answer
-    public synchronized void sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
+    public synchronized Map<String, String> sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
         NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
         final int ticket= Router.sendMessage(this.port,notifyRequestMessage);
         this.waitingTickets.add(ticket);
@@ -35,7 +35,7 @@ public class NodeDispatcher {
             public void run(){
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,ticket);
+                        NotifyAnswerMessage notifyAnswerMessage = new NotifyAnswerMessage(sender, destination,new HashMap<>(), ticket);
                         notifyAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, notifyAnswerMessage);
                     }
@@ -54,6 +54,7 @@ public class NodeDispatcher {
         waitingTickets.remove((Integer) ticket);
         answers.remove(ticket);
         notifyAnswerMessage.check();
+        return notifyAnswerMessage.getFiles();
     }
 
     public  synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException, PredecessorException {

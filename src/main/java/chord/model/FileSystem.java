@@ -7,14 +7,15 @@ import java.util.Map;
  * This class contains the files stored to the associated node
  */
 public class FileSystem {
-
+    private String nodeIdentifier;
     /**
      * The hashmap keys are the keys of the files in Chord
      * The hashmap values are json strings of application specific objects
      */
     HashMap<String , String> files;
 
-    public FileSystem(){
+    public FileSystem(String nodeIdentifier){
+        this.nodeIdentifier = nodeIdentifier;
         this.files=new HashMap<>();
     }
 
@@ -61,6 +62,23 @@ public class FileSystem {
             files.put(key, value);
         }
         this.files.clear();
+        return files;
+    }
+
+    /**
+     * This method is used to pass to a new node all the files he is responsible for
+     * @param newNodeidentifier of the new Node
+     * @return all the files with a key less or equal the new node identifier
+     */
+    public Map<String, String> retrieveFiles(String newNodeidentifier) {
+        FingerTableComparator fingerTableComparator = new FingerTableComparator(this.nodeIdentifier);
+        Map<String, String> files = new HashMap();
+        for (String key : this.files.keySet()) {
+            if (fingerTableComparator.compare(key, newNodeidentifier) <0){
+                String value = this.files.remove(key);
+                files.put(key, value);
+            }
+        }
         return files;
     }
 

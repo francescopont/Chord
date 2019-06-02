@@ -1,7 +1,12 @@
 package chord.model;
 
-import chord.Exceptions.*;
+import chord.Exceptions.NotInitializedException;
+import chord.Exceptions.PredecessorException;
+import chord.Exceptions.SuccessorListException;
+import chord.Exceptions.TimerExpiredException;
+
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -31,7 +36,7 @@ public class Node {
         this.predecessor = null;
         this.dispatcher = new NodeDispatcher(this.getPort());
         this.fixFingerCounter = 0;
-        this.fileSystem = new FileSystem();
+        this.fileSystem = new FileSystem(me.getHash());
         this.comparator=new NodeComparator(me.getHash());
         this.started = false;
     }
@@ -85,6 +90,7 @@ public class Node {
     public NodeDispatcher getDispatcher() {
         return dispatcher;
     }
+    public FileSystem getFileSystem(){ return  fileSystem;}
 
 
     /**
@@ -197,7 +203,12 @@ public class Node {
         }catch (PredecessorException e){}
         try {
             NodeInfo newSuccessor = this.successorList.getFirstElement();
-            this.dispatcher.sendNotify(newSuccessor, this.nodeInfo);
+            Map<String,String> newFiles = this.dispatcher.sendNotify(newSuccessor, this.nodeInfo);
+            if (!newFiles.isEmpty()){
+                for (Map.Entry<String, String> newFile: newFiles.entrySet() ){
+                    this.fileSystem.publish(newFile.getKey(), newFile.getValue());
+                }
+            }
         } catch (TimerExpiredException e) {
             repopulateSuccessorList(0);
         }
