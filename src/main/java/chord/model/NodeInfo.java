@@ -2,12 +2,14 @@ package chord.model;
 
 import java.io.Serializable;
 
+/**
+ * Class which contains the information about a node : IP address, port number and hashed key
+ */
 public class NodeInfo implements Serializable{
     private String IPAddress;
     private int port;
     private String hash;
 
-    //constructor
     public NodeInfo(String IPAddress, int port){
         this.IPAddress = IPAddress;
         this.port = port;
@@ -15,11 +17,15 @@ public class NodeInfo implements Serializable{
         this.hash = Utilities.hashfunction(key);
     }
 
-    //getters and setters
+    /**
+     *Getter and setter methods
+     */
+
     public String getIPAddress() {
         return IPAddress;
     }
 
+    //si può togliere?
     public void setIPAddress(String IPAddress) {
         this.IPAddress = IPAddress;
         // I need to update the hash function
@@ -48,7 +54,9 @@ public class NodeInfo implements Serializable{
         return this.hash.equals(nodeInfo.hash);
     }
 
-    //fake constructor used only for testing
+    /**
+     * Constructor for testing
+     */
     public NodeInfo (String hash){
         this.hash = hash;
         this.IPAddress = "-.-.-.-";

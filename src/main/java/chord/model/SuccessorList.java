@@ -6,14 +6,28 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Class which represents the successor list of an associated node
+ */
 public class SuccessorList {
+    /**
+     * Support data structure to sort the fingers
+     */
     private final TreeMap<String, NodeInfo> map;
+    /**
+     * List of successors of the node
+     */
     private LinkedList<NodeInfo> successors;
+    /**
+     * The identifier of the node
+     */
     private String node;
-    // this boolean indicates if I'm alone on the chord
+    /**
+     * Boolean which indicates if the node is the only in the Chord or not
+     */
     private boolean alone;
 
-    //constructor
+
     public SuccessorList(String nodeIdentifier){
         this.map = new TreeMap<>(new FingerTableComparator(nodeIdentifier));
         this.successors = new LinkedList<>();
@@ -21,26 +35,38 @@ public class SuccessorList {
         this.alone = true;
     }
 
-    //to add an entry in the last position
+    /**
+     * Add a new node in the last position
+     * @param node information of the node to insert
+     */
     public void addEntry( NodeInfo node){
         if (successors.size() < 4){
             successors.addLast(node);
         }
     }
 
-    //we count from 0 to 3
+    /**
+     * Modify the successor list by inserting the new node in the indicated position
+     * Position from 0 to 3
+     * @param position of the node to modify
+     * @param newnodeInfo information of the new node
+     */
     public synchronized void modifyEntry(int position, NodeInfo newnodeInfo){
         if (position == 0 && newnodeInfo.getHash().equals(this.node)){
-            System.out.println("stai creando un bug");
             setAlone(true);
         }
         if (position == 0 && !(newnodeInfo.getHash().equals(this.node))){
             setAlone(false);
         }
         this.successors.set(position, newnodeInfo);
-
     }
 
+    /**
+     * Get the biggest node, if it exists, among the ones smaller than the given node
+     * @param node whose predecessor the caller is looking for
+     * @return the biggest node among the ones smaller than the given node
+     * @throws SuccessorListException Exception thrown if the successor list is empty
+     */
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
         this.map.clear();
         for (NodeInfo nodeInfo : this.successors){
@@ -53,21 +79,29 @@ public class SuccessorList {
         return successor.getValue();
     }
 
-    //to get a specific nodeinfo (indexes go from 0 to 3)
+    /**
+     * Return an element in a specific position
+     * @param position from 0 to 3
+     * @return element in that position
+     */
     public NodeInfo getElement(int position){
         return this.successors.get(position);
     }
 
+    /**
+     * Get the last element of the successor list
+     * @return the last element
+     */
     public NodeInfo getLastElement(){
         return this.successors.getLast();
     }
 
+    /**
+     * Get the first element of the successor list
+     * @return the first element
+     */
     public NodeInfo getFirstElement(){
         return successors.getFirst();
-    }
-
-    public void removeLast(){
-        this.successors.removeLast();
     }
 
     public boolean isAlone() { return alone; }
@@ -76,9 +110,9 @@ public class SuccessorList {
         this.alone = alone;
     }
 
-
-    //useful for testing
-    //to print the state of the map
+    /**
+     * Print the status of the successor list
+     */
     public void printTable(){
         int i=0;
         System.out.println("SUCCESSOR LIST ");
@@ -89,9 +123,10 @@ public class SuccessorList {
         }
     }
 
+    /**
+     *Methods useful for testing
+     */
 
-    //useful for testing
-    //getters
     public TreeMap<String, NodeInfo> getMap() {
         return map;
     }
