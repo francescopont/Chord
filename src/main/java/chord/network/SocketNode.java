@@ -12,12 +12,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
+/**
+ * Class that opens a socket channel associated with a newly created node and listens for messages from other nodes
+ * When a socket is created associated with a certain port, its management is entrusted to SocketHandler class
+ */
 public class SocketNode implements Runnable {
-    //the port is an unique identifier for the node
+    /**
+     * The port is an unique identifier for the node
+     */
     private int port;
-    //the socket where I listen for new connections
+    /**
+     * The socket where I listen for new connections
+     */
     private ServerSocket serverSocket;
-    //to delete the node
+    /**
+     * To delete the node
+     */
     private boolean terminated;
 
     private ScheduledFuture terminate;
@@ -26,9 +36,7 @@ public class SocketNode implements Runnable {
     //PROBLEMA: AGGIORNARE QUESTA LISTA TOGLIENDO LE CONNESSIONI CHE SONO STATE CHIUSE
     // soluzione artigianale: se quando mando un messaggio non riesco, allora sicuramente la connessione ha un problema
 
-    //porta effettivamente in uso
 
-    //constructor
     public SocketNode(int port) throws IOException {
         this.terminated = false;
         this.handlers = new LinkedList<>();
@@ -36,6 +44,10 @@ public class SocketNode implements Runnable {
         this.port=serverSocket.getLocalPort();
     }
 
+    /**
+     * Listen for new connections
+     * When a new connection is accepted , create a SocketHandler to handle the connection associated to a specific port
+     */
     @Override
     public void run() {
 
@@ -62,7 +74,9 @@ public class SocketNode implements Runnable {
         }
     }
 
-    //to delete this socketnode
+    /**
+     * Delete this socketnode
+     */
     public void terminate(){
         this.terminate.cancel(true);
         for (SocketHandler handler : this.handlers){
@@ -71,7 +85,9 @@ public class SocketNode implements Runnable {
         this.terminated = true;
     }
 
-    //to check the actual use of active connections
+    /**
+     * Check the actual use of active connections
+     */
     public void initialize(){
         this.terminate = Threads.executeRarely(() -> {
             synchronized (handlers){
@@ -91,12 +107,21 @@ public class SocketNode implements Runnable {
         });
     }
 
-    //used by Router Class, it may be deleted in future improvements of code
+    /**
+     * Get the port on which the socket node is listening
+     * used by Router Class, it may be deleted in future improvements of code
+     * @return the port associated to the serveSocket
+     */
     public int getPort() {
         return port;
     }
 
-    //to send a message
+    /**
+     * Send a message
+     * Called from the Router class
+     * Calls the method of the above layer (SockeHandler) to deliver the message
+     * @param message to send
+     */
     public  void sendMessage(Message message){
         boolean yetsend = false;
         NodeInfo nodeInfo = message.getDestination();
@@ -117,7 +142,6 @@ public class SocketNode implements Runnable {
                     //do nothing
                 }
             }
-
             if (!removedHandlers.isEmpty()){
                 for (SocketHandler handler: removedHandlers){
                     handlers.remove(handler);
@@ -146,7 +170,10 @@ public class SocketNode implements Runnable {
         }
     }
 
-    //useful for testing
+    //TENIAMO O CANCELLIAMO??
+    /**
+     * Method useful for testing
+     */
     public void printSocketNode(){
         System.out.println("It's socketME! "+ this.port +  " and I've " + this.handlers.size() + " connections");
         for (SocketHandler socketHandler: this.handlers){

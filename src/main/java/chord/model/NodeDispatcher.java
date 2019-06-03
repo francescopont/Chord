@@ -7,25 +7,44 @@ import chord.network.Router;
 
 import java.util.*;
 
+/**
+ * Class that manages the communication of the node to which it is associated with the other nodes
+ * Creates and forwards at the lower layers the different types of messages
+ */
 public class NodeDispatcher {
 
-    //the port associated to this node
+    /**
+     * The port associated to this node
+     */
     private int port;
 
-    // the tickets that are waiting for an answer
+    /**
+     * List of tickets associated with messaged that are waiting for an answer
+     */
     private List<Integer> waitingTickets;
 
-    //the answers
+    /**
+     * List of answer received
+     */
     private HashMap<Integer, Message> answers;
 
-    //constrcutor
     public NodeDispatcher(int port){
         this.answers = new HashMap<>();
         this.port = port;
         this.waitingTickets = new LinkedList<>();
     }
 
-    //a set of methods used to send a message and handle the answer
+    /**
+     *Set of methods used to send a message and handle the answer
+     */
+
+    /**
+     * Create and forward a message of notify
+     * @param destination information of the message destination
+     * @param sender information of the message sender
+     * @return
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized Map<String, String> sendNotify(final NodeInfo destination, final NodeInfo sender)throws TimerExpiredException {
         NotifyRequestMessage notifyRequestMessage=new NotifyRequestMessage(destination, sender);
         final int ticket= Router.sendMessage(this.port,notifyRequestMessage);
@@ -42,7 +61,6 @@ public class NodeDispatcher {
                 }
             }
         });
-
         while (!this.answers.containsKey(ticket)) {
             try {
                 wait();
@@ -57,6 +75,14 @@ public class NodeDispatcher {
         return notifyAnswerMessage.getFiles();
     }
 
+    /**
+     * Create and send a message to request the predecessor of the destination of the message
+     * @param destination information of the message destination
+     * @param sender information of the message sender
+     * @return the predecessor of the node, if it exists
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     * @throws PredecessorException Exception thrown if the predecessor of the receiver of the message does not exist
+     */
     public  synchronized NodeInfo sendPredecessorRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException, PredecessorException {
         PredecessorRequestMessage predecessorRequestMessage = new PredecessorRequestMessage(destination, sender);
         final int ticket = Router.sendMessage(this.port, predecessorRequestMessage);
@@ -89,7 +115,14 @@ public class NodeDispatcher {
         return answerMessage.getPredecessor();
     }
 
-
+    /**
+     * Create and send a request to knoe the successor of a given key
+     * @param destination information of the message destination
+     * @param node key of the node whose successor the sender is looking for
+     * @param sender information of the message sender
+     * @return the successor of the node if it exists
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized NodeInfo sendSuccessorRequest(final NodeInfo destination, String node, final NodeInfo sender)throws TimerExpiredException{
         SuccessorRequestMessage successorRequestMessage= new SuccessorRequestMessage(destination, node, sender);
         final int ticket= Router.sendMessage(this.port, successorRequestMessage);
@@ -121,6 +154,13 @@ public class NodeDispatcher {
         return successorAnswerMessage.getSuccessor();
     }
 
+    /**
+     *
+     * @param destination
+     * @param sender
+     * @return
+     * @throws TimerExpiredException
+     */
     public synchronized NodeInfo sendFirstSuccessorRequest(final NodeInfo destination,final NodeInfo sender)throws TimerExpiredException{
         FirstSuccessorRequestMessage firstSuccessorRequestMessage= new FirstSuccessorRequestMessage(destination,sender);
         final int ticket= Router.sendMessage(this.port, firstSuccessorRequestMessage);
@@ -365,7 +405,11 @@ public class NodeDispatcher {
         deleteFileAnswerMessage.check();
     }
 
-    //this method is used when an answer is received
+    /**
+     * Receive and add an answer to the list
+     * @param ticket of the message that waits a reply (same ticket for request and answer)
+     * @param message of reply
+     */
     public synchronized void addAnswer(int ticket, Message message){
         if( waitingTickets.contains(ticket) && !answers.containsKey(ticket)){
             answers.put(ticket,message);

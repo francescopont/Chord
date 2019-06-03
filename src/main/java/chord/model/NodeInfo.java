@@ -28,14 +28,12 @@ public class NodeInfo implements Serializable{
     //si può togliere?
     public void setIPAddress(String IPAddress) {
         this.IPAddress = IPAddress;
-        // I need to update the hash function
         String key = IPAddress.concat(Integer.toString(port));
         this.hash = Utilities.hashfunction(key);
     }
 
     public void setPort(int port) {
         this.port = port;
-        // I need to update the hash function
         String key = IPAddress.concat(Integer.toString(port));
         this.hash = Utilities.hashfunction(key);
     }

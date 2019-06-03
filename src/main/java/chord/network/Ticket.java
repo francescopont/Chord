@@ -1,5 +1,8 @@
 package chord.network;
 
+/**
+ * Class which return an unique identifier for every message
+ */
 public class Ticket {
     private static int ticket=0;
 
@@ -10,5 +13,4 @@ public class Ticket {
         ticket++;
         return ticket;
     }
-
 }

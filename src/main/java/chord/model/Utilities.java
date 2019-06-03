@@ -1,31 +1,26 @@
 package chord.model;
 
-// this class contains all the operations we need to run periodically on each node, and the code for the hash function
-
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+/**
+ * Class which contains all the operations that must be run periodically on each node, and the code for the hash function
+ */
 public class Utilities implements Runnable {
+    /**
+     * Node on which the operations are performed
+     */
     private final Node virtualnode;
 
-    public static boolean isTesting() {
-        return testing;
-    }
 
-    public static void setTesting(boolean testing) {
-        Utilities.testing = testing;
-    }
-
-    static boolean testing = false;
-    static boolean testing2 = false;
-
-    //constructor
     public Utilities(Node node){
         this.virtualnode = node;
     }
 
-    //calls periodic functions on the nodes
+    /**
+     * Calls periodic functions on the nodes
+     */
     @Override
     public void run() {
         if ( !virtualnode.isAlone()) {
@@ -37,9 +32,12 @@ public class Utilities implements Runnable {
     }
 
     //code modified for testing
-    //we use just the first two byte to test the correct behaviour of the function
-    //returns a string representation of the hash of the string passed as param
-    //in case of nodes, param = concat of ip and port
+
+    /**
+     * Calculate the hashed key of a node, given a string. In case of node the string is obtained chaining Ip address and port of the node (concat ip and port)
+     * @param key string to calculate the hash
+     * @return a string representation of the hash of the string passed as param
+     */
     public static String hashfunction(String key){
         MessageDigest digest;
         byte[] hash;
@@ -61,11 +59,15 @@ public class Utilities implements Runnable {
         return hexHash.toString();
     }
 
-    //SI CONTA DA 0 A 15
-    //to compute the i-th finger in the current Chord, given the node identifier
-    //uso sempre l'intero, non ritorno mai ai bytes, per evitare la gestione dei numeri negativi in complemento a due
+    /**
+     * Compute the i-th finger in the current Chord, given the node identifier.
+     * i from 0 to 15.
+     * Always use the integer, never return to the bytes, to avoid the management of negative numbers in two's complement
+     * @param nodeidentifier of the node
+     * @param finger position of the finger to calculate
+     * @return
+     */
     public static String computefinger(String nodeidentifier, int finger){
-
         //reconverting the  string nodeidentifier in the  integer representation
         int[] hash = new int[numberOfBit()/8];
         int j=0;
@@ -76,7 +78,6 @@ public class Utilities implements Runnable {
             j++;
 
         }
-
         //counter starts from 0
         finger = numberOfBit()-finger;
 
@@ -94,35 +95,65 @@ public class Utilities implements Runnable {
         return hexHash.toString();
     }
 
+    /**
+     *
+     * @param hash
+     * @param tosum
+     * @param i
+     */
     private static void recursion (int hash[], int tosum, int i){
         if (hash[i] + tosum <= 255){
             hash[i] = hash[i] + tosum;
         }
         else{
-            //in case we reach the maximum value in that byte
+            //in case is reached the maximum value in that byte
             hash[i] =  (hash[i] + tosum -256);
             if(i >0){
                 recursion(hash,1, i-1);
             }
-            //se siamo al bit più grande è giusto che il riporto si perda
+            //if it is the largest byte it is right that the carry-over is lost
         }
     }
 
+    /**
+     * Set the number of bits to use from the algorithm sha1, which uses 160 bits
+     * @return number of bit to use for the algorithm
+     */
     public static int numberOfBit(){
-        //this is used to set the number of bits we want to use from the algorithm sha1, which uses 160 bits
         return 16;
     }
 
-    //period of utilities
+    /**
+     * Get the period of utilities functions
+     * @return the period for executing utilies functions
+     */
     public static int getPeriod(){
-        //0.5 secondi
+        //0.5 seconds
         return 500;
     }
 
-    //timer for messages
+    /**
+     * Get the timer for the message
+     * @return the time within which a node must receive a reply to a message
+     */
     public static int getTimer(){
-        // 1 secondo
+        // 1 second
         return 3000;
     }
+
+    /**
+     * Methods useful for testing
+     */
+
+    public static boolean isTesting() {
+        return testing;
+    }
+
+    //si può togliere??
+    public static void setTesting(boolean testing) {
+        Utilities.testing = testing;
+    }
+
+    static boolean testing = false;
 
 }
