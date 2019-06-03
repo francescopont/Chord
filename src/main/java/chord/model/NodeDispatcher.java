@@ -116,7 +116,7 @@ public class NodeDispatcher {
     }
 
     /**
-     * Create and send a request to knoe the successor of a given key
+     * Create and send a request to know the successor of a given key
      * @param destination information of the message destination
      * @param node key of the node whose successor the sender is looking for
      * @param sender information of the message sender
@@ -155,11 +155,11 @@ public class NodeDispatcher {
     }
 
     /**
-     *
-     * @param destination
-     * @param sender
-     * @return
-     * @throws TimerExpiredException
+     * Create and send a request to know the first successor of the receiver
+     * @param destination information of the message destination
+     * @param sender information of the message sender
+     * @return the first successor of the node if it exists
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
      */
     public synchronized NodeInfo sendFirstSuccessorRequest(final NodeInfo destination,final NodeInfo sender)throws TimerExpiredException{
         FirstSuccessorRequestMessage firstSuccessorRequestMessage= new FirstSuccessorRequestMessage(destination,sender);
@@ -192,6 +192,13 @@ public class NodeDispatcher {
         return firstSuccessorAnswerMessage.getSuccessor();
     }
 
+    /**
+     * Create and send a ping message
+     * @param destination information of the message destination
+     * @param sender information of the message sender
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     *
+     */
     public synchronized void sendPing(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException {
         PingRequestMessage pingRequestMessage = new PingRequestMessage(destination,sender);
         final int ticket=Router.sendMessage(this.port,pingRequestMessage);
@@ -223,7 +230,12 @@ public class NodeDispatcher {
         pingAnswerMessage.check();
     }
 
-
+    /**
+     * Create and send a start request message
+     * @param destination information of the message destination
+     * @param sender information of the message sender
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized void sendStartRequest(final NodeInfo destination, final NodeInfo sender) throws TimerExpiredException{
         StartRequestMessage startRequestMessage = new StartRequestMessage(destination,sender);
         final int ticket=Router.sendMessage(this.port,startRequestMessage);
@@ -254,6 +266,14 @@ public class NodeDispatcher {
         startAnswerMessage.check();
     }
 
+    /**
+     * Create and send a message to notify the successor of the sender that it (that is the predecessor of the receiver) is leaving Chord
+     * @param destination information of the message destination
+     * @param newPredecessor information about the new predecessor of the receiver (predecessor of the sender)
+     * @param files files of the node that must be transfer to the successor that is now responsible for them
+     * @param sender information of the message sender
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized void sendLeavingPredecessorRequest(final NodeInfo destination, final NodeInfo newPredecessor, final Map<String, String> files, final NodeInfo sender) throws TimerExpiredException{
         LeavingPredecessorRequestMessage leavingPredecessorRequestMessage = new LeavingPredecessorRequestMessage(destination,newPredecessor,files, sender);
         final int ticket=Router.sendMessage(this.port, leavingPredecessorRequestMessage);
@@ -284,6 +304,13 @@ public class NodeDispatcher {
         leavingPredecessorAnswerMessage.check();
     }
 
+    /**
+     * Create and send a message to notify the predecessor of the sender that it (that is the successor of the receiver) is leaving Chord
+     * @param destination information of the message destination
+     * @param newSuccessor information about the new successor of the receiver (successor of the sender)
+     * @param sender information of the message sender
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized void sendLeavingSuccessorRequest(final NodeInfo destination, final NodeInfo newSuccessor, final NodeInfo sender) throws TimerExpiredException{
         LeavingSuccessorRequestMessage leavingSuccessorRequestMessage = new LeavingSuccessorRequestMessage(destination,newSuccessor,sender);
         final int ticket=Router.sendMessage(this.port, leavingSuccessorRequestMessage);
@@ -314,6 +341,14 @@ public class NodeDispatcher {
         leavingSuccessorAnswerMessage.check();
     }
 
+    /**
+     * Create and send a request of publish message
+     * @param destination information of the message destination (node responsible of the key of the file)
+     * @param data file to publish
+     * @param key of the file
+     * @param sender information of the message sender
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized void sendPublishRequest(final NodeInfo destination, final String data, final String key, final NodeInfo sender) throws TimerExpiredException{
         PublishRequestMessage publishRequestMessage= new PublishRequestMessage(destination,data,key,sender);
         final int ticket=Router.sendMessage(this.port, publishRequestMessage);
@@ -344,6 +379,14 @@ public class NodeDispatcher {
         publishAnswerMessage.check();
     }
 
+    /**
+     * Create and send a request for a file with an associated key
+     * @param destination information of the message destination (node responsible of the key of the file)
+     * @param key of the file the sender is looking for
+     * @param sender information of the message sender
+     * @return the file associated to the key
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized String sendFileRequest(final NodeInfo destination,final String key, final NodeInfo sender) throws TimerExpiredException{
         FileRequestMessage fileRequestMessage= new FileRequestMessage(destination,key,sender);
         final int ticket=Router.sendMessage(this.port, fileRequestMessage);
@@ -375,6 +418,13 @@ public class NodeDispatcher {
         return fileAnswerMessage.getFile();
     }
 
+    /**
+     * Create and send a request for delete the file associated to the passed key
+     * @param destination information of the message destination (node responsible of the key of the file)
+     * @param key of the file to delete
+     * @param sender information of the message sender
+     * @throws TimerExpiredException Exception thrown if the answer does not arrive within the expiration of the timer
+     */
     public synchronized void sendDeleteFileRequest(final NodeInfo destination, final String key, final NodeInfo sender) throws TimerExpiredException{
         DeleteFileRequestMessage deleteFileRequestMessage= new DeleteFileRequestMessage(destination,key,sender);
         final int ticket=Router.sendMessage(this.port, deleteFileRequestMessage);
