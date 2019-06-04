@@ -3,7 +3,6 @@ package chord.network;
 import chord.Messages.Message;
 import chord.model.NodeInfo;
 import chord.model.Threads;
-import chord.model.Utilities;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -157,9 +156,6 @@ public class SocketNode implements Runnable {
                     //finally send the message
                     handler.sendMessage(message);
                 }catch(IOException e){
-                    if (Utilities.isTesting() && message.getSender().getHash().equals("fc6e")){
-                        System.out.println("excpetion");
-                    }
                     //do nothing
                 }
             }
