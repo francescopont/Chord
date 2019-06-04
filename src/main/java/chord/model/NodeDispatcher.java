@@ -19,12 +19,12 @@ public class NodeDispatcher {
     private int port;
 
     /**
-     * List of tickets associated with messaged that are waiting for an answer
+     * List of tickets associated with messages that are waiting for an answer
      */
     private List<Integer> waitingTickets;
 
     /**
-     * List of answer received
+     * List of answers received
      */
     private HashMap<Integer, Message> answers;
 
@@ -104,7 +104,6 @@ public class NodeDispatcher {
             try{
                 wait();
             }catch (InterruptedException  e){
-                //e.printStackTrace();
             }
         }
         PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
@@ -144,7 +143,6 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
             }
         }
         SuccessorAnswerMessage successorAnswerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
@@ -257,7 +255,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
+
             }
         }
         StartAnswerMessage startAnswerMessage = (StartAnswerMessage) answers.get(ticket);
@@ -267,7 +265,7 @@ public class NodeDispatcher {
     }
 
     /**
-     * Create and send a message to notify the successor of the sender that it (that is the predecessor of the receiver) is leaving Chord
+     * Create and send a message to notify that the predecessor of the receiver is leaving Chord
      * @param destination information of the message destination
      * @param newPredecessor information about the new predecessor of the receiver (predecessor of the sender)
      * @param files files of the node that must be transfer to the successor that is now responsible for them
@@ -295,7 +293,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
+
             }
         }
         LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = (LeavingPredecessorAnswerMessage) answers.get(ticket);
@@ -305,7 +303,7 @@ public class NodeDispatcher {
     }
 
     /**
-     * Create and send a message to notify the predecessor of the sender that it (that is the successor of the receiver) is leaving Chord
+     * Create and send a message to notify that is the successor of the receiver is leaving Chord
      * @param destination information of the message destination
      * @param newSuccessor information about the new successor of the receiver (successor of the sender)
      * @param sender information of the message sender
@@ -332,7 +330,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
+
             }
         }
         LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = (LeavingSuccessorAnswerMessage) answers.get(ticket);

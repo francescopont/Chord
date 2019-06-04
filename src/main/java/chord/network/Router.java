@@ -15,11 +15,9 @@ import java.util.List;
  */
 public class Router {
     /**
-     * list of socket nodes connected on the network (??)
+     * list of socket nodes connected on the network
      */
     private static List<SocketNode> nodes = new LinkedList<>();
-    private static String IPAddress = null;
-
     private Router(){};
 
     /**
@@ -65,11 +63,6 @@ public class Router {
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(),message);
         }
-        //code optmization we do not use in early releases
-        /*if (message.getDestination().getIPAddress().equals(IPAddress)){
-            delivered = true;
-            Chord.deliverMessage(message.getDestination().getPort(), message);
-        }*/ //decommentiamo?
         if (!delivered){
             for (SocketNode node: nodes){
                 if (node.getPort() == port){
@@ -91,15 +84,10 @@ public class Router {
             delivered = true;
             Chord.deliverMessage(message.getDestination().getPort(),message);
         }
-        /*if (message.getDestination().getIPAddress().equals(IPAddress)){
-            delivered = true;
-            Chord.deliverMessage(message.getDestination().getPort(), message);
-        }*/
         if (!delivered){
             for (SocketNode node: nodes){
                 if (node.getPort() == port){
                     node.sendMessage(message);
-
                 }
             }
         }
@@ -120,12 +108,9 @@ public class Router {
         nodes.remove(removedNode);
     }
 
-    public static void setIPAddress( String newIPAddress){
-        IPAddress = newIPAddress;
-    }
 
     /**
-     * Print the status of the Router (cancelliamo??)
+     * Print the status of the Router
      */
     public static void printRouter(){
         for(SocketNode socketNode: nodes){

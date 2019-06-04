@@ -10,9 +10,9 @@ import java.io.Serializable;
 
 public class  Message implements Serializable{
     private final NodeInfo destination; //the destination address of this message
-    private final int type; //indica il tipo di messaggio (quale metodo va chiamato)
+    private final int type; //indicates the type of message
     private final boolean ack; //indica se è il messaggio richiede una risposta
-    protected int id; //identificativo incrementale del messaggio per tenere traccia dell'ordine dei messaggi
+    protected int id; //incremental identifier of the message
     protected TimerExpiredException exception;
     private final NodeInfo sender;
 
@@ -62,8 +62,5 @@ public class  Message implements Serializable{
         }
     }
 
-    public void printMessage(){
-        System.out.println("Sender: "+ getSender().getPort() + " destination: "+ getDestination().getPort() + " id: " + id + " type: "+ type );
-    }
 
 }

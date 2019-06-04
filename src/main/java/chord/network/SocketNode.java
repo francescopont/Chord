@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Class that opens a socket channel associated with a newly created node and listens for messages from other nodes
- * When a socket is created associated with a certain port, its management is entrusted to SocketHandler class
+ * Class that opens a ServerSocket listener associated with a newly created node and listens for messages from other nodes
+ * When a socket is created associated with a certain node(IP, port), its management is entrusted to SocketHandler class
  */
 public class SocketNode implements Runnable {
     /**
-     * The port is an unique identifier for the node
+     * The port is an unique identifier for the node on this device
      */
     private int port;
     /**
@@ -31,11 +31,7 @@ public class SocketNode implements Runnable {
     private boolean terminated;
 
     private ScheduledFuture terminate;
-
     private final List<SocketHandler> handlers;
-    //PROBLEMA: AGGIORNARE QUESTA LISTA TOGLIENDO LE CONNESSIONI CHE SONO STATE CHIUSE
-    // soluzione artigianale: se quando mando un messaggio non riesco, allora sicuramente la connessione ha un problema
-
 
     public SocketNode(int port) throws IOException {
         this.terminated = false;
@@ -109,7 +105,7 @@ public class SocketNode implements Runnable {
 
     /**
      * Get the port on which the socket node is listening
-     * used by Router Class, it may be deleted in future improvements of code
+     * used by Router Class
      * @return the port associated to the serveSocket
      */
     public int getPort() {
@@ -119,7 +115,7 @@ public class SocketNode implements Runnable {
     /**
      * Send a message
      * Called from the Router class
-     * Calls the method of the above layer (SockeHandler) to deliver the message
+     * Calls the method of the layer below(SockeHandler) to deliver the message
      * @param message to send
      */
     public  void sendMessage(Message message){
@@ -170,17 +166,16 @@ public class SocketNode implements Runnable {
         }
     }
 
-    //TENIAMO O CANCELLIAMO??
     /**
      * Method useful for testing
      */
     public void printSocketNode(){
-        System.out.println("It's socketME! "+ this.port +  " and I've " + this.handlers.size() + " connections");
+        System.out.println("It's socketMe! "+ this.port +  " and I've " + this.handlers.size() + " connections");
         for (SocketHandler socketHandler: this.handlers){
             try{
                 System.out.println(socketHandler.getEndpoint().getPort());
             }catch (Exception e){
-                System.out.println("porta sconosciuta");
+                System.out.println("unknown port");
             }
         }
         System.out.println("---------------------");

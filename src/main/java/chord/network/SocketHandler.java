@@ -27,11 +27,11 @@ public class SocketHandler implements Runnable{
      */
     private Socket socket;
     /**
-     * Socket stream in input
+     * Socket input stream
      */
     private ObjectInputStream in = null;
     /**
-     * Socket stream in output
+     * Socket output stream
      */
     private ObjectOutputStream out = null;
     /**
@@ -83,8 +83,8 @@ public class SocketHandler implements Runnable{
     }
 
     /**
-     * Receive a message from the under layer (Socket node) and write it on the output stream
-     * @param message to send on the connection
+     * Receive a message from the above layer (Socket node) and write it on the output stream
+     * @param message to send on the channel
      * @throws IOException Exception thrown when the input or the output are not correct
      */
     public void sendMessage(Message message)throws IOException{
@@ -97,6 +97,9 @@ public class SocketHandler implements Runnable{
         setUsedRecently(true);
     }
 
+    /**
+     * to close this connection ( stop waiting for new messages and sending messages)
+     */
     public void terminate(){
         this.terminate = true;
     }

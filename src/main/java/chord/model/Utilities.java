@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Class which contains all the operations that must be run periodically on each node, and the code for the hash function
+ * Class which contains all the operations that must be run periodically on each node, and the code for computing the hash function
  */
 public class Utilities implements Runnable {
     /**
@@ -31,10 +31,10 @@ public class Utilities implements Runnable {
         }
     }
 
-    //code modified for testing
+
 
     /**
-     * Calculate the hashed key of a node, given a string. In case of node the string is obtained chaining Ip address and port of the node (concat ip and port)
+     * Calculate the hashed key of a string. In case of node the string is obtained chaining Ip address and port of the node (concat ip and port)
      * @param key string to calculate the hash
      * @return a string representation of the hash of the string passed as param
      */
@@ -60,7 +60,7 @@ public class Utilities implements Runnable {
     }
 
     /**
-     * Compute the i-th finger in the current Chord, given the node identifier.
+     * Compute the i-th finger in the current Chord, given the node identifier ( which is basically the hash calculated in the above function).
      * i from 0 to 15.
      * Always use the integer, never return to the bytes, to avoid the management of negative numbers in two's complement
      * @param nodeidentifier of the node
@@ -97,9 +97,9 @@ public class Utilities implements Runnable {
 
     /**
      *
-     * @param hash
-     * @param tosum
-     * @param i
+     * @param hash an array of Integer in the interval (0,256); each integer corresponds to a byte in the hash, ad to two chars in the key
+     * @param tosum the integer value to sum
+     * @param i the index in the hash to handle the carry over
      */
     private static void recursion (int hash[], int tosum, int i){
         if (hash[i] + tosum <= 255){
@@ -145,15 +145,6 @@ public class Utilities implements Runnable {
      * Methods useful for testing
      */
 
-    public static boolean isTesting() {
-        return testing;
-    }
 
-    //si può togliere??
-    public static void setTesting(boolean testing) {
-        Utilities.testing = testing;
-    }
-
-    static boolean testing = false;
 
 }

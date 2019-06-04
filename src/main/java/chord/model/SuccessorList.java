@@ -62,10 +62,10 @@ public class SuccessorList {
     }
 
     /**
-     * Get the biggest node, if it exists, among the ones smaller than the given node
-     * @param node whose predecessor the caller is looking for
-     * @return the biggest node among the ones smaller than the given node
-     * @throws SuccessorListException Exception thrown if the successor list is empty
+     * Get the smallest node, if it exists, among the ones bigger than the given node
+     * @param node whose successor the caller is looking for
+     * @return the smallest node among the ones bigger than the given node
+     * @throws SuccessorListException Exception thrown if the successor list does not contain such node
      */
     public synchronized NodeInfo closestSuccessor(String node) throws SuccessorListException{
         this.map.clear();
