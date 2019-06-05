@@ -141,9 +141,6 @@ public class Utilities implements Runnable {
         return 3000;
     }
 
-    /**
-     * Methods useful for testing
-     */
 
 
 
