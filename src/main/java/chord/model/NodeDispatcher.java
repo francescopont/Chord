@@ -34,6 +34,10 @@ public class NodeDispatcher {
         this.waitingTickets = new LinkedList<>();
     }
 
+    public void setPort(int port){
+        this.port = port;
+    }
+
     /**
      *Set of methods used to send a message and handle the answer
      */

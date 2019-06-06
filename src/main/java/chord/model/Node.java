@@ -47,6 +47,7 @@ public class Node {
      */
     public void modifyPort(int port) {
         this.nodeInfo.setPort(port);
+        this.dispatcher.setPort(port);
         NodeInfo me = this.nodeInfo;
         String key = me.getIPAddress().concat(Integer.toString(me.getPort()));
         this.nodeidentifier = Utilities.hashfunction(key);
