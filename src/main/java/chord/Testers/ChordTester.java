@@ -5,14 +5,24 @@ import chord.Exceptions.PortException;
 import chord.model.Chord;
 import chord.model.Data;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class ChordTester implements Runnable {
 
     @Override
     public synchronized void run() {
+        InetAddress me = null;
+        try {
+            me = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        String ip= me.getHostAddress();
         System.out.println("STARTING TEST");
         try {
             long previous = System.currentTimeMillis();
-            Chord.create("192.168.43.70", 1000);
+            Chord.create(ip, 1000);
             long after = System.currentTimeMillis();
             System.out.println(after - previous);
         } catch (PortException e) {
@@ -23,7 +33,7 @@ public class ChordTester implements Runnable {
         for (int i = 1; i < 90; i++) {
             try {
                 long previous = System.currentTimeMillis();
-                Chord.join("192.168.43.70", 1000 + i, "192.168.43.70", 1000);
+                Chord.join(ip, 1000 + i, ip, 1000);
                 long after = System.currentTimeMillis();
                 System.out.println("NEW NODE ( " + i + " ) created in time " + (after - previous));
                 wait(1000);
@@ -36,7 +46,7 @@ public class ChordTester implements Runnable {
             }
         }
 
-        testLocally();
+        testLocally(ip);
 
     }
 
@@ -45,7 +55,7 @@ public class ChordTester implements Runnable {
         new Thread(new ChordTester()).start();
     }
 
-    public void testLocally(){
+    public void testLocally(String ip){
         try {
             wait(20000);
         } catch (InterruptedException e) {
@@ -55,7 +65,7 @@ public class ChordTester implements Runnable {
         int port = 65533;
         try {
             long previous1 = System.currentTimeMillis();
-            Chord.join("192.168.43.70", port, "192.168.43.70", 1001);
+            Chord.join(ip, port, ip, 1001);
             long after1 = System.currentTimeMillis();
             System.out.println("time for join: "+ (after1-previous1));
             long previuos = System.currentTimeMillis();
