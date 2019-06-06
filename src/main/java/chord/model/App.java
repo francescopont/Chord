@@ -67,7 +67,7 @@ public class App
                     } catch (PortException e) {
                         System.out.println("The chosen port is already in use. Your new port is: " +e.getPort());
                     } catch (NotInitializedException e) {
-                        System.out.println(e.getMessage());
+                        System.out.println(e.getMessage() + ". Try with another IP address");
                     }
                     scanner.skip("\n");
                 }
@@ -103,23 +103,27 @@ public class App
                         } catch (NotInitializedException e) {
                             System.out.println(e.getMessage());
                         }
+                        scanner.skip("\n");
                     }
                     else{
                         System.out.println("The key must be of 4 characters");
                     }
-                    scanner.skip("\n");
                 }
                 else if(input.equals("d")){
                     System.out.println("Insert the file key :");
                     String key= scanner.nextLine();
-                    System.out.println("Insert your port number :");
-                    int port= scanner.nextInt();
-                    try {
-                        Chord.deleteFile(key,port);
-                    } catch (NotInitializedException e) {
-                        System.out.println(e.getMessage());
+                    if(key.length()==4) {
+                        System.out.println("Insert your port number :");
+                        int port = scanner.nextInt();
+                        try {
+                            Chord.deleteFile(key, port);
+                        } catch (NotInitializedException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        scanner.skip("\n");
                     }
-                    scanner.skip("\n");
+                    else
+                        System.out.println("The key must be of 4 characters");
                 }
                 else if(input.equals("t")){
                     System.out.println("Insert your port number : ");

@@ -398,7 +398,6 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
                         FileAnswerMessage fileAnswerMessage= new FileAnswerMessage(sender,null,destination,ticket);
                         fileAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, fileAnswerMessage);
