@@ -151,7 +151,7 @@ public class App {
             long previous = System.currentTimeMillis();
             Chord.create("172.20.10.2", 1000);
             long after = System.currentTimeMillis();
-            System.out.println(after - previous);
+            System.out.println( "time for create " + (after - previous));
         } catch (PortException e) {
             System.out.println("new port: " + e.getPort());
         }
@@ -161,7 +161,7 @@ public class App {
                 long previous = System.currentTimeMillis();
                 Chord.join("172.20.10.2", 1000 + i, "172.20.10.2", 1000);
                 long after = System.currentTimeMillis();
-                System.out.println(after - previous);
+                System.out.println("Time for join" + (after - previous));
             } catch (PortException e) {
                 System.out.println("new port: " + e.getPort());
             } catch (NotInitializedException e) {
