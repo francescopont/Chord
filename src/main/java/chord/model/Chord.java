@@ -170,7 +170,17 @@ public class Chord{
         else {
             throw new NotInitializedException("There is no node associated to this port, try with another port");
         }
+    }
 
+    /**
+     * Delete all the nodes of the application
+     */
+    public static void deleteAll(){
+        for(Node node: virtualnodes){
+            node.terminate();
+            Router.terminate(node.getPort());
+            virtualnodes.remove(node);
+        }
     }
 
     /**

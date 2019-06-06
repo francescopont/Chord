@@ -139,6 +139,7 @@ public class App
                     Chord.printChord();
                 }
                 else if(input.equals("e")){
+                    Chord.deleteAll();
                     exit=true;
                 }
                 else{
