@@ -30,7 +30,7 @@ public class ChordTester implements Runnable {
         }
 
 
-        for (int i = 1; i < 90; i++) {
+        for (int i = 1; i < 3; i++) {
             try {
                 long previous = System.currentTimeMillis();
                 Chord.join(ip, 1000 + i, ip, 1000);
@@ -57,7 +57,7 @@ public class ChordTester implements Runnable {
 
     public void testLocally(String ip){
         try {
-            wait(20000);
+            wait(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
