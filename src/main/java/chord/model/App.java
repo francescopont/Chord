@@ -15,11 +15,10 @@ public class App
     //piccolo test
     public static void main( String[] args ) {
         Boolean exit=false;
-        Scanner scanner= new Scanner(System.in);
-
+        Scanner scanner=new Scanner(System.in);
         while(!exit) {
             System.out.println("Selezionare un'opzione:\n c for Create \n j for Join\n p for publish\n g for get a file\n d for delete a file\n t for terminate a node\n ps for print the Chord status\n e for exit ");
-                String input = scanner.nextLine();
+            String input = scanner.nextLine();
                 if (input.equals("c")) {
                     System.out.println("Insert IP Address: ");
                     String ip = scanner.nextLine();
@@ -31,7 +30,7 @@ public class App
                         long after = System.currentTimeMillis();
                         System.out.println("time: " + (after - previous));
                     } catch (PortException e) {
-                        e.printStackTrace();
+                        System.out.println("The chosen port is already in use. Your new port is: " +e.getPort());
                     }
                 } else if (input.equals("j")) {
                     System.out.println("Insert your IP Address: ");
@@ -45,7 +44,7 @@ public class App
                     try {
                         Chord.join(ip, port, friendIp, friendPort);
                     } catch (PortException e) {
-                        e.printStackTrace();
+                        System.out.println("The chosen port is already in use. Your new port is: " +e.getPort());
                     } catch (NotInitializedException e) {
                         e.printStackTrace();
                     }
@@ -85,7 +84,6 @@ public class App
                     else{
                         System.out.println("The key must be of 4 characters");
                     }
-
                 }
                 else if(input.equals("d")){
                     System.out.println("Insert the file key :");
@@ -116,6 +114,8 @@ public class App
                 else{
                     System.out.println("Wrong input");
                 }
+
+                scanner.skip("\n");
         }
         System.out.println("Program terminate");
     }

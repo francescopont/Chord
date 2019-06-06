@@ -66,6 +66,7 @@ public class Chord{
                 Router.addnode(port);
             }catch(PortException e){
                 node.modifyPort(e.getPort());
+                System.out.println("The chosen port is already in use. Your new port is: " +e.getPort());
                 throw e;
             }finally {
                 try {
