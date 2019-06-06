@@ -537,6 +537,7 @@ public class Node {
         fingerTable.printTable();
         fileSystem.print();
         System.out.println("-------------------");
+        return;
     }
 
     /**
