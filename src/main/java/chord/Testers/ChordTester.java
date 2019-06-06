@@ -26,7 +26,7 @@ public class ChordTester implements Runnable {
                 Chord.join("192.168.43.70", 1000 + i, "192.168.43.70", 1000);
                 long after = System.currentTimeMillis();
                 System.out.println("NEW NODE ( " + i + " ) created in time " + (after - previous));
-                wait(5000);
+                wait(1000);
             } catch (PortException e) {
                 System.out.println("new port: " + e.getPort());
             } catch (NotInitializedException e) {

@@ -31,10 +31,7 @@ public class App {
                 System.out.println("Insert port Number: ");
                 int port = scanner.nextInt();
                 try {
-                    long previous = System.currentTimeMillis();
                     Chord.create(ip, port);
-                    long after = System.currentTimeMillis();
-                    System.out.println("time: " + (after - previous));
                 } catch (PortException e) {
                     System.out.println("The chosen port is already in use. Your new port is: " +e.getPort());
                 }
@@ -54,7 +51,7 @@ public class App {
                 String friendIp = scanner.nextLine();
                 System.out.println("Insert your port Number: ");
                 int port = scanner.nextInt();
-                System.out.println("Insert the port Number of your BFF: ");
+                System.out.println("Insert the port Number of the already known node: ");
                 int friendPort = scanner.nextInt();
                 try {
                     Chord.join(ip, port, friendIp, friendPort);
