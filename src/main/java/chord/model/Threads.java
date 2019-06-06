@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class Threads {
 
     private Threads(){}
-    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(100000);
+    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(10000);
 
     /**
      * add to the pool a new Thread to be executed periodically, with a period set by the Utilities

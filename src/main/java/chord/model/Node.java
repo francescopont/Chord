@@ -528,6 +528,7 @@ public class Node {
     public void printStatus() {
         System.out.println("-------------------");
         System.out.println("It's me:  " + this.nodeidentifier + "!");
+        System.out.println("Port: "+ this.getPort());
         if (predecessor != null){
             System.out.println("Predecessor is : " + predecessor.getHash());
         }

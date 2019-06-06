@@ -69,7 +69,7 @@ public class NodeDispatcher {
             try {
                 wait();
             } catch (InterruptedException e) {
-                //e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         NotifyAnswerMessage notifyAnswerMessage = (NotifyAnswerMessage) answers.get(ticket);
@@ -108,6 +108,7 @@ public class NodeDispatcher {
             try{
                 wait();
             }catch (InterruptedException  e){
+                Thread.currentThread().interrupt();
             }
         }
         PredecessorAnswerMessage answerMessage = (PredecessorAnswerMessage) this.answers.get(ticket);
@@ -147,6 +148,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
+                Thread.currentThread().interrupt();
             }
         }
         SuccessorAnswerMessage successorAnswerMessage= (SuccessorAnswerMessage)this.answers.get(ticket);
@@ -259,7 +261,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-
+                Thread.currentThread().interrupt();
             }
         }
         StartAnswerMessage startAnswerMessage = (StartAnswerMessage) answers.get(ticket);
@@ -297,7 +299,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-
+                Thread.currentThread().interrupt();
             }
         }
         LeavingPredecessorAnswerMessage leavingPredecessorAnswerMessage = (LeavingPredecessorAnswerMessage) answers.get(ticket);
@@ -334,7 +336,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-
+                Thread.currentThread().interrupt();
             }
         }
         LeavingSuccessorAnswerMessage leavingSuccessorAnswerMessage = (LeavingSuccessorAnswerMessage) answers.get(ticket);
@@ -360,7 +362,6 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
                         PublishAnswerMessage publishAnswerMessage = new PublishAnswerMessage(sender,destination,ticket);
                         publishAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, publishAnswerMessage);
@@ -372,7 +373,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         PublishAnswerMessage publishAnswerMessage = (PublishAnswerMessage) answers.get(ticket);
@@ -409,7 +410,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         FileAnswerMessage fileAnswerMessage = (FileAnswerMessage) answers.get(ticket);
@@ -435,7 +436,6 @@ public class NodeDispatcher {
             public void run() {
                 synchronized (this){
                     if(waitingTickets.contains(ticket)){
-                        System.out.println("method: leavingSuccessor "+ "id: "+ ticket+ " sender: "+ sender.getHash() + " destination: "+ destination.getHash() );
                         DeleteFileAnswerMessage deleteFileAnswerMessage= new DeleteFileAnswerMessage(sender,destination,ticket);
                         deleteFileAnswerMessage.setException(new TimerExpiredException());
                         addAnswer(ticket, deleteFileAnswerMessage);
@@ -447,7 +447,7 @@ public class NodeDispatcher {
             try{
                 wait();
             } catch (InterruptedException e){
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         DeleteFileAnswerMessage deleteFileAnswerMessage = (DeleteFileAnswerMessage) answers.get(ticket);

@@ -147,7 +147,6 @@ public class Chord{
         else{
             throw new NotInitializedException("There is no node associated to this port, try with another port");
         }
-
     }
 
     /**
