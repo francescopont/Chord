@@ -39,10 +39,11 @@ public class SuccessorList {
      * Add a new node in the last position
      * @param node information of the node to insert
      */
-    public void addEntry( NodeInfo node){
-        if (successors.size() < 4){
+    public void addEntry( NodeInfo node) {
+        if (successors.size() < 4) {
             successors.addLast(node);
         }
+
     }
 
     /**

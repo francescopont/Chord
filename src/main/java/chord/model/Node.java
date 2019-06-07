@@ -162,7 +162,9 @@ public class Node {
             throw new NotInitializedException("impossible to initialize this node");
         }
         this.UtilitiesThread = Threads.executePeriodically(new Utilities(this));
-        setAlone(false);
+        if (!successorList.getFirstElement().getHash().equals(this.nodeidentifier)){
+            setAlone(false);
+        }
         setStarted(true);
     }
 
