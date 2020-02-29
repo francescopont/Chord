@@ -6,7 +6,5 @@
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
-;
-fingers.txt,f\6\f6dc05fd27b5b87ad0f2297d337948312f2aba77
 8
 TODO.txt,b\8\b871594f146532f9abccbebffa1170a083349518

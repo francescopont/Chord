@@ -138,7 +138,7 @@ public class Utilities implements Runnable {
      */
     public static int getTimer(){
         // 1 second
-        return 3000;
+        return 1000;
     }
 
 
