@@ -2,7 +2,7 @@
 This repository contains the implementation in Java of the Chord protocol to build up a distributed and fault tolerant hash table, and it's part of the Distributed Systems course at the Computer Science master degree at Politecnico of Milan, academic year 19/20. A related project can be found at https://github.com/arancicarini/Middleware-2019-2020. For more info about the protocol, refer to the paper.
 
 The project comes as a Java library, with the following static methods of the Chord class which are the APIs of the library:
-methods | params | meaning | throws | return |
+| methods | params | meaning | throws | return |
 | create |String IPAddress, int port | create a new Chord and add a new node at `IPAddress` and `port` | PortException if `port` is not available | void |
 | join   | String IPAddress, int port, String knownIPAddress, int knownPort | join an existing Chord through the node at `knownIPAddress` and `knownPort` and create a node at `IPAddress` and `port`| PortException if `port` is not available,  NotInitializedException if the known node does not reply | void |
 | publish | Object o, int port |   Insert an object o into the distributed hashtable using the local node at `port` | NotInitializedException  if there is no node with such port number | a String: the key of the object |
